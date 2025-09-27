@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:App-Playgrounds}/Chat/ChatBackend",
+            "name": "Debug ChatBackend (Chat/ChatBackend)",
+            "program": "${workspaceFolder:App-Playgrounds}/Chat/ChatBackend/.build/debug/ChatBackend",
+            "preLaunchTask": "swift: Build Debug ChatBackend (Chat/ChatBackend)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:App-Playgrounds}/Chat/ChatBackend",
+            "name": "Release ChatBackend (Chat/ChatBackend)",
+            "program": "${workspaceFolder:App-Playgrounds}/Chat/ChatBackend/.build/release/ChatBackend",
+            "preLaunchTask": "swift: Build Release ChatBackend (Chat/ChatBackend)"
+        }
+    ]
+}

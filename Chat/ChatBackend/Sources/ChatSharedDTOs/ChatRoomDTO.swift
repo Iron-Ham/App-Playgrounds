@@ -1,19 +1,19 @@
 import Foundation
 
-public struct ChatRoomDTO: Codable, Sendable {
-  public let id: UUID?
+public struct ChatRoomDTO: Codable, Sendable, Identifiable, Hashable {
+  public let id: UUID
   public let name: String
   public let topic: String?
-  public let createdAt: Date?
-  public let updatedAt: Date?
+  public let createdAt: Date
+  public let updatedAt: Date
   public let messages: [ChatMessageDTO]?
 
   public init(
-    id: UUID? = nil,
+    id: UUID,
     name: String,
     topic: String? = nil,
-    createdAt: Date? = nil,
-    updatedAt: Date? = nil,
+    createdAt: Date,
+    updatedAt: Date,
     messages: [ChatMessageDTO]? = nil
   ) {
     self.id = id

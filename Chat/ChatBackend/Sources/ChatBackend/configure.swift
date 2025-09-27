@@ -14,6 +14,8 @@ public func configure(_ app: Application) async throws {
   app.migrations.add(CreateChatMessage())
   app.migrations.add(SeedChatData())
 
+  try await app.autoMigrate()
+
   // register routes
   try routes(app)
 }

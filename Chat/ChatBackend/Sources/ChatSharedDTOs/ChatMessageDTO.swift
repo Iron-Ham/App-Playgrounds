@@ -1,18 +1,18 @@
 import Foundation
 
-public struct ChatMessageDTO: Codable, Sendable {
-  public let id: UUID?
+public struct ChatMessageDTO: Codable, Sendable, Identifiable, Hashable {
+  public let id: UUID
   public let roomID: UUID
   public let sender: String
   public let body: String
-  public let createdAt: Date?
+  public let createdAt: Date
 
   public init(
-    id: UUID? = nil,
+    id: UUID,
     roomID: UUID,
     sender: String,
     body: String,
-    createdAt: Date? = nil
+    createdAt: Date
   ) {
     self.id = id
     self.roomID = roomID

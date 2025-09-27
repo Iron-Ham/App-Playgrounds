@@ -1,6 +1,7 @@
 import ChatSharedDTOs
 import Fluent
 import Foundation
+import Vapor
 
 final class ChatMessage: Model, @unchecked Sendable {
   static let schema = "chat_messages"
@@ -34,13 +35,21 @@ final class ChatMessage: Model, @unchecked Sendable {
     self.body = body
   }
 
-  func toDTO() -> ChatMessageDTO {
-    ChatMessageDTO(
-      id: self.id,
+  func toDTO() throws -> ChatMessageDTO {
+    guard let id = self.id else {
+      throw Abort(.internalServerError, reason: "Cannot create DTO for unpersisted ChatMessage")
+    }
+    
+    guard let createdAt = self.createdAt else {
+      throw Abort(.internalServerError, reason: "ChatMessage missing createdAt timestamp")
+    }
+
+    return ChatMessageDTO(
+      id: id,
       roomID: self.$room.id,
       sender: self.sender,
       body: self.body,
-      createdAt: self.createdAt
+      createdAt: createdAt
     )
   }
 }

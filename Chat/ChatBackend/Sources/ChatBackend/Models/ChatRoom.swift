@@ -1,6 +1,7 @@
 import ChatSharedDTOs
 import Fluent
 import Foundation
+import Vapor
 
 final class ChatRoom: Model, @unchecked Sendable {
   static let schema = "chat_rooms"
@@ -35,7 +36,19 @@ final class ChatRoom: Model, @unchecked Sendable {
     self.topic = topic
   }
 
-  func toDTO(includeMessages: Bool = false, messages: [ChatMessage] = []) -> ChatRoomDTO {
+  func toDTO(includeMessages: Bool = false, messages: [ChatMessage] = []) throws -> ChatRoomDTO {
+    guard let id = self.id else {
+      throw Abort(.internalServerError, reason: "Cannot create DTO for unpersisted ChatRoom")
+    }
+    
+    guard let createdAt = self.createdAt else {
+      throw Abort(.internalServerError, reason: "ChatRoom missing createdAt timestamp")
+    }
+    
+    guard let updatedAt = self.updatedAt else {
+      throw Abort(.internalServerError, reason: "ChatRoom missing updatedAt timestamp")
+    }
+
     let resolvedMessages: [ChatMessage]
     if includeMessages {
       resolvedMessages = messages.isEmpty ? self.$messages.value ?? [] : messages
@@ -44,12 +57,12 @@ final class ChatRoom: Model, @unchecked Sendable {
     }
 
     return ChatRoomDTO(
-      id: self.id,
+      id: id,
       name: self.name,
       topic: self.topic,
-      createdAt: self.createdAt,
-      updatedAt: self.updatedAt,
-      messages: includeMessages ? resolvedMessages.map { $0.toDTO() } : nil
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      messages: includeMessages ? try resolvedMessages.map { try $0.toDTO() } : nil
     )
   }
 }

@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0B73A3F32E88567A005DC6DD /* ChatSharedDTOs in Frameworks */ = {isa = PBXBuildFile; productRef = 0B73A3F22E88567A005DC6DD /* ChatSharedDTOs */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0B73A3592E884E80005DC6DD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B73A3F32E88567A005DC6DD /* ChatSharedDTOs in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = ChatFrontend;
 			packageProductDependencies = (
+				0B73A3F22E88567A005DC6DD /* ChatSharedDTOs */,
 			);
 			productName = ChatFrontend;
 			productReference = 0B73A34B2E884E7F005DC6DD /* ChatFrontend.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 0B73A3422E884E7F005DC6DD;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				0B73A3F12E88567A005DC6DD /* XCLocalSwiftPackageReference "../ChatBackend" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0B73A34C2E884E7F005DC6DD /* Products */;
 			projectDirPath = "";
@@ -395,6 +404,7 @@
 				DEVELOPMENT_TEAM = F4H8GRP7M4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -439,6 +449,7 @@
 				DEVELOPMENT_TEAM = F4H8GRP7M4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -615,6 +626,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		0B73A3F12E88567A005DC6DD /* XCLocalSwiftPackageReference "../ChatBackend" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../ChatBackend;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0B73A3F22E88567A005DC6DD /* ChatSharedDTOs */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ChatSharedDTOs;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0B73A3432E884E7F005DC6DD /* Project object */;
 }

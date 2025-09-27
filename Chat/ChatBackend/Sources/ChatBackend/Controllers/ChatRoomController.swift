@@ -20,7 +20,7 @@ struct ChatRoomController: RouteCollection {
     let rooms = try await ChatRoom.query(on: req.db)
       .sort(\.$createdAt, .descending)
       .all()
-    return rooms.map { $0.toDTO() }
+    return try rooms.map { try $0.toDTO() }
   }
 
   @Sendable
@@ -28,7 +28,7 @@ struct ChatRoomController: RouteCollection {
     let payload = try req.content.decode(CreateChatRoomDTO.self)
     let room = try payload.toModel()
     try await room.create(on: req.db)
-    return room.toDTO()
+    return try room.toDTO()
   }
 
   @Sendable
@@ -37,7 +37,7 @@ struct ChatRoomController: RouteCollection {
     let includeMessages = req.query[Bool.self, at: "includeMessages"] ?? false
 
     guard includeMessages else {
-      return room.toDTO()
+      return try room.toDTO()
     }
 
     let messages = try await room.$messages
@@ -47,7 +47,7 @@ struct ChatRoomController: RouteCollection {
       .all()
       .reversed()
 
-    return room.toDTO(includeMessages: true, messages: Array(messages))
+    return try room.toDTO(includeMessages: true, messages: Array(messages))
   }
 
   @Sendable
@@ -63,7 +63,7 @@ struct ChatRoomController: RouteCollection {
       .all()
       .reversed()
 
-    return Array(messages).map { $0.toDTO() }
+    return try Array(messages).map { try $0.toDTO() }
   }
 
   @Sendable
@@ -73,7 +73,7 @@ struct ChatRoomController: RouteCollection {
     let roomID = try room.requireID()
     let message = try payload.toModel(roomID: roomID)
     try await message.create(on: req.db)
-    return message.toDTO()
+    return try message.toDTO()
   }
 
   private func requireRoom(req: Request) async throws -> ChatRoom {
