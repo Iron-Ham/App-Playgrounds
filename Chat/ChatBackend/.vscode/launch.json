@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ChatBackend}",
+            "name": "Debug ChatBackend",
+            "program": "${workspaceFolder:ChatBackend}/.build/debug/ChatBackend",
+            "preLaunchTask": "swift: Build Debug ChatBackend"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ChatBackend}",
+            "name": "Release ChatBackend",
+            "program": "${workspaceFolder:ChatBackend}/.build/release/ChatBackend",
+            "preLaunchTask": "swift: Build Release ChatBackend"
+        }
+    ]
+}
