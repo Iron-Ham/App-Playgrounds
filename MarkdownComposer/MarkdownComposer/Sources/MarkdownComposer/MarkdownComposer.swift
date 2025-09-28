@@ -29,37 +29,36 @@ public struct MarkdownComposer: View {
 #Preview {
   @Previewable @State var text: String = """
     Hello, _Steve_, my name is **Billy Joel Armstrong**, the lead singer of a band called ~~The Muppets~~ Green Day.
-    
+
     This is a quote:
-    
+
     > Once upon a midnight dreary
-    
+
     This is a numbered list:
-    
+
     1. One
     2. Two
     3. Three
-    
+
     This is a bullet list:
-    
+
     - One
     - Two
     - Three
-    
+
     This is a bullet list, but with stars:
-    
+
     * One
     * Two
     * Three
-    
+
     And this is a [link](https://www.google.com).
-    
+
     But my mortal enemy, the table:
-    
+
     | Before | After |
     | --- | --- |
     | Jajaja | Hahaha |
     """
   MarkdownComposer(text: $text, configuration: .init(placeholder: "Write a story"))
 }
-

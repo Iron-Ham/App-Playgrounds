@@ -1,11 +1,11 @@
 import SwiftUI
 
 #if canImport(UIKit)
-import UIKit
+  import UIKit
 #endif
 
 #if canImport(AppKit)
-import AppKit
+  import AppKit
 #endif
 
 public struct MarkdownComposerConfiguration: Equatable {
@@ -40,9 +40,9 @@ public struct MarkdownComposerConfiguration: Equatable {
     quoteBarColor: Color = .secondary,
     quoteBackgroundColor: Color = Color.secondary.opacity(0.08),
     strikethroughColor: Color = .secondary,
-  tableBorderColor: Color = .secondary,
-  tableHeaderBackgroundColor: Color = Color.secondary.opacity(0.12),
-  tableRowBackgroundColor: Color = Color.secondary.opacity(0.05),
+    tableBorderColor: Color = .secondary,
+    tableHeaderBackgroundColor: Color = Color.secondary.opacity(0.12),
+    tableRowBackgroundColor: Color = Color.secondary.opacity(0.05),
     backgroundColor: Color = .clear,
     cursorColor: Color? = nil,
     placeholder: String? = nil,
@@ -61,9 +61,9 @@ public struct MarkdownComposerConfiguration: Equatable {
     self.quoteBarColor = quoteBarColor
     self.quoteBackgroundColor = quoteBackgroundColor
     self.strikethroughColor = strikethroughColor
-  self.tableBorderColor = tableBorderColor
-  self.tableHeaderBackgroundColor = tableHeaderBackgroundColor
-  self.tableRowBackgroundColor = tableRowBackgroundColor
+    self.tableBorderColor = tableBorderColor
+    self.tableHeaderBackgroundColor = tableHeaderBackgroundColor
+    self.tableRowBackgroundColor = tableRowBackgroundColor
     self.backgroundColor = backgroundColor
     self.cursorColor = cursorColor
     self.placeholder = placeholder
@@ -76,27 +76,23 @@ public struct MarkdownComposerConfiguration: Equatable {
 
   public static var `default`: MarkdownComposerConfiguration { MarkdownComposerConfiguration() }
 
-  public static func == (lhs: MarkdownComposerConfiguration, rhs: MarkdownComposerConfiguration) -> Bool {
-    lhs.fontSize == rhs.fontSize &&
-    lhs.fontWeight == rhs.fontWeight &&
-    lhs.textColor == rhs.textColor &&
-    lhs.tokenColor == rhs.tokenColor &&
-    lhs.codeBackgroundColor == rhs.codeBackgroundColor &&
-    lhs.linkColor == rhs.linkColor &&
-    lhs.quoteBarColor == rhs.quoteBarColor &&
-    lhs.quoteBackgroundColor == rhs.quoteBackgroundColor &&
-    lhs.strikethroughColor == rhs.strikethroughColor &&
-  lhs.tableBorderColor == rhs.tableBorderColor &&
-  lhs.tableHeaderBackgroundColor == rhs.tableHeaderBackgroundColor &&
-  lhs.tableRowBackgroundColor == rhs.tableRowBackgroundColor &&
-    lhs.backgroundColor == rhs.backgroundColor &&
-    lhs.cursorColor == rhs.cursorColor &&
-    lhs.placeholder == rhs.placeholder &&
-    lhs.placeholderColor == rhs.placeholderColor &&
-    lhs.contentInsets.isApproximatelyEqual(to: rhs.contentInsets) &&
-    lhs.isEditable == rhs.isEditable &&
-    lhs.isScrollEnabled == rhs.isScrollEnabled &&
-    lhs.autocorrection == rhs.autocorrection
+  public static func == (lhs: MarkdownComposerConfiguration, rhs: MarkdownComposerConfiguration)
+    -> Bool
+  {
+    lhs.fontSize == rhs.fontSize && lhs.fontWeight == rhs.fontWeight
+      && lhs.textColor == rhs.textColor && lhs.tokenColor == rhs.tokenColor
+      && lhs.codeBackgroundColor == rhs.codeBackgroundColor && lhs.linkColor == rhs.linkColor
+      && lhs.quoteBarColor == rhs.quoteBarColor
+      && lhs.quoteBackgroundColor == rhs.quoteBackgroundColor
+      && lhs.strikethroughColor == rhs.strikethroughColor
+      && lhs.tableBorderColor == rhs.tableBorderColor
+      && lhs.tableHeaderBackgroundColor == rhs.tableHeaderBackgroundColor
+      && lhs.tableRowBackgroundColor == rhs.tableRowBackgroundColor
+      && lhs.backgroundColor == rhs.backgroundColor && lhs.cursorColor == rhs.cursorColor
+      && lhs.placeholder == rhs.placeholder && lhs.placeholderColor == rhs.placeholderColor
+      && lhs.contentInsets.isApproximatelyEqual(to: rhs.contentInsets)
+      && lhs.isEditable == rhs.isEditable && lhs.isScrollEnabled == rhs.isScrollEnabled
+      && lhs.autocorrection == rhs.autocorrection
   }
 }
 
@@ -116,18 +112,26 @@ extension MarkdownComposerConfiguration {
     let colors = MarkdownColorPalette(
       text: PlatformColor.from(color: textColor, fallback: PlatformColor.markdownLabel),
       token: PlatformColor.from(color: tokenColor, fallback: PlatformColor.markdownToken),
-      codeBackground: PlatformColor.from(color: codeBackgroundColor, fallback: PlatformColor.markdownCodeBackground),
+      codeBackground: PlatformColor.from(
+        color: codeBackgroundColor, fallback: PlatformColor.markdownCodeBackground),
       link: PlatformColor.from(color: linkColor, fallback: PlatformColor.markdownLink),
       quoteBar: PlatformColor.from(color: quoteBarColor, fallback: PlatformColor.markdownToken),
-      quoteBackground: PlatformColor.from(color: quoteBackgroundColor, fallback: PlatformColor.markdownQuoteBackground),
-      strikethrough: PlatformColor.from(color: strikethroughColor, fallback: PlatformColor.markdownToken),
-      tableBorder: PlatformColor.from(color: tableBorderColor, fallback: PlatformColor.markdownTableBorder),
-      tableHeaderBackground: PlatformColor.from(color: tableHeaderBackgroundColor, fallback: PlatformColor.markdownTableHeaderBackground),
-      tableRowBackground: PlatformColor.from(color: tableRowBackgroundColor, fallback: PlatformColor.markdownTableRowBackground)
+      quoteBackground: PlatformColor.from(
+        color: quoteBackgroundColor, fallback: PlatformColor.markdownQuoteBackground),
+      strikethrough: PlatformColor.from(
+        color: strikethroughColor, fallback: PlatformColor.markdownToken),
+      tableBorder: PlatformColor.from(
+        color: tableBorderColor, fallback: PlatformColor.markdownTableBorder),
+      tableHeaderBackground: PlatformColor.from(
+        color: tableHeaderBackgroundColor, fallback: PlatformColor.markdownTableHeaderBackground),
+      tableRowBackground: PlatformColor.from(
+        color: tableRowBackgroundColor, fallback: PlatformColor.markdownTableRowBackground)
     )
     let styler = DefaultMarkdownStyler(fonts: fontPalette, colors: colors)
     let resolvedBackground = PlatformColor.from(color: backgroundColor, fallback: .clear)
-    let resolvedCursor = cursorColor.map { PlatformColor.from(color: $0, fallback: resolvedBackground) }
+    let resolvedCursor = cursorColor.map {
+      PlatformColor.from(color: $0, fallback: resolvedBackground)
+    }
 
     return Resolved(
       styler: styler,
@@ -141,55 +145,53 @@ extension MarkdownComposerConfiguration {
   }
 }
 
-private extension Font.Weight {
-  var platformWeight: PlatformFontWeight {
+extension Font.Weight {
+  fileprivate var platformWeight: PlatformFontWeight {
     #if canImport(UIKit)
-    switch self {
-    case .ultraLight: return .ultraLight
-    case .thin: return .thin
-    case .light: return .light
-    case .regular: return .regular
-    case .medium: return .medium
-    case .semibold: return .semibold
-    case .bold: return .bold
-    case .heavy: return .heavy
-    case .black: return .black
-    default: return .regular
-    }
+      switch self {
+      case .ultraLight: return .ultraLight
+      case .thin: return .thin
+      case .light: return .light
+      case .regular: return .regular
+      case .medium: return .medium
+      case .semibold: return .semibold
+      case .bold: return .bold
+      case .heavy: return .heavy
+      case .black: return .black
+      default: return .regular
+      }
     #else
-    switch self {
-    case .ultraLight: return .ultraLight
-    case .thin: return .thin
-    case .light: return .light
-    case .regular: return .regular
-    case .medium: return .medium
-    case .semibold: return .semibold
-    case .bold: return .bold
-    case .heavy: return .heavy
-    case .black: return .black
-    default: return .regular
-    }
+      switch self {
+      case .ultraLight: return .ultraLight
+      case .thin: return .thin
+      case .light: return .light
+      case .regular: return .regular
+      case .medium: return .medium
+      case .semibold: return .semibold
+      case .bold: return .bold
+      case .heavy: return .heavy
+      case .black: return .black
+      default: return .regular
+      }
     #endif
   }
 }
 
 extension EdgeInsets {
   #if canImport(UIKit)
-  var uiEdgeInsets: UIEdgeInsets {
-    UIEdgeInsets(top: top, left: leading, bottom: bottom, right: trailing)
-  }
+    var uiEdgeInsets: UIEdgeInsets {
+      UIEdgeInsets(top: top, left: leading, bottom: bottom, right: trailing)
+    }
   #endif
 
   #if canImport(AppKit)
-  var textContainerInset: NSSize {
-    NSSize(width: max(leading, trailing), height: max(top, bottom))
-  }
+    var textContainerInset: NSSize {
+      NSSize(width: max(leading, trailing), height: max(top, bottom))
+    }
   #endif
 
   func isApproximatelyEqual(to other: EdgeInsets) -> Bool {
-    top == other.top &&
-    leading == other.leading &&
-    bottom == other.bottom &&
-    trailing == other.trailing
+    top == other.top && leading == other.leading && bottom == other.bottom
+      && trailing == other.trailing
   }
 }
