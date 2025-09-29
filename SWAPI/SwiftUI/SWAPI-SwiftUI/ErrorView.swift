@@ -38,5 +38,5 @@ struct ErrorView: View {
 }
 
 #Preview {
-  ErrorView(errorTitle: "An error has occurred", errorDescription: "Unknown error", action: { })
+  ErrorView(errorTitle: "An error has occurred", errorDescription: "Unknown error", action: {})
 }

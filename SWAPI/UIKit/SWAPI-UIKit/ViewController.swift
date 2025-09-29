@@ -64,7 +64,7 @@ class ViewController: UIViewController {
         self?.refreshControl.endRefreshing()
       }
       do {
-        let films = try await SWAPIClient.films()
+        let films = try await Client.films()
         await MainActor.run {
           self.viewModel = ViewModel(allFilms: .init(uniqueElements: films))
         }

@@ -5,13 +5,12 @@ import Testing
 
 @Suite("FilmResponseTests", .serialized)
 struct FilmResponseTests {
-
   @Test
   func initialization() throws {
-    let aNewHope = try #require(try FilmResponse(data: aNewHopeResponse))
+    let aNewHope = try FilmResponse(data: aNewHopeResponse)
     #expect(aNewHope.title == "A New Hope")
     #expect(aNewHope.episodeId == 4)
-    #expect(aNewHope.id == 4)
+    #expect(aNewHope.id == URL(string: "https://swapi.info/api/films/1")!)
     #expect(aNewHope.director == "George Lucas")
     #expect(aNewHope.producers == ["Gary Kurtz", "Rick McCallum"])
     #expect(aNewHope.characters.count == 18)

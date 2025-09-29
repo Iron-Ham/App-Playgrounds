@@ -2,8 +2,8 @@ import Foundation
 
 /// A model representing a single Star Wars film returned by the public SWAPI (https://swapi.info).
 public struct FilmResponse: Codable, Hashable, Sendable, Identifiable {
-  /// Stable identifier equal to ``episodeId`` (e.g. Episode IV => 4).
-  public var id: Int { episodeId }
+  /// Stable identifier equal to the canonical resource ``url``.
+  public var id: URL { url }
 
   /// Human‑readable film title (e.g. "A New Hope").
   public let title: String
@@ -72,13 +72,9 @@ extension FilmResponse {
   }
 
   /// Creates a single `FilmResponse` by decoding the provided JSON `Data`.
-  ///
-  /// Although this is a failable initializer (`init?`), it only returns `nil` when used with
-  /// `try?`; on success it always yields a value and on failure it throws. This pattern allows
-  /// both `let film = try FilmResponse(data: d)` and `let film = try? FilmResponse(data: d)`.
   /// - Parameter data: Raw JSON representing one film object.
   /// - Throws: Any decoding error encountered while parsing the payload.
-  public init?(data: Data) throws {
+  public init(data: Data) throws {
     self = try Self.decoder.decode(FilmResponse.self, from: data)
   }
 }

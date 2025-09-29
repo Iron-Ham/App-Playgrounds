@@ -2,15 +2,16 @@
   "fileScopedDeclarationPrivacy" : {
     "accessLevel" : "private"
   },
+  "indentConditionalCompilationBlocks" : true,
+  "indentSwitchCaseLabels" : false,
   "indentation" : {
     "spaces" : 2
   },
-  "indentConditionalCompilationBlocks" : true,
-  "indentSwitchCaseLabels" : false,
   "lineBreakAroundMultilineExpressionChainComponents" : false,
   "lineBreakBeforeControlFlowKeywords" : false,
   "lineBreakBeforeEachArgument" : false,
   "lineBreakBeforeEachGenericRequirement" : false,
+  "lineBreakBetweenDeclarationAttributes" : true,
   "lineLength" : 100,
   "maximumBlankLines" : 1,
   "multiElementCollectionTrailingCommas" : true,
@@ -19,13 +20,15 @@
       "XCTAssertNoThrow"
     ]
   },
-  "prioritizeKeepingFunctionOutputTogether" : false,
+  "prioritizeKeepingFunctionOutputTogether" : true,
+  "reflowMultilineStringLiterals" : "never",
   "respectsExistingLineBreaks" : true,
   "rules" : {
     "AllPublicDeclarationsHaveDocumentation" : false,
-    "AlwaysUseLiteralForEmptyCollectionInit" : false,
+    "AlwaysUseLiteralForEmptyCollectionInit" : true,
     "AlwaysUseLowerCamelCase" : true,
     "AmbiguousTrailingClosureOverload" : true,
+    "AvoidRetroactiveConformances" : true,
     "BeginDocumentationCommentWithOneLineSummary" : false,
     "DoNotUseSemicolons" : true,
     "DontRepeatTypeInStaticProperties" : true,
@@ -40,6 +43,7 @@
     "NoAssignmentInExpressions" : true,
     "NoBlockComments" : true,
     "NoCasesWithOnlyFallthrough" : true,
+    "NoEmptyLinesOpeningClosingBraces" : true,
     "NoEmptyTrailingClosureParentheses" : true,
     "NoLabelsInCasePatterns" : true,
     "NoLeadingUnderscores" : false,
@@ -61,10 +65,11 @@
     "UseSingleLinePropertyGetter" : true,
     "UseSynthesizedInitializer" : true,
     "UseTripleSlashForDocumentationComments" : true,
-    "UseWhereClausesInForLoops" : false,
+    "UseWhereClausesInForLoops" : true,
     "ValidateDocumentationComments" : false
   },
   "spacesAroundRangeFormationOperators" : false,
+  "spacesBeforeEndOfLineComments" : 2,
   "tabWidth" : 8,
   "version" : 1
 }

@@ -2,13 +2,16 @@ import API
 import SwiftUI
 
 struct ContentView: View {
-  @State var films: [FilmResponse] = []
-  @State var error: Error?
-  @State var isLoading: Bool = true
+  @State
+  var films: [FilmResponse] = []
+  @State
+  var error: Error?
+  @State
+  var isLoading: Bool = true
 
   private func fetch() async {
     do {
-      films = try await SWAPIClient.films()
+      films = try await Client.films()
       isLoading = false
       error = nil
     } catch {
