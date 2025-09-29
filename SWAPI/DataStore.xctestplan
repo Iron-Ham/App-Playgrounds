@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "F37FFCF2-8265-404B-91BB-99D57D8984F7",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:SWAPI.xcodeproj",
+        "identifier" : "0BB383AC2E8B320F00312DBF",
+        "name" : "DataStoreTests"
+      }
+    }
+  ],
+  "version" : 1
+}
