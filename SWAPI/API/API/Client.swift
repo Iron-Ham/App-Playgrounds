@@ -69,20 +69,21 @@ public enum Client {
 }
 
 extension Client {
-#if DEBUG
-  internal static func withSessionOverride<T>(
-    _ session: URLSession,
-    operation: () async throws -> T
-  ) async rethrows -> T {
-    try await sessionStore.withSessionOverride(session, operation: operation)
-  }
-#endif
+  #if DEBUG
+    internal static func withSessionOverride<T>(
+      _ session: URLSession,
+      operation: () async throws -> T
+    ) async rethrows -> T {
+      try await sessionStore.withSessionOverride(session, operation: operation)
+    }
+  #endif
 }
 
 extension Client {
   private static func makeSession() -> URLSession {
     let configuration = URLSessionConfiguration.default
-    configuration.httpMaximumConnectionsPerHost = max(configuration.httpMaximumConnectionsPerHost, 8)
+    configuration.httpMaximumConnectionsPerHost = max(
+      configuration.httpMaximumConnectionsPerHost, 8)
     configuration.waitsForConnectivity = true
     return URLSession(configuration: configuration)
   }
@@ -94,16 +95,16 @@ extension Client {
       try await session.data(from: url)
     }
 
-#if DEBUG
-    func withSessionOverride<T>(
-      _ session: URLSession,
-      operation: () async throws -> T
-    ) async rethrows -> T {
-      let previous = self.session
-      self.session = session
-      defer { self.session = previous }
-      return try await operation()
-    }
-#endif
+    #if DEBUG
+      func withSessionOverride<T>(
+        _ session: URLSession,
+        operation: () async throws -> T
+      ) async rethrows -> T {
+        let previous = self.session
+        self.session = session
+        defer { self.session = previous }
+        return try await operation()
+      }
+    #endif
   }
 }

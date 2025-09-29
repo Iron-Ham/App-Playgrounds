@@ -54,7 +54,8 @@ struct ClientConcurrencyTests {
       #expect(film.title == "A New Hope")
       let gregorian = Calendar(identifier: .gregorian)
       #expect(
-        film.release == gregorian
+        film.release
+          == gregorian
           .date(from: DateComponents(year: 1977, month: 5, day: 25))
       )
     }
@@ -65,7 +66,8 @@ struct ClientConcurrencyTests {
     SWAPIURLProtocolStub.removeAll()
     SWAPIURLProtocolStub.stub(url: peopleCollectionURL, data: StubData.peopleCollection)
     try await Client.withSessionOverride(makeStubSession()) {
-      let results = try await withThrowingTaskGroup(of: [PersonResponse].self) { group -> [[PersonResponse]] in
+      let results = try await withThrowingTaskGroup(of: [PersonResponse].self) {
+        group -> [[PersonResponse]] in
         for _ in 0..<12 {
           group.addTask {
             try await Client.people()
@@ -103,8 +105,10 @@ private final class SWAPIURLProtocolStub: URLProtocol {
   private static var stubs: [URL: Stub] = [:]
   private static let lock = NSLock()
 
-  static func stub(url: URL, data: Data, statusCode: Int = 200,
-                   headers: [String: String] = ["Content-Type": "application/json"]) {
+  static func stub(
+    url: URL, data: Data, statusCode: Int = 200,
+    headers: [String: String] = ["Content-Type": "application/json"]
+  ) {
     lock.lock()
     stubs[url] = Stub(statusCode: statusCode, headers: headers, data: data)
     lock.unlock()
@@ -168,7 +172,8 @@ private func makeStubSession() -> URLSession {
 }
 
 private enum StubData {
-  static let peopleCollection = Data(#"""
+  static let peopleCollection = Data(
+    #"""
     [
       {
         "name": "Luke Skywalker",
@@ -191,7 +196,8 @@ private enum StubData {
     ]
     """#.utf8)
 
-  static let planetsCollection = Data(#"""
+  static let planetsCollection = Data(
+    #"""
     [
       {
         "name": "Tatooine",
@@ -212,7 +218,8 @@ private enum StubData {
     ]
     """#.utf8)
 
-  static let speciesCollection = Data(#"""
+  static let speciesCollection = Data(
+    #"""
     [
       {
         "name": "Human",
@@ -234,7 +241,8 @@ private enum StubData {
     ]
     """#.utf8)
 
-  static let vehiclesCollection = Data(#"""
+  static let vehiclesCollection = Data(
+    #"""
     [
       {
         "name": "Snowspeeder",
@@ -257,7 +265,8 @@ private enum StubData {
     ]
     """#.utf8)
 
-  static let starshipsCollection = Data(#"""
+  static let starshipsCollection = Data(
+    #"""
     [
       {
         "name": "Millennium Falcon",
@@ -282,7 +291,8 @@ private enum StubData {
     ]
     """#.utf8)
 
-  static let filmsCollection = Data(#"""
+  static let filmsCollection = Data(
+    #"""
     [
       {
         "title": "A New Hope",
