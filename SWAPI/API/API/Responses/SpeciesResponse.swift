@@ -88,14 +88,14 @@ extension SpeciesResponse {
   /// - Returns: An array of `SpeciesResponse` values.
   /// - Throws: Any decoding error encountered while parsing the payload.
   public static func species(from data: Data) throws -> [SpeciesResponse] {
-    try Self.decoder.decode([SpeciesResponse].self, from: data)
+    try Self.makeDecoder().decode([SpeciesResponse].self, from: data)
   }
 
   /// Creates a single `SpeciesResponse` by decoding the provided JSON `Data`.
   /// - Parameter data: Raw JSON representing one species object.
   /// - Throws: Any decoding error encountered while parsing the payload.
   public init(data: Data) throws {
-    self = try Self.decoder.decode(SpeciesResponse.self, from: data)
+    self = try Self.makeDecoder().decode(SpeciesResponse.self, from: data)
   }
 }
 
@@ -112,10 +112,10 @@ extension SpeciesResponse {
     return Double(String(filtered))
   }
 
-  private static let decoder: JSONDecoder = {
+  private static func makeDecoder() -> JSONDecoder {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .iso8601
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     return decoder
-  }()
+  }
 }

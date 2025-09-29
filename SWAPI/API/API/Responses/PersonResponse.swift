@@ -233,14 +233,14 @@ extension PersonResponse {
   /// - Returns: An array of `PersonResponse` values.
   /// - Throws: Any decoding error encountered while parsing the payload.
   public static func people(from data: Data) throws -> [PersonResponse] {
-    try Self.decoder.decode([PersonResponse].self, from: data)
+    try Self.makeDecoder().decode([PersonResponse].self, from: data)
   }
 
   /// Creates a single `PersonResponse` by decoding the provided JSON `Data`.
   /// - Parameter data: Raw JSON representing one person object.
   /// - Throws: Any decoding error encountered while parsing the payload.
   public init(data: Data) throws {
-    self = try Self.decoder.decode(PersonResponse.self, from: data)
+    self = try Self.makeDecoder().decode(PersonResponse.self, from: data)
   }
 }
 
@@ -257,10 +257,10 @@ extension PersonResponse {
     return Double(String(filtered))
   }
 
-  private static let decoder: JSONDecoder = {
+  private static func makeDecoder() -> JSONDecoder {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .iso8601
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     return decoder
-  }()
+  }
 }

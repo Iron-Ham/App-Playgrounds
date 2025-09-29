@@ -132,14 +132,14 @@ extension StarshipResponse {
   /// - Returns: An array of `StarshipResponse` values.
   /// - Throws: Any decoding error encountered while parsing the payload.
   public static func starships(from data: Data) throws -> [StarshipResponse] {
-    try Self.decoder.decode([StarshipResponse].self, from: data)
+    try Self.makeDecoder().decode([StarshipResponse].self, from: data)
   }
 
   /// Creates a single `StarshipResponse` by decoding the provided JSON `Data`.
   /// - Parameter data: Raw JSON representing one starship object.
   /// - Throws: Any decoding error encountered while parsing the payload.
   public init(data: Data) throws {
-    self = try Self.decoder.decode(StarshipResponse.self, from: data)
+    self = try Self.makeDecoder().decode(StarshipResponse.self, from: data)
   }
 }
 
@@ -162,10 +162,10 @@ extension StarshipResponse {
     return Int(value)
   }
 
-  private static let decoder: JSONDecoder = {
+  private static func makeDecoder() -> JSONDecoder {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .iso8601
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     return decoder
-  }()
+  }
 }

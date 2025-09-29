@@ -9,6 +9,8 @@ public enum Client {
   private static let vehiclesURL = URL(string: "https://swapi.info/api/vehicles")!
   private static let starshipsURL = URL(string: "https://swapi.info/api/starships")!
 
+  private static let sessionStore = SessionStore()
+
   public static func films() async throws -> [FilmResponse] {
     try await fetch(Self.filmsURL, decode: FilmResponse.films(from:))
   }
@@ -57,8 +59,51 @@ public enum Client {
     try await fetch(url, decode: StarshipResponse.init(data:))
   }
 
-  private static func fetch<T>(_ url: URL, decode: (Data) throws -> T) async throws -> T {
-    let (data, _) = try await URLSession.shared.data(from: url)
+  private static func fetch<T: Sendable>(
+    _ url: URL,
+    decode: @Sendable (Data) throws -> T
+  ) async throws -> T {
+    let (data, _) = try await sessionStore.data(from: url)
     return try decode(data)
+  }
+}
+
+extension Client {
+#if DEBUG
+  internal static func withSessionOverride<T>(
+    _ session: URLSession,
+    operation: () async throws -> T
+  ) async rethrows -> T {
+    try await sessionStore.withSessionOverride(session, operation: operation)
+  }
+#endif
+}
+
+extension Client {
+  private static func makeSession() -> URLSession {
+    let configuration = URLSessionConfiguration.default
+    configuration.httpMaximumConnectionsPerHost = max(configuration.httpMaximumConnectionsPerHost, 8)
+    configuration.waitsForConnectivity = true
+    return URLSession(configuration: configuration)
+  }
+
+  private actor SessionStore {
+    private var session: URLSession = Client.makeSession()
+
+    func data(from url: URL) async throws -> (Data, URLResponse) {
+      try await session.data(from: url)
+    }
+
+#if DEBUG
+    func withSessionOverride<T>(
+      _ session: URLSession,
+      operation: () async throws -> T
+    ) async rethrows -> T {
+      let previous = self.session
+      self.session = session
+      defer { self.session = previous }
+      return try await operation()
+    }
+#endif
   }
 }

@@ -34,7 +34,7 @@ public struct FilmResponse: Codable, Hashable, Sendable, Identifiable {
   /// Parsed ``Date`` representation of the film's release date (format `yyyy-MM-dd`).
   /// Returns `nil` if the date string is invalid or the formatter fails.
   public var release: Date? {
-    FilmResponse.releaseDateFormatter.date(from: releaseDate)
+    FilmResponse.makeReleaseDateFormatter().date(from: releaseDate)
   }
 
   /// Resource URLs for character endpoints appearing in this film.
@@ -68,28 +68,28 @@ extension FilmResponse {
   /// - Returns: An array of `FilmResponse` values.
   /// - Throws: Any decoding error encountered while parsing the payload.
   public static func films(from data: Data) throws -> [FilmResponse] {
-    try Self.decoder.decode([FilmResponse].self, from: data)
+    try Self.makeDecoder().decode([FilmResponse].self, from: data)
   }
 
   /// Creates a single `FilmResponse` by decoding the provided JSON `Data`.
   /// - Parameter data: Raw JSON representing one film object.
   /// - Throws: Any decoding error encountered while parsing the payload.
   public init(data: Data) throws {
-    self = try Self.decoder.decode(FilmResponse.self, from: data)
+    self = try Self.makeDecoder().decode(FilmResponse.self, from: data)
   }
 }
 
 extension FilmResponse {
-  private nonisolated static let releaseDateFormatter: DateFormatter = {
+  private static func makeReleaseDateFormatter() -> DateFormatter {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-dd"
     return dateFormatter
-  }()
+  }
 
-  private static let decoder: JSONDecoder = {
+  private static func makeDecoder() -> JSONDecoder {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .iso8601
     decoder.keyDecodingStrategy = .convertFromSnakeCase
     return decoder
-  }()
+  }
 }
