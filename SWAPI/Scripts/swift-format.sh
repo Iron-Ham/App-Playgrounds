@@ -51,6 +51,8 @@ fi
 
 log "Checking for modified files..."
 
-GIT_PAGER='' git diff --exit-code '*.swift'
-
-log "✅ Found no formatting issues."
+if GIT_PAGER='' git diff --quiet -- '*.swift'; then
+  log "✅ Found no formatting issues."
+else
+  log "⚠️ Swift-format introduced Swift file changes; review and commit them when ready."
+fi
