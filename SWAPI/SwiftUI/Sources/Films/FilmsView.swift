@@ -11,12 +11,20 @@ struct FilmsView: View {
 
   let onRefresh: () async -> Void
 
+  private static let placeholderRows = Array(0..<6)
+
   var body: some View {
     List(selection: $selection) {
       Section {
-        ForEach(films) { film in
-          CellView(film: film)
-            .tag(film.id)
+        if isLoading, films.isEmpty {
+          ForEach(Self.placeholderRows, id: \.self) { _ in
+            CellView(film: nil)
+          }
+        } else {
+          ForEach(films) { film in
+            CellView(film: film)
+              .tag(film)
+          }
         }
       } header: {
         Text("All films")
@@ -27,31 +35,32 @@ struct FilmsView: View {
     .refreshable {
       await onRefresh()
     }
-    .overlay(alignment: .bottom) {
-      if isLoading {
-        ProgressView()
-          .progressViewStyle(.circular)
-          .padding()
-      }
-    }
+    .redacted(if: isLoading)
+    .allowsHitTesting(!isLoading)
   }
 }
 
 private struct CellView: View {
-  let film: Film
+  let film: Film?
+
+  private var releaseDateText: String {
+    film?.releaseDate?.formatted(date: .abbreviated, time: .omitted) ?? .placeholder(length: 20)
+  }
+
+  private var filmTitle: String {
+    film?.title ?? .placeholder(length: 12)
+  }
 
   var body: some View {
     VStack(alignment: .leading) {
-      if let releaseDate = film.releaseDate?.formatted(date: .abbreviated, time: .omitted) {
-        Text(releaseDate)
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-      }
+      Text(releaseDateText)
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
 
-      Text(film.title)
+      Text(filmTitle)
         .font(.title2)
         .foregroundStyle(.primary)
-    }
+    }.redacted(if: film == nil)
   }
 }
 
@@ -73,8 +82,7 @@ private struct CellView: View {
       ],
       selection: .constant(nil),
       isLoading: false,
-      onRefresh: {
-}
+      onRefresh: { }
     )
   }
 }
