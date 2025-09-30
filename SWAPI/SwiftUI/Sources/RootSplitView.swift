@@ -21,8 +21,6 @@ struct RootSplitView: View {
   @State
   private var selectedFilm: Film?
 
-
-
   var body: some View {
     NavigationSplitView {
       FilmsView(

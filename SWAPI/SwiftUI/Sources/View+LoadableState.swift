@@ -10,9 +10,9 @@ extension View {
     @ViewBuilder errorView: (_ error: Error) -> ErrorContent,
     @ViewBuilder emptyView: () -> EmptyContent
   ) -> some View {
-  let shouldShowContent = hasLoadedInitialData && !isContentEmpty
+    let shouldShowContent = hasLoadedInitialData && !isContentEmpty
 
-  ZStack {
+    ZStack {
       self
         .opacity(shouldShowContent ? 1 : 0)
         .allowsHitTesting(shouldShowContent)

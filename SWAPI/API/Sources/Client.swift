@@ -69,7 +69,7 @@ public enum Client {
 
 extension Client {
   #if DEBUG
-  internal static func withSessionOverride<T: Sendable>(
+    internal static func withSessionOverride<T: Sendable>(
       _ session: URLSession,
       operation: @Sendable () async throws -> T
     ) async rethrows -> T {

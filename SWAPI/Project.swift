@@ -1,5 +1,12 @@
 import ProjectDescription
 
+private let swiftFormatScript: TargetScript = .pre(
+  path: .relativeToRoot("Scripts/swift-format.sh"),
+  arguments: [],
+  name: "Swift Format",
+  basedOnDependencyAnalysis: false
+)
+
 let project = Project(
   name: "SWAPI",
   settings: .settings(
@@ -25,6 +32,7 @@ let project = Project(
         "SwiftUI/Sources",
         "SwiftUI/Resources",
       ],
+      scripts: [swiftFormatScript],
       dependencies: [
         .target(name: "API"),
         .target(name: "Persistence"),
@@ -40,6 +48,7 @@ let project = Project(
       buildableFolders: [
         "SwiftUI/Tests"
       ],
+      scripts: [swiftFormatScript],
       dependencies: [.target(name: "SWAPI-SwiftUI")]
     ),
     .target(
@@ -52,6 +61,7 @@ let project = Project(
         "API/Sources",
         "API/Resources",
       ],
+      scripts: [swiftFormatScript],
       dependencies: []
     ),
     .target(
@@ -63,6 +73,7 @@ let project = Project(
       buildableFolders: [
         "API/Tests"
       ],
+      scripts: [swiftFormatScript],
       dependencies: [.target(name: "API")]
     ),
     .target(
@@ -75,6 +86,7 @@ let project = Project(
         "Persistence/Sources",
         "Persistence/Resources",
       ],
+      scripts: [swiftFormatScript],
       dependencies: [
         .external(name: "Dependencies"),
         .external(name: "SQLiteData"),
@@ -90,6 +102,7 @@ let project = Project(
       buildableFolders: [
         "Persistence/Tests"
       ],
+      scripts: [swiftFormatScript],
       dependencies: [.target(name: "Persistence")]
     ),
   ]

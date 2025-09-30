@@ -128,7 +128,6 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: UICollectionViewDelegate {
-
 }
 
 private struct CellView: View {

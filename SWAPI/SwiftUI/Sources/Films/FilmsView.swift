@@ -82,7 +82,7 @@ private struct CellView: View {
       ],
       selection: .constant(nil),
       isLoading: false,
-      onRefresh: { }
+      onRefresh: {}
     )
   }
 }

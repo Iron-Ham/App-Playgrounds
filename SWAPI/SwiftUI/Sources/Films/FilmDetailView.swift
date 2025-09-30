@@ -3,7 +3,8 @@ import Persistence
 import SwiftUI
 
 struct FilmDetailView: View {
-  @Binding var film: Film?
+  @Binding
+  var film: Film?
   let dataStore: SWAPIDataStore
 
   @State
@@ -153,9 +154,9 @@ struct FilmDetailView: View {
       .padding()
     }
     .navigationTitle(film.title)
-#if os(iOS) || os(tvOS)
-    .navigationBarTitleDisplayMode(.inline)
-#endif
+    #if os(iOS) || os(tvOS)
+      .navigationBarTitleDisplayMode(.inline)
+    #endif
   }
 
   @ViewBuilder
@@ -210,8 +211,8 @@ struct FilmDetailView: View {
   }
 }
 
-private extension SWAPIDataStore.FilmRelationshipSummary {
-  static let empty = Self(
+extension SWAPIDataStore.FilmRelationshipSummary {
+  fileprivate static let empty = Self(
     characterCount: 0,
     planetCount: 0,
     speciesCount: 0,
@@ -219,7 +220,7 @@ private extension SWAPIDataStore.FilmRelationshipSummary {
     vehicleCount: 0
   )
 
-  func localizedCount(_ key: CountKey) -> String {
+  fileprivate func localizedCount(_ key: CountKey) -> String {
     let count: Int = {
       switch key {
       case .characters: characterCount
@@ -240,7 +241,7 @@ private extension SWAPIDataStore.FilmRelationshipSummary {
     return String.localizedStringWithFormat(format, count)
   }
 
-  enum CountKey: String {
+  fileprivate enum CountKey: String {
     case characters = "characters-count"
     case planets = "planets-count"
     case species = "species-count"
@@ -249,21 +250,21 @@ private extension SWAPIDataStore.FilmRelationshipSummary {
   }
 }
 
-private extension Film {
-  var releaseDateLongText: String? {
+extension Film {
+  fileprivate var releaseDateLongText: String? {
     releaseDate?.formatted(date: .long, time: .omitted)
   }
 
-  var releaseDateDisplayText: String {
+  fileprivate var releaseDateDisplayText: String {
     releaseDateLongText ?? "Release date unavailable"
   }
 
-  var producersListText: String {
+  fileprivate var producersListText: String {
     guard !producers.isEmpty else { return "No producers listed" }
     return ListFormatter.localizedString(byJoining: producers)
   }
 
-  var openingCrawlAccessibilityLabel: String {
+  fileprivate var openingCrawlAccessibilityLabel: String {
     String(localized: "Opening crawl: \(openingCrawl)")
   }
 }
@@ -298,7 +299,9 @@ private struct InfoRow: View {
 }
 
 #Preview {
-  @Previewable @State var film: Film? = Film(
+  @Previewable
+  @State
+  var film: Film? = Film(
     url: URL(string: "https://swapi.dev/api/films/1/")!,
     title: "A New Hope",
     episodeId: 4,

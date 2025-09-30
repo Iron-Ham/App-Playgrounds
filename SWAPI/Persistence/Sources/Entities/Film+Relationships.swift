@@ -28,7 +28,8 @@ extension SWAPIDataStore {
     try relationshipSummary(forFilmWithURL: film.url)
   }
 
-  public func relationshipSummary(forFilmWithURL filmURL: Film.ID) throws -> FilmRelationshipSummary {
+  public func relationshipSummary(forFilmWithURL filmURL: Film.ID) throws -> FilmRelationshipSummary
+  {
     try FilmRelationshipSummary(
       characterCount: relationshipCount(forFilmWithURL: filmURL, .characters),
       planetCount: relationshipCount(forFilmWithURL: filmURL, .planets),
@@ -52,7 +53,8 @@ extension SWAPIDataStore {
     try database.read { db in
       let identifiers = try String.fetchAll(
         db,
-        sql: "SELECT \"\(relationship.valueColumn)\" FROM \"\(relationship.tableName)\" WHERE \"filmUrl\" = ?",
+        sql:
+          "SELECT \"\(relationship.valueColumn)\" FROM \"\(relationship.tableName)\" WHERE \"filmUrl\" = ?",
         arguments: [filmURL.absoluteString]
       )
       return identifiers.compactMap(URL.init(string:))

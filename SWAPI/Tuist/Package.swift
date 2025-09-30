@@ -29,7 +29,7 @@ import PackageDescription
       "StructuredQueriesSQLiteCore": .framework,
       "StructuredQueries": .framework,
       "StructuredQueriesMacros": .framework,
-      "XCTestDynamicOverlay": .framework
+      "XCTestDynamicOverlay": .framework,
     ]
   )
 #endif
