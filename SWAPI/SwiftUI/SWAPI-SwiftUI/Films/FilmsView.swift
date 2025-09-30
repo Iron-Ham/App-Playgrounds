@@ -1,0 +1,79 @@
+import DataStore
+import SwiftUI
+
+struct FilmsView: View {
+  let films: [FilmEntity]
+
+  @Binding
+  var selection: FilmEntity.ID?
+
+  let isLoading: Bool
+
+  let onRefresh: () async -> Void
+
+  var body: some View {
+    List(selection: $selection) {
+      Section {
+        ForEach(films) { film in
+          CellView(film: film)
+            .tag(film.id)
+        }
+      } header: {
+        Text("All films")
+      }
+    }
+    .listStyle(.sidebar)
+    .navigationTitle("Star Wars")
+    .refreshable {
+      await onRefresh()
+    }
+    .overlay(alignment: .bottom) {
+      if isLoading {
+        ProgressView()
+          .progressViewStyle(.circular)
+          .padding()
+      }
+    }
+  }
+}
+
+private struct CellView: View {
+  let film: FilmEntity
+
+  var body: some View {
+    VStack(alignment: .leading) {
+      if let releaseDate = film.releaseDate?.formatted(date: .abbreviated, time: .omitted) {
+        Text(releaseDate)
+          .font(.subheadline)
+          .foregroundStyle(.secondary)
+      }
+
+      Text(film.title)
+        .font(.title2)
+        .foregroundStyle(.primary)
+    }
+  }
+}
+
+#Preview {
+  let film = FilmEntity(
+    url: URL(string: "https://swapi.dev/api/films/1/")!,
+    title: "A New Hope",
+    episodeID: 4,
+    openingCrawl: "It is a period of civil war...",
+    director: "George Lucas",
+    producerNames: ["Gary Kurtz", "Rick McCallum"],
+    releaseDate: Date(timeIntervalSince1970: 236_102_400),
+    created: Date(timeIntervalSince1970: 236_102_400),
+    edited: Date(timeIntervalSince1970: 236_102_400)
+  )
+
+  return NavigationStack {
+    FilmsView(
+      films: [film],
+      selection: .constant(nil),
+      isLoading: false,
+      onRefresh: {}
+    )
+  }
+}

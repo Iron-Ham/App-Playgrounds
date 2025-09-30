@@ -12,6 +12,15 @@
 		0B8D850D2E88288600A3894C /* API.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B8D85022E88288500A3894C /* API.framework */; };
 		0B8D85172E88288600A3894C /* API.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B8D85022E88288500A3894C /* API.framework */; };
 		0B8D85182E88288600A3894C /* API.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0B8D85022E88288500A3894C /* API.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0BAF1D862E8B4D4600024151 /* RootSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BAF1D812E8B4D4600024151 /* RootSplitView.swift */; };
+		0BAF1D872E8B4D4600024151 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BAF1D822E8B4D4600024151 /* ErrorView.swift */; };
+		0BAF1D892E8B4D4600024151 /* SWAPIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BAF1D842E8B4D4600024151 /* SWAPIApp.swift */; };
+		0BAF1D8A2E8B4D4600024151 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0BAF1D802E8B4D4600024151 /* Assets.xcassets */; };
+		0BAF1D8D2E8B4D4900024151 /* SWAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BAF1D8B2E8B4D4900024151 /* SWAPITests.swift */; };
+		0BAF1D912E8B4D4B00024151 /* SWAPIUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BAF1D8E2E8B4D4B00024151 /* SWAPIUITests.swift */; };
+		0BAF1D922E8B4D4B00024151 /* SWAPIUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BAF1D8F2E8B4D4B00024151 /* SWAPIUITestsLaunchTests.swift */; };
+		0BAF1D962E8B4EB500024151 /* FilmsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BAF1D952E8B4EB300024151 /* FilmsView.swift */; };
+		0BAF1D992E8B505400024151 /* FilmDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BAF1D982E8B505200024151 /* FilmDetailView.swift */; };
 		0BB383AE2E8B320F00312DBF /* DataStore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BB383A32E8B320F00312DBF /* DataStore.framework */; };
 		0BB383B82E8B320F00312DBF /* DataStore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BB383A32E8B320F00312DBF /* DataStore.framework */; };
 		0BB383B92E8B320F00312DBF /* DataStore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0BB383A32E8B320F00312DBF /* DataStore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -22,6 +31,7 @@
 		0BB383D02E8B351200312DBF /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB383CB2E8B351200312DBF /* DataStore.swift */; };
 		0BB383D12E8B351200312DBF /* SnapshotImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB383CC2E8B351200312DBF /* SnapshotImporter.swift */; };
 		0BB383D42E8B351500312DBF /* DataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB383D22E8B351500312DBF /* DataStoreTests.swift */; };
+		0BCA8A612E8B6F3B00C46FCC /* View+LoadableState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A5F2E8B6F3B00C46FCC /* View+LoadableState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -140,6 +150,15 @@
 		0B8D853C2E8829BF00A3894C /* SWAPI-UIKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SWAPI-UIKitTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B8D85462E8829BF00A3894C /* SWAPI-UIKitUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SWAPI-UIKitUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B8D86322E88307A00A3894C /* API.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = API.xctestplan; sourceTree = "<group>"; };
+		0BAF1D802E8B4D4600024151 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0BAF1D812E8B4D4600024151 /* RootSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootSplitView.swift; sourceTree = "<group>"; };
+		0BAF1D822E8B4D4600024151 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		0BAF1D842E8B4D4600024151 /* SWAPIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SWAPIApp.swift; sourceTree = "<group>"; };
+		0BAF1D8B2E8B4D4900024151 /* SWAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SWAPITests.swift; sourceTree = "<group>"; };
+		0BAF1D8E2E8B4D4B00024151 /* SWAPIUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SWAPIUITests.swift; sourceTree = "<group>"; };
+		0BAF1D8F2E8B4D4B00024151 /* SWAPIUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SWAPIUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		0BAF1D952E8B4EB300024151 /* FilmsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmsView.swift; sourceTree = "<group>"; };
+		0BAF1D982E8B505200024151 /* FilmDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmDetailView.swift; sourceTree = "<group>"; };
 		0BB383A32E8B320F00312DBF /* DataStore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DataStore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0BB383AD2E8B320F00312DBF /* DataStoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DataStoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0BB383C92E8B351200312DBF /* DataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModels.swift; sourceTree = "<group>"; };
@@ -148,6 +167,7 @@
 		0BB383CC2E8B351200312DBF /* SnapshotImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotImporter.swift; sourceTree = "<group>"; };
 		0BB383D22E8B351500312DBF /* DataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStoreTests.swift; sourceTree = "<group>"; };
 		0BB383D62E8B358400312DBF /* DataStore.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DataStore.xctestplan; sourceTree = "<group>"; };
+		0BCA8A5F2E8B6F3B00C46FCC /* View+LoadableState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+LoadableState.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -161,21 +181,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		0B3F857C2E841A5F0053A15D /* SWAPI-SwiftUI */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "SWAPI-SwiftUI";
-			sourceTree = "<group>";
-		};
-		0B3F858A2E841A630053A15D /* SWAPITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SWAPITests;
-			sourceTree = "<group>";
-		};
-		0B3F85942E841A630053A15D /* SWAPIUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SWAPIUITests;
-			sourceTree = "<group>";
-		};
 		0B8D85032E88288500A3894C /* API */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = API;
@@ -338,9 +343,9 @@
 		0B8D85592E8829F000A3894C /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
-				0B3F857C2E841A5F0053A15D /* SWAPI-SwiftUI */,
-				0B3F858A2E841A630053A15D /* SWAPITests */,
-				0B3F85942E841A630053A15D /* SWAPIUITests */,
+				0BAF1D852E8B4D4600024151 /* SWAPI-SwiftUI */,
+				0BAF1D8C2E8B4D4900024151 /* SWAPITests */,
+				0BAF1D902E8B4D4B00024151 /* SWAPIUITests */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -352,6 +357,45 @@
 				0B8D85122E88288600A3894C /* APITests */,
 			);
 			path = API;
+			sourceTree = "<group>";
+		};
+		0BAF1D852E8B4D4600024151 /* SWAPI-SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				0BCA8A5F2E8B6F3B00C46FCC /* View+LoadableState.swift */,
+				0BAF1D972E8B504B00024151 /* Films */,
+				0BAF1D802E8B4D4600024151 /* Assets.xcassets */,
+				0BAF1D812E8B4D4600024151 /* RootSplitView.swift */,
+				0BAF1D822E8B4D4600024151 /* ErrorView.swift */,
+				0BAF1D842E8B4D4600024151 /* SWAPIApp.swift */,
+			);
+			path = "SWAPI-SwiftUI";
+			sourceTree = "<group>";
+		};
+		0BAF1D8C2E8B4D4900024151 /* SWAPITests */ = {
+			isa = PBXGroup;
+			children = (
+				0BAF1D8B2E8B4D4900024151 /* SWAPITests.swift */,
+			);
+			path = SWAPITests;
+			sourceTree = "<group>";
+		};
+		0BAF1D902E8B4D4B00024151 /* SWAPIUITests */ = {
+			isa = PBXGroup;
+			children = (
+				0BAF1D8E2E8B4D4B00024151 /* SWAPIUITests.swift */,
+				0BAF1D8F2E8B4D4B00024151 /* SWAPIUITestsLaunchTests.swift */,
+			);
+			path = SWAPIUITests;
+			sourceTree = "<group>";
+		};
+		0BAF1D972E8B504B00024151 /* Films */ = {
+			isa = PBXGroup;
+			children = (
+				0BAF1D982E8B505200024151 /* FilmDetailView.swift */,
+				0BAF1D952E8B4EB300024151 /* FilmsView.swift */,
+			);
+			path = Films;
 			sourceTree = "<group>";
 		};
 		0BB383CD2E8B351200312DBF /* DataStore */ = {
@@ -417,9 +461,6 @@
 				0B8D85162E88288600A3894C /* PBXTargetDependency */,
 				0BB383B72E8B320F00312DBF /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				0B3F857C2E841A5F0053A15D /* SWAPI-SwiftUI */,
-			);
 			name = "SWAPI-SwiftUI";
 			packageProductDependencies = (
 			);
@@ -440,9 +481,6 @@
 			dependencies = (
 				0B3F85892E841A630053A15D /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				0B3F858A2E841A630053A15D /* SWAPITests */,
-			);
 			name = SWAPITests;
 			packageProductDependencies = (
 			);
@@ -462,9 +500,6 @@
 			);
 			dependencies = (
 				0B3F85932E841A630053A15D /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				0B3F85942E841A630053A15D /* SWAPIUITests */,
 			);
 			name = SWAPIUITests;
 			packageProductDependencies = (
@@ -714,6 +749,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0BAF1D8A2E8B4D4600024151 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -787,6 +823,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0BAF1D862E8B4D4600024151 /* RootSplitView.swift in Sources */,
+				0BAF1D992E8B505400024151 /* FilmDetailView.swift in Sources */,
+				0BAF1D872E8B4D4600024151 /* ErrorView.swift in Sources */,
+				0BAF1D892E8B4D4600024151 /* SWAPIApp.swift in Sources */,
+				0BCA8A612E8B6F3B00C46FCC /* View+LoadableState.swift in Sources */,
+				0BAF1D962E8B4EB500024151 /* FilmsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -794,6 +836,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0BAF1D8D2E8B4D4900024151 /* SWAPITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -801,6 +844,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0BAF1D912E8B4D4B00024151 /* SWAPIUITests.swift in Sources */,
+				0BAF1D922E8B4D4B00024151 /* SWAPIUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
