@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "54510D7A06E818ED4E4EB50C"
-               BuildableName = "API.framework"
-               BlueprintName = "API"
+               BlueprintIdentifier = "9DC078BDEF101831D6F38166"
+               BuildableName = "Persistence.framework"
+               BlueprintName = "Persistence"
                ReferencedContainer = "container:SWAPI.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,9 +33,9 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8774CDD8A916570BCFB42D9"
-               BuildableName = "APITests.xctest"
-               BlueprintName = "APITests"
+               BlueprintIdentifier = "7D079D720C7E88D09308DB81"
+               BuildableName = "PersistenceTests.xctest"
+               BlueprintName = "PersistenceTests"
                ReferencedContainer = "container:SWAPI.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -54,9 +54,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "54510D7A06E818ED4E4EB50C"
-            BuildableName = "API.framework"
-            BlueprintName = "API"
+            BlueprintIdentifier = "9DC078BDEF101831D6F38166"
+            BuildableName = "Persistence.framework"
+            BlueprintName = "Persistence"
             ReferencedContainer = "container:SWAPI.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -70,9 +70,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "54510D7A06E818ED4E4EB50C"
-            BuildableName = "API.framework"
-            BlueprintName = "API"
+            BlueprintIdentifier = "9DC078BDEF101831D6F38166"
+            BuildableName = "Persistence.framework"
+            BlueprintName = "Persistence"
             ReferencedContainer = "container:SWAPI.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

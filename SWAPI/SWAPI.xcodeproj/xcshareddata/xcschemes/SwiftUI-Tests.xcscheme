@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "54510D7A06E818ED4E4EB50C"
-               BuildableName = "API.framework"
-               BlueprintName = "API"
+               BlueprintIdentifier = "C383CB245DB90F1DC034045E"
+               BuildableName = "SwiftUI_Tests.xctest"
+               BlueprintName = "SwiftUI-Tests"
                ReferencedContainer = "container:SWAPI.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,9 +33,9 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E8774CDD8A916570BCFB42D9"
-               BuildableName = "APITests.xctest"
-               BlueprintName = "APITests"
+               BlueprintIdentifier = "C383CB245DB90F1DC034045E"
+               BuildableName = "SwiftUI_Tests.xctest"
+               BlueprintName = "SwiftUI-Tests"
                ReferencedContainer = "container:SWAPI.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -54,9 +54,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "54510D7A06E818ED4E4EB50C"
-            BuildableName = "API.framework"
-            BlueprintName = "API"
+            BlueprintIdentifier = "C383CB245DB90F1DC034045E"
+            BuildableName = "SwiftUI_Tests.xctest"
+            BlueprintName = "SwiftUI-Tests"
             ReferencedContainer = "container:SWAPI.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -70,9 +70,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "54510D7A06E818ED4E4EB50C"
-            BuildableName = "API.framework"
-            BlueprintName = "API"
+            BlueprintIdentifier = "C383CB245DB90F1DC034045E"
+            BuildableName = "SwiftUI_Tests.xctest"
+            BlueprintName = "SwiftUI-Tests"
             ReferencedContainer = "container:SWAPI.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
