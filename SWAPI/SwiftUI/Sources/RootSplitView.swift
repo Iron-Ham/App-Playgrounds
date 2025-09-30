@@ -1,11 +1,15 @@
 import API
+import Dependencies
 import Persistence
 import SQLiteData
 import SwiftUI
 
 struct RootSplitView: View {
-  let dataStore: SWAPIDataStore
-  let client: Client
+  @Dependency(\.dataStore)
+  private var dataStore: SWAPIDataStore
+
+  @Dependency(\.client)
+  private var client: Client
 
   @FetchAll(Film.order(by: \.releaseDate))
   private var films
@@ -22,11 +26,6 @@ struct RootSplitView: View {
   @State
   private var selectedFilm: Film?
 
-  init(dataStore: SWAPIDataStore, client: Client = .init()) {
-    self.dataStore = dataStore
-    self.client = client
-  }
-
   var body: some View {
     NavigationSplitView {
       FilmsView(
@@ -38,7 +37,7 @@ struct RootSplitView: View {
         }
       )
     } detail: {
-      FilmDetailView(film: $selectedFilm, dataStore: dataStore)
+      FilmDetailView(film: $selectedFilm)
         .redacted(if: isLoading)
         .allowsHitTesting(!isLoading)
     }
@@ -123,7 +122,11 @@ private struct SnapshotPayload: Sendable {
 #Preview {
   let store = SWAPIDataStorePreview.inMemory()
 
-  return NavigationStack {
-    RootSplitView(dataStore: store)
+  withDependencies {
+    $0.dataStore = store
+  } operation: {
+    NavigationStack {
+      RootSplitView()
+    }
   }
 }

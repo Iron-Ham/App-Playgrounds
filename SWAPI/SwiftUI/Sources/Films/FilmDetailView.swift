@@ -1,3 +1,4 @@
+import Dependencies
 import Foundation
 import Persistence
 import SwiftUI
@@ -5,7 +6,8 @@ import SwiftUI
 struct FilmDetailView: View {
   @Binding
   var film: Film?
-  let dataStore: SWAPIDataStore
+  @Dependency(\.dataStore)
+  private var dataStore: SWAPIDataStore
 
   @State
   private var relationshipSummary: SWAPIDataStore.FilmRelationshipSummary = .empty
@@ -37,8 +39,8 @@ struct FilmDetailView: View {
     for film: Film,
     summary: SWAPIDataStore.FilmRelationshipSummary
   ) -> some View {
-    ScrollView {
-      VStack(alignment: .leading, spacing: 24) {
+    List {
+      Section {
         VStack(alignment: .leading, spacing: 8) {
           Text(film.title)
             .font(.largeTitle)
@@ -54,104 +56,100 @@ struct FilmDetailView: View {
             .font(.title3)
             .foregroundStyle(.secondary)
         }
-
-        Divider()
-
-        VStack(alignment: .leading, spacing: 12) {
-          Text("Release Information")
-            .font(.headline)
-
-          InfoRow(
-            title: "Episode number",
-            value: "Episode \(film.episodeId)",
-            iconName: "rectangle.3.offgrid",
-            iconDescription: "Icon representing the episode number"
-          )
-
-          InfoRow(
-            title: "Release date",
-            value: film.releaseDateDisplayText,
-            iconName: "calendar.circle",
-            iconDescription: "Calendar icon denoting the release date"
-          )
-        }
-
-        Divider()
-
-        VStack(alignment: .leading, spacing: 12) {
-          Text("Production Team")
-            .font(.headline)
-
-          InfoRow(
-            title: "Director",
-            value: film.director,
-            iconName: "person.crop.rectangle",
-            iconDescription: "Person icon indicating the director"
-          )
-
-          InfoRow(
-            title: "Producers",
-            value: film.producersListText,
-            iconName: "person.2",
-            iconDescription: "People icon indicating the producers"
-          )
-        }
-
-        Divider()
-
-        VStack(alignment: .leading, spacing: 12) {
-          Text("Featured In This Film")
-            .font(.headline)
-
-          InfoRow(
-            title: "Characters",
-            value: summary.localizedCount(.characters),
-            iconName: "person.3",
-            iconDescription: "Icon representing the number of characters"
-          )
-
-          InfoRow(
-            title: "Planets",
-            value: summary.localizedCount(.planets),
-            iconName: "globe.europe.africa",
-            iconDescription: "Globe icon representing planets"
-          )
-
-          InfoRow(
-            title: "Species",
-            value: summary.localizedCount(.species),
-            iconName: "leaf",
-            iconDescription: "Leaf icon representing species"
-          )
-
-          InfoRow(
-            title: "Starships",
-            value: summary.localizedCount(.starships),
-            iconName: "airplane",
-            iconDescription: "Airplane icon representing starships"
-          )
-
-          InfoRow(
-            title: "Vehicles",
-            value: summary.localizedCount(.vehicles),
-            iconName: "car",
-            iconDescription: "Car icon representing vehicles"
-          )
-        }
-
-        Divider()
-
-        VStack(alignment: .leading, spacing: 12) {
-          Text("Opening Crawl")
-            .font(.headline)
-
-          Text(film.openingCrawl)
-            .foregroundStyle(.primary)
-            .accessibilityLabel(film.openingCrawlAccessibilityLabel)
-        }
+        .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
       }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding()
+
+      Section {
+        InfoRow(
+          title: "Episode number",
+          value: "Episode \(film.episodeId)",
+          iconName: "rectangle.3.offgrid",
+          iconDescription: "Icon representing the episode number"
+        )
+
+        InfoRow(
+          title: "Release date",
+          value: film.releaseDateDisplayText,
+          iconName: "calendar.circle",
+          iconDescription: "Calendar icon denoting the release date"
+        )
+      } header: {
+        Text("Release Information")
+          .font(.headline)
+          .textCase(nil)
+      }
+
+      Section {
+        InfoRow(
+          title: "Director",
+          value: film.director,
+          iconName: "person.crop.rectangle",
+          iconDescription: "Person icon indicating the director"
+        )
+
+        InfoRow(
+          title: "Producers",
+          value: film.producersListText,
+          iconName: "person.2",
+          iconDescription: "People icon indicating the producers"
+        )
+      } header: {
+        Text("Production Team")
+          .font(.headline)
+          .textCase(nil)
+      }
+
+      Section {
+        InfoRow(
+          title: "Characters",
+          value: summary.localizedCount(.characters),
+          iconName: "person.3",
+          iconDescription: "Icon representing the number of characters"
+        )
+
+        InfoRow(
+          title: "Planets",
+          value: summary.localizedCount(.planets),
+          iconName: "globe.europe.africa",
+          iconDescription: "Globe icon representing planets"
+        )
+
+        InfoRow(
+          title: "Species",
+          value: summary.localizedCount(.species),
+          iconName: "leaf",
+          iconDescription: "Leaf icon representing species"
+        )
+
+        InfoRow(
+          title: "Starships",
+          value: summary.localizedCount(.starships),
+          iconName: "airplane",
+          iconDescription: "Airplane icon representing starships"
+        )
+
+        InfoRow(
+          title: "Vehicles",
+          value: summary.localizedCount(.vehicles),
+          iconName: "car",
+          iconDescription: "Car icon representing vehicles"
+        )
+      } header: {
+        Text("Featured In This Film")
+          .font(.headline)
+          .textCase(nil)
+      }
+
+      Section {
+        Text(film.openingCrawl)
+          .foregroundStyle(.primary)
+          .accessibilityLabel(film.openingCrawlAccessibilityLabel)
+          .frame(maxWidth: .infinity, alignment: .leading)
+      } header: {
+        Text("Opening Crawl")
+          .font(.headline)
+          .textCase(nil)
+      }
     }
     .navigationTitle(film.title)
     #if os(iOS) || os(tvOS)
@@ -185,6 +183,7 @@ struct FilmDetailView: View {
     guard !Task.isCancelled else { return }
 
     let filmURL = film.url
+    let dataStore = self.dataStore
     let summaryTask = Task.detached(priority: .userInitiated) {
       try dataStore.relationshipSummary(forFilmWithURL: filmURL)
     }
@@ -313,9 +312,11 @@ private struct InfoRow: View {
     edited: Date(timeIntervalSince1970: 236_102_400)
   )
 
-  let dataStore = SWAPIDataStorePreview.inMemory()
-
-  NavigationStack {
-    FilmDetailView(film: $film, dataStore: dataStore)
+  withDependencies {
+    $0.dataStore = SWAPIDataStorePreview.inMemory()
+  } operation: {
+    NavigationStack {
+      FilmDetailView(film: $film)
+    }
   }
 }

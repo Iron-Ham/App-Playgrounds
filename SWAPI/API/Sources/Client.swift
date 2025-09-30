@@ -119,3 +119,5 @@ extension Client {
     #endif
   }
 }
+
+extension Client: Sendable {}

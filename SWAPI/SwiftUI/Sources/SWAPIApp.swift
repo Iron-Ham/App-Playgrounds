@@ -1,13 +1,21 @@
+import API
+import Dependencies
 import Persistence
 import SwiftUI
 
 @main
 struct SWAPIApp: App {
   private let dataStore: SWAPIDataStore
+  private let client: Client
 
   init() {
+    client = Client()
     do {
       dataStore = try SWAPIDataStore()
+      prepareDependencies {
+        $0.client = client
+        $0.dataStore = dataStore
+      }
     } catch {
       fatalError("Failed to create data store: \(error)")
     }
@@ -15,7 +23,7 @@ struct SWAPIApp: App {
 
   var body: some Scene {
     WindowGroup {
-      RootSplitView(dataStore: dataStore)
+      RootSplitView()
     }
   }
 }

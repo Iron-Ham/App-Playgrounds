@@ -50,7 +50,12 @@ let project = Project(
         "SwiftUI/Tests"
       ],
       scripts: [swiftFormatScript],
-      dependencies: [.target(name: "SWAPI-SwiftUI")]
+      dependencies: [
+        .target(name: "SWAPI-SwiftUI"),
+        .target(name: "Persistence"),
+        .target(name: "API"),
+        .external(name: "Dependencies"),
+      ]
     ),
     .target(
       name: "API",
@@ -63,7 +68,9 @@ let project = Project(
         "API/Resources",
       ],
       scripts: [swiftFormatScript],
-      dependencies: []
+      dependencies: [
+        .external(name: "Dependencies")
+      ]
     ),
     .target(
       name: "APITests",
