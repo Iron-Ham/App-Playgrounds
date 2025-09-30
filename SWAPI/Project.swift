@@ -37,6 +37,7 @@ let project = Project(
         .target(name: "API"),
         .target(name: "Persistence"),
         .external(name: "SQLiteData"),
+        .external(name: "Dependencies"),
       ]
     ),
     .target(
