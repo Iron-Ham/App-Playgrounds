@@ -43,7 +43,8 @@ struct StarshipResponseTests {
     #expect(falcon.mglt == "75")
     #expect(falcon.mgltValue == 75)
 
-    #expect(falcon.starshipClass == "Light freighter")
+    #expect(falcon.starshipClass == .lightFreighter)
+    #expect(falcon.starshipClass.displayName == "Light Freighter")
 
     #expect(falcon.pilots.count == 4)
     #expect(falcon.pilots.contains(URL(string: "https://swapi.info/api/people/13")!))
@@ -77,6 +78,8 @@ struct StarshipResponseTests {
     #expect(starDestroyer.cargoCapacityInKilograms == 36_000_000)
     #expect(starDestroyer.hyperdriveRatingValue == 2.0)
     #expect(starDestroyer.mgltValue == 60)
+    #expect(starDestroyer.starshipClass == .starDestroyer)
+    #expect(starDestroyer.starshipClass.rawValue == "star destroyer")
     #expect(starDestroyer.pilots.isEmpty)
     #expect(starDestroyer.films.count == 3)
 
@@ -91,6 +94,7 @@ struct StarshipResponseTests {
     #expect(executor.cargoCapacityInKilograms == 250_000_000)
     #expect(executor.hyperdriveRatingValue == 2.0)
     #expect(executor.mgltValue == 40)
+    #expect(executor.starshipClass == .starDreadnought)
     #expect(executor.films.count == 2)
 
     let isoNoFrac = ISO8601DateFormatter()
@@ -104,6 +108,8 @@ struct StarshipResponseTests {
   @Test
   func manufacturerNormalization() throws {
     let starship = try StarshipResponse(data: manufacturerNormalizationResponse)
+
+    #expect(starship.starshipClass == .yacht)
 
     let names = starship.manufacturers.map(\.displayName)
     #expect(

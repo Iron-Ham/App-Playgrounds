@@ -9,8 +9,8 @@ struct RootSplitView: View {
   @Environment(\.modelContext)
   private var modelContext
 
-  @Query(sort: \FilmEntity.releaseDate, order: .forward)
-  private var films: [FilmEntity]
+  @Query(sort: \Film.releaseDate, order: .forward)
+  private var films: [Film]
 
   @State
   private var error: Error?
@@ -22,7 +22,7 @@ struct RootSplitView: View {
   private var hasLoadedInitialData: Bool = false
 
   @State
-  private var selectedFilmID: FilmEntity.ID?
+  private var selectedFilmID: Film.ID?
 
   var body: some View {
     NavigationSplitView {
@@ -115,7 +115,7 @@ extension RootSplitView {
 }
 
 extension RootSplitView {
-  fileprivate var selectedFilmBinding: Binding<FilmEntity?> {
+  fileprivate var selectedFilmBinding: Binding<Film?> {
     Binding(
       get: {
         if let selectedFilmID {

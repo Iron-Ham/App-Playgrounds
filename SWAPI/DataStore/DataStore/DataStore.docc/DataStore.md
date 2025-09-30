@@ -6,7 +6,7 @@ Bring the Star Wars API offline with a set of ``SwiftData`` models, a ready-to-u
 
 The ``DataStore`` module mirrors the networking layer provided by the ``API`` target and exposes:
 
-- ``FilmEntity``, ``PersonEntity``, ``PlanetEntity``, ``SpeciesEntity``, ``StarshipEntity``, and ``VehicleEntity`` SwiftData models with rich computed properties for presentation.
+- ``Film``, ``Person``, ``Planet``, ``Species``, ``Starship``, and ``Vehicle`` SwiftData models with rich computed properties for presentation.
 - ``SWAPIDataStore`` as a lightweight factory for creating a configured ``SwiftData/ModelContainer``.
 - ``SnapshotImporter`` to translate decoded ``API`` response structs into managed models, wiring up all cross-entity relationships.
 
@@ -21,12 +21,12 @@ Use these tools to hydrate a SwiftUI or UIKit experience with offline-capable da
 
 ### Persisted models
 
-- ``FilmEntity``
-- ``PersonEntity``
-- ``PlanetEntity``
-- ``SpeciesEntity``
-- ``StarshipEntity``
-- ``VehicleEntity``
+- ``Film``
+- ``Person``
+- ``Planet``
+- ``Species``
+- ``Starship``
+- ``Vehicle``
 
 ### Importing API responses
 

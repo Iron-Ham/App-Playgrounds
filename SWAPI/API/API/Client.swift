@@ -70,9 +70,9 @@ public enum Client {
 
 extension Client {
   #if DEBUG
-    internal static func withSessionOverride<T>(
+  internal static func withSessionOverride<T: Sendable>(
       _ session: URLSession,
-      operation: () async throws -> T
+      operation: @Sendable () async throws -> T
     ) async rethrows -> T {
       try await sessionStore.withSessionOverride(session, operation: operation)
     }
@@ -98,7 +98,7 @@ extension Client {
     #if DEBUG
       func withSessionOverride<T>(
         _ session: URLSession,
-        operation: () async throws -> T
+        operation: @Sendable () async throws -> T
       ) async rethrows -> T {
         let previous = self.session
         self.session = session

@@ -2,10 +2,10 @@ import DataStore
 import SwiftUI
 
 struct FilmsView: View {
-  let films: [FilmEntity]
+  let films: [Film]
 
   @Binding
-  var selection: FilmEntity.ID?
+  var selection: Film.ID?
 
   let isLoading: Bool
 
@@ -38,7 +38,7 @@ struct FilmsView: View {
 }
 
 private struct CellView: View {
-  let film: FilmEntity
+  let film: Film
 
   var body: some View {
     VStack(alignment: .leading) {
@@ -56,7 +56,7 @@ private struct CellView: View {
 }
 
 #Preview {
-  let film = FilmEntity(
+  let film = Film(
     url: URL(string: "https://swapi.dev/api/films/1/")!,
     title: "A New Hope",
     episodeID: 4,

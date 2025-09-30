@@ -31,13 +31,17 @@
 		0BB383D12E8B351200312DBF /* SnapshotImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB383CC2E8B351200312DBF /* SnapshotImporter.swift */; };
 		0BB383D42E8B351500312DBF /* DataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB383D22E8B351500312DBF /* DataStoreTests.swift */; };
 		0BCA8A612E8B6F3B00C46FCC /* View+LoadableState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A5F2E8B6F3B00C46FCC /* View+LoadableState.swift */; };
-		0BCA8A642E8B6FFF00C46FCC /* FilmEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A632E8B6FFC00C46FCC /* FilmEntity.swift */; };
-		0BCA8A662E8B701700C46FCC /* PersonEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A652E8B701600C46FCC /* PersonEntity.swift */; };
-		0BCA8A682E8B702A00C46FCC /* PlanetEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A672E8B702800C46FCC /* PlanetEntity.swift */; };
-		0BCA8A6A2E8B703A00C46FCC /* SpeciesEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A692E8B703800C46FCC /* SpeciesEntity.swift */; };
-		0BCA8A6C2E8B704C00C46FCC /* StarshipEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A6B2E8B704A00C46FCC /* StarshipEntity.swift */; };
-		0BCA8A6E2E8B705C00C46FCC /* VehicleEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A6D2E8B705A00C46FCC /* VehicleEntity.swift */; };
 		0BCA8A702E8B74B700C46FCC /* FilmDetail.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 0BCA8A6F2E8B74B700C46FCC /* FilmDetail.stringsdict */; };
+		0BCA8B252E8B7ECB00C46FCC /* SQLiteData in Frameworks */ = {isa = PBXBuildFile; productRef = 0BCA8B242E8B7ECB00C46FCC /* SQLiteData */; };
+		0BCA8B272E8B7ECB00C46FCC /* SQLiteDataTestSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 0BCA8B262E8B7ECB00C46FCC /* SQLiteDataTestSupport */; };
+		0BCA8C562E8BFC8500C46FCC /* Vehicle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8C552E8BFC8500C46FCC /* Vehicle.swift */; };
+		0BCA8C572E8BFC8500C46FCC /* Planet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8C512E8BFC8500C46FCC /* Planet.swift */; };
+		0BCA8C582E8BFC8500C46FCC /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8C502E8BFC8500C46FCC /* Person.swift */; };
+		0BCA8C592E8BFC8500C46FCC /* Starship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8C542E8BFC8500C46FCC /* Starship.swift */; };
+		0BCA8C5A2E8BFC8500C46FCC /* Film.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8C4F2E8BFC8500C46FCC /* Film.swift */; };
+		0BCA8C5B2E8BFC8500C46FCC /* Species.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8C532E8BFC8500C46FCC /* Species.swift */; };
+		0BCA8C5C2E8BFC8500C46FCC /* Relationships.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8C522E8BFC8500C46FCC /* Relationships.swift */; };
+		0BD6A54F2E8D78A300C096B7 /* StructuredQueries in Frameworks */ = {isa = PBXBuildFile; productRef = 0BD6A54E2E8D78A300C096B7 /* StructuredQueries */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,13 +65,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 0B8D85012E88288500A3894C;
 			remoteInfo = API;
-		};
-		0B8D85102E88288600A3894C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0B3F85722E841A5F0053A15D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 0B3F85792E841A5F0053A15D;
-			remoteInfo = SWAPI;
 		};
 		0B8D85152E88288600A3894C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -96,13 +93,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 0BB383A22E8B320F00312DBF;
 			remoteInfo = DataStore;
-		};
-		0BB383B12E8B320F00312DBF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0B3F85722E841A5F0053A15D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 0B3F85792E841A5F0053A15D;
-			remoteInfo = "SWAPI-SwiftUI";
 		};
 		0BB383B62E8B320F00312DBF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -173,13 +163,14 @@
 		0BB383D22E8B351500312DBF /* DataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStoreTests.swift; sourceTree = "<group>"; };
 		0BB383D62E8B358400312DBF /* DataStore.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DataStore.xctestplan; sourceTree = "<group>"; };
 		0BCA8A5F2E8B6F3B00C46FCC /* View+LoadableState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+LoadableState.swift"; sourceTree = "<group>"; };
-		0BCA8A632E8B6FFC00C46FCC /* FilmEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmEntity.swift; sourceTree = "<group>"; };
-		0BCA8A652E8B701600C46FCC /* PersonEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonEntity.swift; sourceTree = "<group>"; };
-		0BCA8A672E8B702800C46FCC /* PlanetEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetEntity.swift; sourceTree = "<group>"; };
-		0BCA8A692E8B703800C46FCC /* SpeciesEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeciesEntity.swift; sourceTree = "<group>"; };
-		0BCA8A6B2E8B704A00C46FCC /* StarshipEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarshipEntity.swift; sourceTree = "<group>"; };
-		0BCA8A6D2E8B705A00C46FCC /* VehicleEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleEntity.swift; sourceTree = "<group>"; };
 		0BCA8A6F2E8B74B700C46FCC /* FilmDetail.stringsdict */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; path = FilmDetail.stringsdict; sourceTree = "<group>"; };
+		0BCA8C4F2E8BFC8500C46FCC /* Film.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Film.swift; sourceTree = "<group>"; };
+		0BCA8C502E8BFC8500C46FCC /* Person.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
+		0BCA8C512E8BFC8500C46FCC /* Planet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Planet.swift; sourceTree = "<group>"; };
+		0BCA8C522E8BFC8500C46FCC /* Relationships.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Relationships.swift; sourceTree = "<group>"; };
+		0BCA8C532E8BFC8500C46FCC /* Species.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Species.swift; sourceTree = "<group>"; };
+		0BCA8C542E8BFC8500C46FCC /* Starship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Starship.swift; sourceTree = "<group>"; };
+		0BCA8C552E8BFC8500C46FCC /* Vehicle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vehicle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -289,6 +280,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0BD6A54F2E8D78A300C096B7 /* StructuredQueries in Frameworks */,
+				0BCA8B252E8B7ECB00C46FCC /* SQLiteData in Frameworks */,
 				0BB383C02E8B322400312DBF /* API.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -297,6 +290,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0BCA8B272E8B7ECB00C46FCC /* SQLiteDataTestSupport in Frameworks */,
 				0BB383AE2E8B320F00312DBF /* DataStore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -442,12 +436,13 @@
 		0BCA8A622E8B6FF700C46FCC /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				0BCA8A6D2E8B705A00C46FCC /* VehicleEntity.swift */,
-				0BCA8A6B2E8B704A00C46FCC /* StarshipEntity.swift */,
-				0BCA8A692E8B703800C46FCC /* SpeciesEntity.swift */,
-				0BCA8A672E8B702800C46FCC /* PlanetEntity.swift */,
-				0BCA8A652E8B701600C46FCC /* PersonEntity.swift */,
-				0BCA8A632E8B6FFC00C46FCC /* FilmEntity.swift */,
+				0BCA8C4F2E8BFC8500C46FCC /* Film.swift */,
+				0BCA8C502E8BFC8500C46FCC /* Person.swift */,
+				0BCA8C512E8BFC8500C46FCC /* Planet.swift */,
+				0BCA8C522E8BFC8500C46FCC /* Relationships.swift */,
+				0BCA8C532E8BFC8500C46FCC /* Species.swift */,
+				0BCA8C542E8BFC8500C46FCC /* Starship.swift */,
+				0BCA8C552E8BFC8500C46FCC /* Vehicle.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -569,7 +564,6 @@
 			);
 			dependencies = (
 				0B8D850F2E88288600A3894C /* PBXTargetDependency */,
-				0B8D85112E88288600A3894C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				0B8D85122E88288600A3894C /* APITests */,
@@ -667,6 +661,8 @@
 			);
 			name = DataStore;
 			packageProductDependencies = (
+				0BD6A54E2E8D78A300C096B7 /* StructuredQueries */,
+				0BCA8B242E8B7ECB00C46FCC /* SQLiteData */,
 			);
 			productName = DataStore;
 			productReference = 0BB383A32E8B320F00312DBF /* DataStore.framework */;
@@ -684,10 +680,10 @@
 			);
 			dependencies = (
 				0BB383B02E8B320F00312DBF /* PBXTargetDependency */,
-				0BB383B22E8B320F00312DBF /* PBXTargetDependency */,
 			);
 			name = DataStoreTests;
 			packageProductDependencies = (
+				0BCA8B262E8B7ECB00C46FCC /* SQLiteDataTestSupport */,
 			);
 			productName = DataStoreTests;
 			productReference = 0BB383AD2E8B320F00312DBF /* DataStoreTests.xctest */;
@@ -750,6 +746,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				0B73A2E12E8840CD005DC6DD /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
+				0BCA8B232E8B7ECB00C46FCC /* XCLocalSwiftPackageReference "sqlite-data" */,
+				0BD6A54D2E8D78A300C096B7 /* XCRemoteSwiftPackageReference "swift-structured-queries" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0B3F857B2E841A5F0053A15D /* Products */;
@@ -915,15 +913,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0BCA8A642E8B6FFF00C46FCC /* FilmEntity.swift in Sources */,
-				0BCA8A682E8B702A00C46FCC /* PlanetEntity.swift in Sources */,
-				0BCA8A662E8B701700C46FCC /* PersonEntity.swift in Sources */,
-				0BCA8A6C2E8B704C00C46FCC /* StarshipEntity.swift in Sources */,
+				0BCA8C562E8BFC8500C46FCC /* Vehicle.swift in Sources */,
+				0BCA8C572E8BFC8500C46FCC /* Planet.swift in Sources */,
+				0BCA8C582E8BFC8500C46FCC /* Person.swift in Sources */,
+				0BCA8C592E8BFC8500C46FCC /* Starship.swift in Sources */,
+				0BCA8C5A2E8BFC8500C46FCC /* Film.swift in Sources */,
+				0BCA8C5B2E8BFC8500C46FCC /* Species.swift in Sources */,
+				0BCA8C5C2E8BFC8500C46FCC /* Relationships.swift in Sources */,
 				0BB383CF2E8B351200312DBF /* DataStore.docc in Sources */,
 				0BB383D02E8B351200312DBF /* DataStore.swift in Sources */,
 				0BB383D12E8B351200312DBF /* SnapshotImporter.swift in Sources */,
-				0BCA8A6A2E8B703A00C46FCC /* SpeciesEntity.swift in Sources */,
-				0BCA8A6E2E8B705C00C46FCC /* VehicleEntity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -953,11 +952,6 @@
 			target = 0B8D85012E88288500A3894C /* API */;
 			targetProxy = 0B8D850E2E88288600A3894C /* PBXContainerItemProxy */;
 		};
-		0B8D85112E88288600A3894C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 0B3F85792E841A5F0053A15D /* SWAPI-SwiftUI */;
-			targetProxy = 0B8D85102E88288600A3894C /* PBXContainerItemProxy */;
-		};
 		0B8D85162E88288600A3894C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0B8D85012E88288500A3894C /* API */;
@@ -977,11 +971,6 @@
 			isa = PBXTargetDependency;
 			target = 0BB383A22E8B320F00312DBF /* DataStore */;
 			targetProxy = 0BB383AF2E8B320F00312DBF /* PBXContainerItemProxy */;
-		};
-		0BB383B22E8B320F00312DBF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 0B3F85792E841A5F0053A15D /* SWAPI-SwiftUI */;
-			targetProxy = 0BB383B12E8B320F00312DBF /* PBXContainerItemProxy */;
 		};
 		0BB383B72E8B320F00312DBF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1221,7 +1210,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SWAPI-SwiftUI.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SWAPI-SwiftUI";
 				XROS_DEPLOYMENT_TARGET = 26.0;
@@ -1247,7 +1236,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SWAPI-SwiftUI.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SWAPI-SwiftUI";
 				XROS_DEPLOYMENT_TARGET = 26.0;
@@ -1272,7 +1261,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = "SWAPI-SwiftUI";
 				XROS_DEPLOYMENT_TARGET = 26.0;
@@ -1297,7 +1286,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = "SWAPI-SwiftUI";
 				XROS_DEPLOYMENT_TARGET = 26.0;
@@ -1343,7 +1332,7 @@
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1390,7 +1379,7 @@
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1417,7 +1406,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
@@ -1442,7 +1431,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
@@ -1477,7 +1466,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1511,7 +1500,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1534,7 +1523,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SWAPI-UIKit.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SWAPI-UIKit";
 			};
@@ -1557,7 +1546,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SWAPI-UIKit.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SWAPI-UIKit";
 				VALIDATE_PRODUCT = YES;
@@ -1580,7 +1569,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = "SWAPI-UIKit";
 			};
@@ -1602,7 +1591,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = "SWAPI-UIKit";
 				VALIDATE_PRODUCT = YES;
@@ -1648,7 +1637,7 @@
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1695,7 +1684,7 @@
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1722,7 +1711,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
@@ -1747,7 +1736,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
@@ -1866,6 +1855,18 @@
 				minimumVersion = 1.1.1;
 			};
 		};
+		0BCA8B232E8B7ECB00C46FCC /* XCLocalSwiftPackageReference "sqlite-data" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "Packages/sqlite-data";
+		};
+		0BD6A54D2E8D78A300C096B7 /* XCRemoteSwiftPackageReference "swift-structured-queries" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-structured-queries";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.21.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1873,6 +1874,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 0B73A2E12E8840CD005DC6DD /* XCRemoteSwiftPackageReference "swift-identified-collections" */;
 			productName = IdentifiedCollections;
+		};
+		0BCA8B242E8B7ECB00C46FCC /* SQLiteData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0BCA8B232E8B7ECB00C46FCC /* XCRemoteSwiftPackageReference "sqlite-data" */;
+			productName = SQLiteData;
+		};
+		0BCA8B262E8B7ECB00C46FCC /* SQLiteDataTestSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0BCA8B232E8B7ECB00C46FCC /* XCRemoteSwiftPackageReference "sqlite-data" */;
+			productName = SQLiteDataTestSupport;
+		};
+		0BD6A54E2E8D78A300C096B7 /* StructuredQueries */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0BD6A54D2E8D78A300C096B7 /* XCRemoteSwiftPackageReference "swift-structured-queries" */;
+			productName = StructuredQueries;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

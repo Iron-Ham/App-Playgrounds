@@ -102,7 +102,7 @@ private final class SWAPIURLProtocolStub: URLProtocol {
     let data: Data
   }
 
-  private static var stubs: [URL: Stub] = [:]
+  nonisolated(unsafe) private static var stubs: [URL: Stub] = [:]
   private static let lock = NSLock()
 
   static func stub(

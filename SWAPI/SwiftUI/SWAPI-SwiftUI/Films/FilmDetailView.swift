@@ -3,7 +3,7 @@ import DataStore
 import SwiftUI
 
 struct FilmDetailView: View {
-  @Binding var film: FilmEntity?
+  @Binding var film: Film?
 
   var body: some View {
     Group {
@@ -17,7 +17,7 @@ struct FilmDetailView: View {
     }
   }
 
-  private func detailContent(for film: FilmEntity) -> some View {
+  private func detailContent(for film: Film) -> some View {
     ScrollView {
       VStack(alignment: .leading, spacing: 24) {
         VStack(alignment: .leading, spacing: 8) {
@@ -140,7 +140,7 @@ struct FilmDetailView: View {
   }
 }
 
-private extension FilmEntity {
+private extension Film {
   var releaseDateLongText: String? {
     releaseDate?.formatted(date: .long, time: .omitted)
   }
@@ -228,7 +228,7 @@ private struct InfoRow: View {
 }
 
 #Preview {
-  let film = FilmEntity(
+  let film = Film(
     url: URL(string: "https://swapi.dev/api/films/1/")!,
     title: "A New Hope",
     episodeID: 4,
