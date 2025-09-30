@@ -26,12 +26,18 @@
 		0BB383B92E8B320F00312DBF /* DataStore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0BB383A32E8B320F00312DBF /* DataStore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0BB383C02E8B322400312DBF /* API.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B8D85022E88288500A3894C /* API.framework */; };
 		0BB383C12E8B322400312DBF /* API.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0B8D85022E88288500A3894C /* API.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		0BB383CE2E8B351200312DBF /* DataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB383C92E8B351200312DBF /* DataModels.swift */; };
 		0BB383CF2E8B351200312DBF /* DataStore.docc in Sources */ = {isa = PBXBuildFile; fileRef = 0BB383CA2E8B351200312DBF /* DataStore.docc */; };
 		0BB383D02E8B351200312DBF /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB383CB2E8B351200312DBF /* DataStore.swift */; };
 		0BB383D12E8B351200312DBF /* SnapshotImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB383CC2E8B351200312DBF /* SnapshotImporter.swift */; };
 		0BB383D42E8B351500312DBF /* DataStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB383D22E8B351500312DBF /* DataStoreTests.swift */; };
 		0BCA8A612E8B6F3B00C46FCC /* View+LoadableState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A5F2E8B6F3B00C46FCC /* View+LoadableState.swift */; };
+		0BCA8A642E8B6FFF00C46FCC /* FilmEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A632E8B6FFC00C46FCC /* FilmEntity.swift */; };
+		0BCA8A662E8B701700C46FCC /* PersonEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A652E8B701600C46FCC /* PersonEntity.swift */; };
+		0BCA8A682E8B702A00C46FCC /* PlanetEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A672E8B702800C46FCC /* PlanetEntity.swift */; };
+		0BCA8A6A2E8B703A00C46FCC /* SpeciesEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A692E8B703800C46FCC /* SpeciesEntity.swift */; };
+		0BCA8A6C2E8B704C00C46FCC /* StarshipEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A6B2E8B704A00C46FCC /* StarshipEntity.swift */; };
+		0BCA8A6E2E8B705C00C46FCC /* VehicleEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BCA8A6D2E8B705A00C46FCC /* VehicleEntity.swift */; };
+		0BCA8A702E8B74B700C46FCC /* FilmDetail.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 0BCA8A6F2E8B74B700C46FCC /* FilmDetail.stringsdict */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -161,13 +167,19 @@
 		0BAF1D982E8B505200024151 /* FilmDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmDetailView.swift; sourceTree = "<group>"; };
 		0BB383A32E8B320F00312DBF /* DataStore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DataStore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0BB383AD2E8B320F00312DBF /* DataStoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DataStoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		0BB383C92E8B351200312DBF /* DataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModels.swift; sourceTree = "<group>"; };
 		0BB383CA2E8B351200312DBF /* DataStore.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = DataStore.docc; sourceTree = "<group>"; };
 		0BB383CB2E8B351200312DBF /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
 		0BB383CC2E8B351200312DBF /* SnapshotImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotImporter.swift; sourceTree = "<group>"; };
 		0BB383D22E8B351500312DBF /* DataStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStoreTests.swift; sourceTree = "<group>"; };
 		0BB383D62E8B358400312DBF /* DataStore.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DataStore.xctestplan; sourceTree = "<group>"; };
 		0BCA8A5F2E8B6F3B00C46FCC /* View+LoadableState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+LoadableState.swift"; sourceTree = "<group>"; };
+		0BCA8A632E8B6FFC00C46FCC /* FilmEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmEntity.swift; sourceTree = "<group>"; };
+		0BCA8A652E8B701600C46FCC /* PersonEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonEntity.swift; sourceTree = "<group>"; };
+		0BCA8A672E8B702800C46FCC /* PlanetEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetEntity.swift; sourceTree = "<group>"; };
+		0BCA8A692E8B703800C46FCC /* SpeciesEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeciesEntity.swift; sourceTree = "<group>"; };
+		0BCA8A6B2E8B704A00C46FCC /* StarshipEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarshipEntity.swift; sourceTree = "<group>"; };
+		0BCA8A6D2E8B705A00C46FCC /* VehicleEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleEntity.swift; sourceTree = "<group>"; };
+		0BCA8A6F2E8B74B700C46FCC /* FilmDetail.stringsdict */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; path = FilmDetail.stringsdict; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -392,6 +404,7 @@
 		0BAF1D972E8B504B00024151 /* Films */ = {
 			isa = PBXGroup;
 			children = (
+				0BCA8A6F2E8B74B700C46FCC /* FilmDetail.stringsdict */,
 				0BAF1D982E8B505200024151 /* FilmDetailView.swift */,
 				0BAF1D952E8B4EB300024151 /* FilmsView.swift */,
 			);
@@ -401,7 +414,7 @@
 		0BB383CD2E8B351200312DBF /* DataStore */ = {
 			isa = PBXGroup;
 			children = (
-				0BB383C92E8B351200312DBF /* DataModels.swift */,
+				0BCA8A622E8B6FF700C46FCC /* Entities */,
 				0BB383CA2E8B351200312DBF /* DataStore.docc */,
 				0BB383CB2E8B351200312DBF /* DataStore.swift */,
 				0BB383CC2E8B351200312DBF /* SnapshotImporter.swift */,
@@ -424,6 +437,19 @@
 				0BB383D32E8B351500312DBF /* DataStoreTests */,
 			);
 			path = DataStore;
+			sourceTree = "<group>";
+		};
+		0BCA8A622E8B6FF700C46FCC /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				0BCA8A6D2E8B705A00C46FCC /* VehicleEntity.swift */,
+				0BCA8A6B2E8B704A00C46FCC /* StarshipEntity.swift */,
+				0BCA8A692E8B703800C46FCC /* SpeciesEntity.swift */,
+				0BCA8A672E8B702800C46FCC /* PlanetEntity.swift */,
+				0BCA8A652E8B701600C46FCC /* PersonEntity.swift */,
+				0BCA8A632E8B6FFC00C46FCC /* FilmEntity.swift */,
+			);
+			path = Entities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -750,6 +776,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0BAF1D8A2E8B4D4600024151 /* Assets.xcassets in Resources */,
+				0BCA8A702E8B74B700C46FCC /* FilmDetail.stringsdict in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -888,10 +915,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0BB383CE2E8B351200312DBF /* DataModels.swift in Sources */,
+				0BCA8A642E8B6FFF00C46FCC /* FilmEntity.swift in Sources */,
+				0BCA8A682E8B702A00C46FCC /* PlanetEntity.swift in Sources */,
+				0BCA8A662E8B701700C46FCC /* PersonEntity.swift in Sources */,
+				0BCA8A6C2E8B704C00C46FCC /* StarshipEntity.swift in Sources */,
 				0BB383CF2E8B351200312DBF /* DataStore.docc in Sources */,
 				0BB383D02E8B351200312DBF /* DataStore.swift in Sources */,
 				0BB383D12E8B351200312DBF /* SnapshotImporter.swift in Sources */,
+				0BCA8A6A2E8B703A00C46FCC /* SpeciesEntity.swift in Sources */,
+				0BCA8A6E2E8B705C00C46FCC /* VehicleEntity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

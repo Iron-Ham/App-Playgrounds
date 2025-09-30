@@ -35,13 +35,7 @@ struct RootSplitView: View {
         }
       )
     } detail: {
-      if let film = selectedFilm {
-        FilmDetailView(film: film)
-      } else {
-        ContentUnavailableView {
-          Label("Select a film", systemImage: "film")
-        }
-      }
+      FilmDetailView(film: selectedFilmBinding)
     }
     .navigationSplitViewStyle(.balanced)
     .loadableState(
@@ -121,13 +115,21 @@ extension RootSplitView {
 }
 
 extension RootSplitView {
-  fileprivate var selectedFilm: FilmEntity? {
-    if let selectedFilmID {
-      films.first { $0.id == selectedFilmID }
-    } else {
-      nil
-    }
+  fileprivate var selectedFilmBinding: Binding<FilmEntity?> {
+    Binding(
+      get: {
+        if let selectedFilmID {
+          films.first { $0.id == selectedFilmID }
+        } else {
+          nil
+        }
+      },
+      set: { film in
+        selectedFilmID = film?.id
+      }
+    )
   }
+
 }
 
 #Preview {
