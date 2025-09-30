@@ -10,14 +10,20 @@ extension View {
     @ViewBuilder errorView: (_ error: Error) -> ErrorContent,
     @ViewBuilder emptyView: () -> EmptyContent
   ) -> some View {
-    if !hasLoadedInitialData {
-      loadingView()
-    } else if let error, isContentEmpty {
-      errorView(error)
-    } else if isContentEmpty {
-      emptyView()
-    } else {
+  let shouldShowContent = hasLoadedInitialData && !isContentEmpty
+
+  ZStack {
       self
+        .opacity(shouldShowContent ? 1 : 0)
+        .allowsHitTesting(shouldShowContent)
+
+      if !hasLoadedInitialData {
+        loadingView()
+      } else if let error, isContentEmpty {
+        errorView(error)
+      } else if isContentEmpty {
+        emptyView()
+      }
     }
   }
 }

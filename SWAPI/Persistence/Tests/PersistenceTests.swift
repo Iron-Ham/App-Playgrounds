@@ -187,6 +187,16 @@ struct PersistenceTests {
       #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM personStarships") == 1)
       #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM personVehicles") == 1)
     }
+
+    let summary = try store.relationshipSummary(forFilmWithURL: filmURL)
+    #expect(summary.characterCount == 1)
+    #expect(summary.planetCount == 1)
+    #expect(summary.speciesCount == 1)
+    #expect(summary.starshipCount == 1)
+    #expect(summary.vehicleCount == 1)
+
+    let characterURLs = try store.relationshipURLs(forFilmWithURL: filmURL, .characters)
+    #expect(characterURLs == [personURL])
   }
 
   @Test("import snapshot clears existing data before reimport")

@@ -15,9 +15,7 @@ struct SWAPIApp: App {
 
   var body: some Scene {
     WindowGroup {
-      NavigationStack {
-        RootSplitView(dataStore: dataStore)
-      }
+      RootSplitView(dataStore: dataStore)
     }
   }
 }

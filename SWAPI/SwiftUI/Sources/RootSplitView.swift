@@ -19,49 +19,25 @@ struct RootSplitView: View {
   private var hasLoadedInitialData: Bool = false
 
   @State
-  private var selectedFilmID: Film.ID?
+  private var selectedFilm: Film?
+
+  @State private var preferredCompactColumn: NavigationSplitViewColumn = .sidebar
 
   var body: some View {
-    NavigationSplitView {
+    NavigationSplitView(preferredCompactColumn: $preferredCompactColumn) {
       FilmsView(
         films: films,
-        selection: $selectedFilmID,
+        selection: $selectedFilm,
         isLoading: isLoading,
         onRefresh: {
           await refresh(force: true)
         }
       )
     } detail: {
-      FilmDetailView(film: selectedFilmBinding)
-    }
-    .navigationSplitViewStyle(.balanced)
-    .loadableState(
-      hasLoadedInitialData: hasLoadedInitialData,
-      isContentEmpty: films.isEmpty,
-      error: error,
-      loadingView: {
-        VStack {
-          Spacer()
-          ProgressView()
-            .progressViewStyle(.circular)
-          Spacer()
-        }
-      },
-      errorView: { error in
-        ErrorView(
-          errorTitle: "An error has occurred",
-          errorDescription: error.localizedDescription,
-          action: {
-            await refresh(force: true)
-          }
-        )
-      },
-      emptyView: {
-        ContentUnavailableView {
-          Text("No films available")
-        }
+      if let selectedFilm {
+        FilmDetailView(film: $selectedFilm, dataStore: dataStore)
       }
-    )
+    }
     .task {
       guard !hasLoadedInitialData else { return }
       await refresh()
@@ -90,43 +66,53 @@ extension RootSplitView {
     }
   }
 
-  @MainActor
   private func loadSnapshot() async throws {
-    async let filmsResponse = Client.films()
-    async let peopleResponse = Client.people()
-    async let planetsResponse = Client.planets()
-    async let speciesResponse = Client.species()
-    async let starshipsResponse = Client.starships()
-    async let vehiclesResponse = Client.vehicles()
+    let snapshot = try await fetchSnapshot()
+    try Task.checkCancellation()
+    try await importSnapshot(snapshot)
+  }
 
-    let importer = dataStore.makeImporter()
-    try importer.importSnapshot(
-      films: try await filmsResponse,
-      people: try await peopleResponse,
-      planets: try await planetsResponse,
-      species: try await speciesResponse,
-      starships: try await starshipsResponse,
-      vehicles: try await vehiclesResponse
+  private func fetchSnapshot() async throws -> SnapshotPayload {
+    async let films = Client.films()
+    async let people = Client.people()
+    async let planets = Client.planets()
+    async let species = Client.species()
+    async let starships = Client.starships()
+    async let vehicles = Client.vehicles()
+
+    return SnapshotPayload(
+      films: try await films,
+      people: try await people,
+      planets: try await planets,
+      species: try await species,
+      starships: try await starships,
+      vehicles: try await vehicles
     )
+  }
+
+  private func importSnapshot(_ snapshot: SnapshotPayload) async throws {
+    try await Task(priority: .userInitiated) {
+      let importer = dataStore.makeImporter()
+      try importer.importSnapshot(
+        films: snapshot.films,
+        people: snapshot.people,
+        planets: snapshot.planets,
+        species: snapshot.species,
+        starships: snapshot.starships,
+        vehicles: snapshot.vehicles
+      )
+    }
+    .value
   }
 }
 
-extension RootSplitView {
-  fileprivate var selectedFilmBinding: Binding<Film?> {
-    Binding(
-      get: {
-        if let selectedFilmID {
-          films.first { $0.id == selectedFilmID }
-        } else {
-          nil
-        }
-      },
-      set: { film in
-        selectedFilmID = film?.id
-      }
-    )
-  }
-
+private struct SnapshotPayload: Sendable {
+  let films: [FilmResponse]
+  let people: [PersonResponse]
+  let planets: [PlanetResponse]
+  let species: [SpeciesResponse]
+  let starships: [StarshipResponse]
+  let vehicles: [VehicleResponse]
 }
 
 #Preview {

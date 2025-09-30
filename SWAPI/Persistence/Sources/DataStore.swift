@@ -4,7 +4,7 @@ import GRDB
 import SQLiteData
 import StructuredQueries
 
-public struct SWAPIDataStore {
+public struct SWAPIDataStore: @unchecked Sendable {
   public let database: any DatabaseWriter
 
   public init(

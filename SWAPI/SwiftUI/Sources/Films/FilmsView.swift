@@ -5,7 +5,7 @@ struct FilmsView: View {
   let films: [Film]
 
   @Binding
-  var selection: Film.ID?
+  var selection: Film?
 
   let isLoading: Bool
 
