@@ -1,5 +1,4 @@
-import DataStore
-import SwiftData
+import Persistence
 import SwiftUI
 
 @main
@@ -20,6 +19,5 @@ struct SWAPIApp: App {
         RootSplitView(dataStore: dataStore)
       }
     }
-    .modelContainer(dataStore.container)
   }
 }

@@ -1,16 +1,13 @@
 import API
-import DataStore
-import SwiftData
+import Persistence
+import SQLiteData
 import SwiftUI
 
 struct RootSplitView: View {
   let dataStore: SWAPIDataStore
 
-  @Environment(\.modelContext)
-  private var modelContext
-
-  @Query(sort: \Film.releaseDate, order: .forward)
-  private var films: [Film]
+  @FetchAll(Film.order(by: \.releaseDate))
+  private var films
 
   @State
   private var error: Error?
@@ -102,7 +99,7 @@ extension RootSplitView {
     async let starshipsResponse = Client.starships()
     async let vehiclesResponse = Client.vehicles()
 
-    let importer = dataStore.makeImporter(context: modelContext)
+    let importer = dataStore.makeImporter()
     try importer.importSnapshot(
       films: try await filmsResponse,
       people: try await peopleResponse,
@@ -138,5 +135,4 @@ extension RootSplitView {
   return NavigationStack {
     RootSplitView(dataStore: store)
   }
-  .modelContainer(store.container)
 }

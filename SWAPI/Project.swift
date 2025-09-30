@@ -9,7 +9,7 @@ let project = Project(
   ),
   targets: [
     .target(
-      name: "SwiftUI",
+      name: "SWAPI-SwiftUI",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .app,
       bundleId: "dev.tuist.SWAPI-SwiftUI",
@@ -28,6 +28,7 @@ let project = Project(
       dependencies: [
         .target(name: "API"),
         .target(name: "Persistence"),
+        .external(name: "SQLiteData"),
       ]
     ),
     .target(
@@ -39,7 +40,7 @@ let project = Project(
       buildableFolders: [
         "SwiftUI/Tests"
       ],
-      dependencies: [.target(name: "SwiftUI")]
+      dependencies: [.target(name: "SWAPI-SwiftUI")]
     ),
     .target(
       name: "API",
@@ -75,6 +76,7 @@ let project = Project(
         "Persistence/Resources",
       ],
       dependencies: [
+        .external(name: "Dependencies"),
         .external(name: "SQLiteData"),
         .target(name: "API"),
       ]

@@ -12,26 +12,26 @@ import Foundation
 
 // swiftlint:disable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:disable nesting type_body_length type_name
-public enum SwiftUIStrings: Sendable {
+public enum SWAPISwiftUIStrings: Sendable {
   /// Plural format key: "%#@value@"
   public static func charactersCount(_ p1: Int) -> String {
-    return SwiftUIStrings.tr("FilmDetail", "characters-count",p1)
+    return SWAPISwiftUIStrings.tr("FilmDetail", "characters-count",p1)
   }
   /// Plural format key: "%#@value@"
   public static func planetsCount(_ p1: Int) -> String {
-    return SwiftUIStrings.tr("FilmDetail", "planets-count",p1)
+    return SWAPISwiftUIStrings.tr("FilmDetail", "planets-count",p1)
   }
   /// Plural format key: "%#@value@"
   public static func speciesCount(_ p1: Int) -> String {
-    return SwiftUIStrings.tr("FilmDetail", "species-count",p1)
+    return SWAPISwiftUIStrings.tr("FilmDetail", "species-count",p1)
   }
   /// Plural format key: "%#@value@"
   public static func starshipsCount(_ p1: Int) -> String {
-    return SwiftUIStrings.tr("FilmDetail", "starships-count",p1)
+    return SWAPISwiftUIStrings.tr("FilmDetail", "starships-count",p1)
   }
   /// Plural format key: "%#@value@"
   public static func vehiclesCount(_ p1: Int) -> String {
-    return SwiftUIStrings.tr("FilmDetail", "vehicles-count",p1)
+    return SWAPISwiftUIStrings.tr("FilmDetail", "vehicles-count",p1)
   }
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
@@ -39,7 +39,7 @@ public enum SwiftUIStrings: Sendable {
 
 // MARK: - Implementation Details
 
-extension SwiftUIStrings {
+extension SWAPISwiftUIStrings {
   private static func tr(_ table: String, _ key: String, _ args: CVarArg...) -> String {
     let format = Bundle.module.localizedString(forKey: key, value: nil, table: table)
     return String(format: format, locale: Locale.current, arguments: args)

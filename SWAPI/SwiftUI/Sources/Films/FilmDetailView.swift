@@ -1,5 +1,5 @@
 import Foundation
-import DataStore
+import Persistence
 import SwiftUI
 
 struct FilmDetailView: View {
@@ -31,7 +31,7 @@ struct FilmDetailView: View {
               .foregroundStyle(.secondary)
           }
 
-          Text("Episode \(film.episodeID)")
+          Text("Episode \(film.episodeId)")
             .font(.title3)
             .foregroundStyle(.secondary)
         }
@@ -44,7 +44,7 @@ struct FilmDetailView: View {
 
           InfoRow(
             title: "Episode number",
-            value: "Episode \(film.episodeID)",
+            value: "Episode \(film.episodeId)",
             iconName: "rectangle.3.offgrid",
             iconDescription: "Icon representing the episode number"
           )
@@ -136,7 +136,6 @@ struct FilmDetailView: View {
     }
     .navigationTitle(film.title)
     .navigationBarTitleDisplayMode(.inline)
-    .background(Color(.systemGroupedBackground))
   }
 }
 
@@ -150,8 +149,8 @@ private extension Film {
   }
 
   var producersListText: String {
-    guard !producerNames.isEmpty else { return "No producers listed" }
-    return ListFormatter.localizedString(byJoining: producerNames)
+    guard !producers.isEmpty else { return "No producers listed" }
+    return ListFormatter.localizedString(byJoining: producers)
   }
 
   var characterCountDescription: String {
@@ -231,10 +230,10 @@ private struct InfoRow: View {
   let film = Film(
     url: URL(string: "https://swapi.dev/api/films/1/")!,
     title: "A New Hope",
-    episodeID: 4,
+    episodeId: 4,
     openingCrawl: "It is a period of civil war...",
     director: "George Lucas",
-    producerNames: ["Gary Kurtz", "Rick McCallum"],
+    producers: ["Gary Kurtz", "Rick McCallum"],
     releaseDate: Date(timeIntervalSince1970: 236_102_400),
     created: Date(timeIntervalSince1970: 236_102_400),
     edited: Date(timeIntervalSince1970: 236_102_400)

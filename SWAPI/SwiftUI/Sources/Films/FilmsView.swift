@@ -1,4 +1,4 @@
-import DataStore
+import Persistence
 import SwiftUI
 
 struct FilmsView: View {
@@ -56,24 +56,25 @@ private struct CellView: View {
 }
 
 #Preview {
-  let film = Film(
-    url: URL(string: "https://swapi.dev/api/films/1/")!,
-    title: "A New Hope",
-    episodeID: 4,
-    openingCrawl: "It is a period of civil war...",
-    director: "George Lucas",
-    producerNames: ["Gary Kurtz", "Rick McCallum"],
-    releaseDate: Date(timeIntervalSince1970: 236_102_400),
-    created: Date(timeIntervalSince1970: 236_102_400),
-    edited: Date(timeIntervalSince1970: 236_102_400)
-  )
-
-  return NavigationStack {
+  NavigationStack {
     FilmsView(
-      films: [film],
+      films: [
+        Film(
+          url: URL(string: "https://swapi.dev/api/films/1/")!,
+          title: "A New Hope",
+          episodeId: 4,
+          openingCrawl: "It is a period of civil war...",
+          director: "George Lucas",
+          producers: ["Gary Kurtz", "Rick McCallum"],
+          releaseDate: Date(timeIntervalSince1970: 236_102_400),
+          created: Date(timeIntervalSince1970: 236_102_400),
+          edited: Date(timeIntervalSince1970: 236_102_400)
+        )
+      ],
       selection: .constant(nil),
       isLoading: false,
-      onRefresh: {}
+      onRefresh: {
+}
     )
   }
 }
