@@ -1,5 +1,4 @@
 import Foundation
-import Playgrounds
 
 public enum Client {
   private static let filmsURL = URL(string: "https://swapi.info/api/films")!

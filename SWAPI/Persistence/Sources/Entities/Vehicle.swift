@@ -74,8 +74,8 @@ public struct Vehicle: Hashable, Identifiable, Sendable {
   }
 }
 
-private extension Vehicle {
-  static func metricNumber(from rawValue: String) -> Double? {
+extension Vehicle {
+  fileprivate static func metricNumber(from rawValue: String) -> Double? {
     let filtered = rawValue.compactMap { character -> Character? in
       if character.isNumber || character == "." || character == "-" { return character }
       return nil
@@ -85,13 +85,13 @@ private extension Vehicle {
     return Double(String(filtered))
   }
 
-  static func intNumber(from rawValue: String) -> Int? {
+  fileprivate static func intNumber(from rawValue: String) -> Int? {
     guard let value = metricNumber(from: rawValue) else { return nil }
     guard value.isFinite, value.truncatingRemainder(dividingBy: 1) == 0 else { return nil }
     return Int(value)
   }
 
-  static func joinedManufacturerRaw(from manufacturers: [Manufacturer]) -> String {
+  fileprivate static func joinedManufacturerRaw(from manufacturers: [Manufacturer]) -> String {
     manufacturers
       .map(\.rawName)
       .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }

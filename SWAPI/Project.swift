@@ -10,7 +10,7 @@ let project = Project(
   targets: [
     .target(
       name: "SwiftUI",
-      destinations: .init(arrayLiteral: .iPad, .iPad, .mac, .appleVision),
+      destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .app,
       bundleId: "dev.tuist.SWAPI-SwiftUI",
       infoPlist: .extendingDefault(
@@ -32,7 +32,7 @@ let project = Project(
     ),
     .target(
       name: "SwiftUI-Tests",
-      destinations: .init(arrayLiteral: .iPad, .iPad, .mac, .appleVision),
+      destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .unitTests,
       bundleId: "dev.tuist.SwiftUI-Tests",
       infoPlist: .default,
@@ -43,7 +43,7 @@ let project = Project(
     ),
     .target(
       name: "API",
-      destinations: .init(arrayLiteral: .iPad, .iPad, .mac, .appleVision),
+      destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .framework,
       bundleId: "dev.tuist.API",
       infoPlist: .default,
@@ -55,7 +55,7 @@ let project = Project(
     ),
     .target(
       name: "APITests",
-      destinations: .init(arrayLiteral: .iPad, .iPad, .mac, .appleVision),
+      destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .unitTests,
       bundleId: "dev.tuist.APITests",
       infoPlist: .default,
@@ -66,7 +66,7 @@ let project = Project(
     ),
     .target(
       name: "Persistence",
-      destinations: .init(arrayLiteral: .iPad, .iPad, .mac, .appleVision),
+      destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .framework,
       bundleId: "dev.tuist.Persistence",
       infoPlist: .default,
@@ -81,7 +81,7 @@ let project = Project(
     ),
     .target(
       name: "PersistenceTests",
-      destinations: .init(arrayLiteral: .iPad, .iPad, .mac, .appleVision),
+      destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .unitTests,
       bundleId: "dev.tuist.PersistenceTests",
       infoPlist: .default,
