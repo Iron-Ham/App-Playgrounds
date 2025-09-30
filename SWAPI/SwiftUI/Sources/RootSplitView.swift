@@ -21,7 +21,8 @@ struct RootSplitView: View {
   @State
   private var selectedFilm: Film?
 
-  @State private var preferredCompactColumn: NavigationSplitViewColumn = .sidebar
+  @State
+  private var preferredCompactColumn: NavigationSplitViewColumn = .sidebar
 
   var body: some View {
     NavigationSplitView(preferredCompactColumn: $preferredCompactColumn) {
@@ -34,13 +35,17 @@ struct RootSplitView: View {
         }
       )
     } detail: {
-      if let selectedFilm {
-        FilmDetailView(film: $selectedFilm, dataStore: dataStore)
-      }
+      FilmDetailView(film: $selectedFilm, dataStore: dataStore)
     }
     .task {
       guard !hasLoadedInitialData else { return }
       await refresh()
+    }
+    .onAppear {
+      preferredCompactColumn = selectedFilm == nil ? .sidebar : .detail
+    }
+    .onChange(of: selectedFilm) { _, newValue in
+      preferredCompactColumn = newValue == nil ? .sidebar : .detail
     }
   }
 }
