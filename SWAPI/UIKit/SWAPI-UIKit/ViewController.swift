@@ -10,6 +10,8 @@ class ViewController: UIViewController {
   private typealias CellRegistration = UICollectionView.CellRegistration
   private typealias SupplementaryRegistration = UICollectionView.SupplementaryRegistration
 
+  private let client = Client()
+
   private lazy var layout = UICollectionViewCompositionalLayout { _, environment in
     var listConfiguration = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
     listConfiguration.headerMode = .supplementary
@@ -64,7 +66,7 @@ class ViewController: UIViewController {
         self?.refreshControl.endRefreshing()
       }
       do {
-        let films = try await Client.films()
+        let films = try await self.client.films()
         await MainActor.run {
           self.viewModel = ViewModel(allFilms: .init(uniqueElements: films))
         }

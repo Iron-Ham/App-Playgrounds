@@ -1,6 +1,6 @@
 import Foundation
 
-public enum Client {
+public struct Client {
   private static let filmsURL = URL(string: "https://swapi.info/api/films")!
   private static let peopleURL = URL(string: "https://swapi.info/api/people")!
   private static let planetsURL = URL(string: "https://swapi.info/api/planets")!
@@ -8,57 +8,65 @@ public enum Client {
   private static let vehiclesURL = URL(string: "https://swapi.info/api/vehicles")!
   private static let starshipsURL = URL(string: "https://swapi.info/api/starships")!
 
-  private static let sessionStore = SessionStore()
+  private let sessionStore: SessionStore
 
-  public static func films() async throws -> [FilmResponse] {
+  public init(session: URLSession? = nil) {
+    if let session {
+      self.sessionStore = SessionStore(session: session)
+    } else {
+      self.sessionStore = SessionStore()
+    }
+  }
+
+  public func films() async throws -> [FilmResponse] {
     try await fetch(Self.filmsURL, decode: FilmResponse.films(from:))
   }
 
-  public static func film(url: URL) async throws -> FilmResponse {
+  public func film(url: URL) async throws -> FilmResponse {
     try await fetch(url, decode: FilmResponse.init(data:))
   }
 
-  public static func people() async throws -> [PersonResponse] {
+  public func people() async throws -> [PersonResponse] {
     try await fetch(Self.peopleURL, decode: PersonResponse.people(from:))
   }
 
-  public static func person(url: URL) async throws -> PersonResponse {
+  public func person(url: URL) async throws -> PersonResponse {
     try await fetch(url, decode: PersonResponse.init(data:))
   }
 
-  public static func planets() async throws -> [PlanetResponse] {
+  public func planets() async throws -> [PlanetResponse] {
     try await fetch(Self.planetsURL, decode: PlanetResponse.planets(from:))
   }
 
-  public static func planet(url: URL) async throws -> PlanetResponse {
+  public func planet(url: URL) async throws -> PlanetResponse {
     try await fetch(url, decode: PlanetResponse.init(data:))
   }
 
-  public static func species() async throws -> [SpeciesResponse] {
+  public func species() async throws -> [SpeciesResponse] {
     try await fetch(Self.speciesURL, decode: SpeciesResponse.species(from:))
   }
 
-  public static func species(url: URL) async throws -> SpeciesResponse {
+  public func species(url: URL) async throws -> SpeciesResponse {
     try await fetch(url, decode: SpeciesResponse.init(data:))
   }
 
-  public static func vehicles() async throws -> [VehicleResponse] {
+  public func vehicles() async throws -> [VehicleResponse] {
     try await fetch(Self.vehiclesURL, decode: VehicleResponse.vehicles(from:))
   }
 
-  public static func vehicle(url: URL) async throws -> VehicleResponse {
+  public func vehicle(url: URL) async throws -> VehicleResponse {
     try await fetch(url, decode: VehicleResponse.init(data:))
   }
 
-  public static func starships() async throws -> [StarshipResponse] {
+  public func starships() async throws -> [StarshipResponse] {
     try await fetch(Self.starshipsURL, decode: StarshipResponse.starships(from:))
   }
 
-  public static func starship(url: URL) async throws -> StarshipResponse {
+  public func starship(url: URL) async throws -> StarshipResponse {
     try await fetch(url, decode: StarshipResponse.init(data:))
   }
 
-  private static func fetch<T: Sendable>(
+  private func fetch<T: Sendable>(
     _ url: URL,
     decode: @Sendable (Data) throws -> T
   ) async throws -> T {
@@ -69,7 +77,7 @@ public enum Client {
 
 extension Client {
   #if DEBUG
-    internal static func withSessionOverride<T: Sendable>(
+    internal func withSessionOverride<T: Sendable>(
       _ session: URLSession,
       operation: @Sendable () async throws -> T
     ) async rethrows -> T {
@@ -88,7 +96,11 @@ extension Client {
   }
 
   private actor SessionStore {
-    private var session: URLSession = Client.makeSession()
+    private var session: URLSession
+
+    init(session: URLSession = Client.makeSession()) {
+      self.session = session
+    }
 
     func data(from url: URL) async throws -> (Data, URLResponse) {
       try await session.data(from: url)

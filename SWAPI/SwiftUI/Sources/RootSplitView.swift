@@ -5,6 +5,7 @@ import SwiftUI
 
 struct RootSplitView: View {
   let dataStore: SWAPIDataStore
+  let client: Client
 
   @FetchAll(Film.order(by: \.releaseDate))
   private var films
@@ -20,6 +21,11 @@ struct RootSplitView: View {
 
   @State
   private var selectedFilm: Film?
+
+  init(dataStore: SWAPIDataStore, client: Client = .init()) {
+    self.dataStore = dataStore
+    self.client = client
+  }
 
   var body: some View {
     NavigationSplitView {
@@ -71,12 +77,13 @@ extension RootSplitView {
   }
 
   private func fetchSnapshot() async throws -> SnapshotPayload {
-    async let films = Client.films()
-    async let people = Client.people()
-    async let planets = Client.planets()
-    async let species = Client.species()
-    async let starships = Client.starships()
-    async let vehicles = Client.vehicles()
+    let client = self.client
+    async let films = client.films()
+    async let people = client.people()
+    async let planets = client.planets()
+    async let species = client.species()
+    async let starships = client.starships()
+    async let vehicles = client.vehicles()
 
     return SnapshotPayload(
       films: try await films,

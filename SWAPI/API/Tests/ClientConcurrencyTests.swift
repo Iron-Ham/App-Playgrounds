@@ -15,13 +15,14 @@ struct ClientConcurrencyTests {
     SWAPIURLProtocolStub.stub(url: starshipsCollectionURL, data: StubData.starshipsCollection)
     SWAPIURLProtocolStub.stub(url: filmsCollectionURL, data: StubData.filmsCollection)
 
-    try await Client.withSessionOverride(makeStubSession()) {
-      async let people = Client.people()
-      async let planets = Client.planets()
-      async let species = Client.species()
-      async let vehicles = Client.vehicles()
-      async let starships = Client.starships()
-      async let films = Client.films()
+    let client = Client()
+    try await client.withSessionOverride(makeStubSession()) {
+      async let people = client.people()
+      async let planets = client.planets()
+      async let species = client.species()
+      async let vehicles = client.vehicles()
+      async let starships = client.starships()
+      async let films = client.films()
 
       let (
         peopleResult,
@@ -65,12 +66,13 @@ struct ClientConcurrencyTests {
   func repeatedRequestsAreThreadSafe() async throws {
     SWAPIURLProtocolStub.removeAll()
     SWAPIURLProtocolStub.stub(url: peopleCollectionURL, data: StubData.peopleCollection)
-    try await Client.withSessionOverride(makeStubSession()) {
+    let client = Client()
+    try await client.withSessionOverride(makeStubSession()) {
       let results = try await withThrowingTaskGroup(of: [PersonResponse].self) {
         group -> [[PersonResponse]] in
         for _ in 0..<12 {
           group.addTask {
-            try await Client.people()
+            try await client.people()
           }
         }
 
