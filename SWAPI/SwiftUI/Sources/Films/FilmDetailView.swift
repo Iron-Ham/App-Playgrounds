@@ -267,7 +267,7 @@ struct FilmDetailView: View {
     film: Film,
     forceReload: Bool = false
   ) async {
-    guard await shouldStartLoading(relationship, forceReload: forceReload) else { return }
+    guard shouldStartLoading(relationship, forceReload: forceReload) else { return }
 
     await MainActor.run {
       relationshipItems[relationship] = .loading
