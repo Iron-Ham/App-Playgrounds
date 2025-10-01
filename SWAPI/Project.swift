@@ -65,7 +65,7 @@ let project = Project(
       bundleId: "dev.iron-ham.API",
       infoPlist: .default,
       buildableFolders: [
-        "API/Sources",
+        "API/Sources"
       ],
       scripts: [swiftFormatScript],
       dependencies: []
@@ -89,7 +89,7 @@ let project = Project(
       bundleId: "dev.iron-ham.SQLiteDataPersistence",
       infoPlist: .default,
       buildableFolders: [
-        "Persistence/SQLiteData/Sources",
+        "Persistence/SQLiteData/Sources"
       ],
       scripts: [swiftFormatScript],
       dependencies: [
@@ -117,7 +117,7 @@ let project = Project(
       bundleId: "dev.iron-ham.FluentPersistence",
       infoPlist: .default,
       buildableFolders: [
-        "Persistence/Fluent/Sources",
+        "Persistence/Fluent/Sources"
       ],
       scripts: [swiftFormatScript],
       dependencies: [

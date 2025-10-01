@@ -1,8 +1,7 @@
 import API
 import Dependencies
 
-extension Client: @retroactive TestDependencyKey {}
-extension Client: @retroactive DependencyKey {
+private enum ClientKey: DependencyKey {
   public static let liveValue = Client()
   public static let testValue = Client()
   public static let previewValue = Client()
@@ -10,7 +9,7 @@ extension Client: @retroactive DependencyKey {
 
 extension DependencyValues {
   public var client: Client {
-    get { self[Client.self] }
-    set { self[Client.self] = newValue }
+    get { self[ClientKey.self] }
+    set { self[ClientKey.self] = newValue }
   }
 }
