@@ -27,35 +27,35 @@ extension SWAPIDataStore {
     }
   }
 
-  public struct CharacterDetails: Sendable, Equatable {
+  public struct CharacterDetails: Sendable, Equatable, Hashable, Identifiable {
     public let id: URL
     public let name: String
     public let gender: PersonResponse.Gender
     public let birthYear: PersonResponse.BirthYear
   }
 
-  public struct PlanetDetails: Sendable, Equatable {
+  public struct PlanetDetails: Sendable, Equatable, Hashable, Identifiable {
     public let id: URL
     public let name: String
     public let climates: [PlanetResponse.ClimateDescriptor]
     public let population: String
   }
 
-  public struct SpeciesDetails: Sendable, Equatable {
+  public struct SpeciesDetails: Sendable, Equatable, Hashable, Identifiable {
     public let id: URL
     public let name: String
     public let classification: String
     public let language: String
   }
 
-  public struct StarshipDetails: Sendable, Equatable {
+  public struct StarshipDetails: Sendable, Equatable, Hashable, Identifiable {
     public let id: URL
     public let name: String
     public let model: String
     public let starshipClass: StarshipResponse.StarshipClass
   }
 
-  public struct VehicleDetails: Sendable, Equatable {
+  public struct VehicleDetails: Sendable, Equatable, Hashable, Identifiable {
     public let id: URL
     public let name: String
     public let model: String
