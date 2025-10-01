@@ -22,6 +22,9 @@ struct FilmDetailView: View {
   @State
   private var expandedRelationships: Set<SWAPIDataStore.Relationship> = []
 
+  @State
+  private var relationshipNavigationPath: [RelationshipEntity] = []
+
   private static let defaultRelationshipState:
     [SWAPIDataStore.Relationship: RelationshipItemsState] =
       Dictionary(
@@ -32,15 +35,21 @@ struct FilmDetailView: View {
   var body: some View {
     Group {
       if let film {
-        detailContent(for: film, summary: relationshipSummary)
-          .task(id: film) {
-            await loadRelationships(for: film)
+        NavigationStack(path: $relationshipNavigationPath) {
+          detailContent(for: film, summary: relationshipSummary)
+        }
+        .navigationDestination(for: RelationshipEntity.self) { entity in
+          RelationshipDestinationPlaceholder(entity: entity)
+        }
+        .id(film.url)
+        .task(id: film) {
+          await loadRelationships(for: film)
+        }
+        .overlay(alignment: .bottomLeading) {
+          if let error = relationshipSummaryError {
+            relationshipErrorBanner(error)
           }
-          .overlay(alignment: .bottomLeading) {
-            if let error = relationshipSummaryError {
-              relationshipErrorBanner(error)
-            }
-          }
+        }
       } else {
         ContentUnavailableView {
           Label("Select a film", systemImage: "film")
@@ -223,8 +232,14 @@ struct FilmDetailView: View {
       } else {
         LazyVStack(alignment: .leading, spacing: 0) {
           ForEach(Array(entities.enumerated()), id: \.element.id) { index, entity in
-            RelationshipItemRow(entity: entity)
-              .padding(.vertical, 6)
+            Button {
+              navigateToRelationshipEntity(entity)
+            } label: {
+              RelationshipItemRow(entity: entity)
+                .padding(.vertical, 6)
+            }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
 
             if index < entities.count - 1 {
               Divider()
@@ -259,6 +274,14 @@ struct FilmDetailView: View {
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(.vertical, 4)
+    }
+  }
+
+  @MainActor
+  private func navigateToRelationshipEntity(_ entity: RelationshipEntity) {
+    guard relationshipNavigationPath != [entity] else { return }
+    withAnimation(.easeInOut(duration: 0.18)) {
+      relationshipNavigationPath = [entity]
     }
   }
 
@@ -347,7 +370,7 @@ struct FilmDetailView: View {
     }
   }
 
-  fileprivate enum RelationshipEntity: Identifiable, Equatable {
+  fileprivate enum RelationshipEntity: Identifiable, Hashable {
     case character(SWAPIDataStore.CharacterDetails)
     case planet(SWAPIDataStore.PlanetDetails)
     case species(SWAPIDataStore.SpeciesDetails)
@@ -475,6 +498,10 @@ struct FilmDetailView: View {
     static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.id == rhs.id
     }
+
+    func hash(into hasher: inout Hasher) {
+      hasher.combine(id)
+    }
   }
 
   private struct RelationshipSummaryRow: View {
@@ -502,26 +529,22 @@ struct FilmDetailView: View {
     let entity: RelationshipEntity
 
     var body: some View {
-      NavigationLink {
-        RelationshipDestinationPlaceholder(entity: entity)
-      } label: {
-        HStack(spacing: 12) {
-          RelationshipThumbnail(entity: entity)
-          VStack(alignment: .leading, spacing: 3) {
-            Text(entity.title)
-              .font(.subheadline)
-              .fontWeight(.semibold)
-              .foregroundStyle(.primary)
-            if let subtitle = entity.subtitle {
-              Text(subtitle)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
+      HStack(spacing: 12) {
+        RelationshipThumbnail(entity: entity)
+        VStack(alignment: .leading, spacing: 3) {
+          Text(entity.title)
+            .font(.subheadline)
+            .fontWeight(.semibold)
+            .foregroundStyle(.primary)
+          if let subtitle = entity.subtitle {
+            Text(subtitle)
+              .font(.caption)
+              .foregroundStyle(.secondary)
           }
-          Spacer(minLength: 0)
         }
+        Spacer(minLength: 0)
       }
-      .accessibilityElement(children: .combine)
+      .contentShape(Rectangle())
     }
   }
 
@@ -597,6 +620,7 @@ struct FilmDetailView: View {
       relationshipSummaryError = nil
       relationshipItems = Self.defaultRelationshipState
       expandedRelationships.removeAll()
+      relationshipNavigationPath.removeAll()
     }
 
     guard !Task.isCancelled else { return }
