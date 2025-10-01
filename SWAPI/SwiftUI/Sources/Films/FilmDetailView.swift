@@ -38,6 +38,14 @@ struct FilmDetailView: View {
           (relationship, .idle)
         })
 
+  private static let relationshipRowInsets = EdgeInsets(
+    top: 8, leading: 16, bottom: 8, trailing: 16)
+
+  private static let expandedRowsTransition: AnyTransition = .asymmetric(
+    insertion: .move(edge: .top).combined(with: .opacity),
+    removal: .move(edge: .top).combined(with: .opacity)
+  )
+
   var body: some View {
     Group {
       if let film {
@@ -56,22 +64,33 @@ struct FilmDetailView: View {
             relationshipErrorBanner(error)
           }
         }
-        .fullScreenCover(isPresented: $isPresentingOpeningCrawl) {
-          OpeningCrawlView(
-            content: .init(
-              title: film.title,
-              episodeNumber: film.episodeId,
-              openingText: film.openingCrawl
-            )
-          )
-          .environment(\.colorScheme, .dark)
-        }
+        #if os(macOS)
+          .sheet(isPresented: $isPresentingOpeningCrawl) {
+            openingCrawlExperience(for: film)
+          }
+        #else
+          .fullScreenCover(isPresented: $isPresentingOpeningCrawl) {
+            openingCrawlExperience(for: film)
+          }
+        #endif
       } else {
         ContentUnavailableView {
           Label("Select a film", systemImage: "film")
         }
       }
     }
+  }
+
+  @ViewBuilder
+  private func openingCrawlExperience(for film: Film) -> some View {
+    OpeningCrawlView(
+      content: .init(
+        title: film.title,
+        episodeNumber: film.episodeId,
+        openingText: film.openingCrawl
+      )
+    )
+    .environment(\.colorScheme, .dark)
   }
 
   private func detailContent(
@@ -96,6 +115,21 @@ struct FilmDetailView: View {
             .foregroundStyle(.secondary)
         }
         .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16))
+      }
+
+      Section {
+        Button {
+          isPresentingOpeningCrawl = true
+        } label: {
+          OpeningCrawlCallout()
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("View the Star Wars style opening crawl")
+        .accessibilityHint("Presents the opening crawl with animated Star Wars styling")
+      } header: {
+        Text("Opening Crawl")
+          .font(.headline)
+          .textCase(nil)
       }
 
       Section {
@@ -138,23 +172,10 @@ struct FilmDetailView: View {
           .textCase(nil)
       }
 
-      featuredSection(for: film, summary: summary)
-
-      Section {
-        Button {
-          isPresentingOpeningCrawl = true
-        } label: {
-          OpeningCrawlCallout()
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("View the Star Wars style opening crawl")
-        .accessibilityHint("Presents the opening crawl with animated Star Wars styling")
-      } header: {
-        Text("Opening Crawl")
-          .font(.headline)
-          .textCase(nil)
-      }
+      relationshipSections(for: film, summary: summary)
     }
+    .listStyle(.inset)
+    //    .listStyle(.grouped)
     .navigationTitle(film.title)
     #if os(iOS) || os(tvOS)
       .navigationBarTitleDisplayMode(.inline)
@@ -162,138 +183,141 @@ struct FilmDetailView: View {
   }
 
   @ViewBuilder
-  private func featuredSection(
+  private func relationshipSections(
     for film: Film,
     summary: SWAPIDataStore.FilmRelationshipSummary
   ) -> some View {
-    Section {
-      ForEach(SWAPIDataStore.Relationship.allCases, id: \.self) { relationship in
-        relationshipDisclosureRow(
-          for: relationship,
-          film: film,
-          summary: summary
-        )
-        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+    let relationships = Array(SWAPIDataStore.Relationship.allCases.enumerated())
+    ForEach(relationships, id: \.element) { index, relationship in
+      Section {
+        let isExpanded = expandedRelationships.contains(relationship)
+        Button {
+          toggleRelationshipExpansion(for: relationship, film: film)
+        } label: {
+          RelationshipSummaryRow(
+            relationship: relationship,
+            summaryText: summary.localizedCount(for: relationship),
+            isExpanded: isExpanded
+          )
+          .padding(.vertical, 10)
+        }
+        .buttonStyle(.plain)
+        .listRowInsets(Self.relationshipRowInsets)
+        .contentShape(Rectangle())
+
+        if isExpanded {
+          relationshipExpandedRows(for: relationship, film: film)
+            .transition(Self.expandedRowsTransition)
+        }
+      } header: {
+        if index == 0 {
+          Text("Featured In This Film")
+            .font(.headline)
+            .textCase(nil)
+        }
       }
-    } header: {
-      Text("Featured In This Film")
-        .font(.headline)
-        .textCase(nil)
-    }
-  }
-
-  @ViewBuilder
-  private func relationshipDisclosureRow(
-    for relationship: SWAPIDataStore.Relationship,
-    film: Film,
-    summary: SWAPIDataStore.FilmRelationshipSummary
-  ) -> some View {
-    let binding = expansionBinding(for: relationship, film: film)
-
-    DisclosureGroup(isExpanded: binding) {
-      relationshipDetailContent(for: relationship, film: film)
-        .padding(.top, 6)
-    } label: {
-      RelationshipSummaryRow(
-        relationship: relationship,
-        summaryText: summary.localizedCount(for: relationship)
+      .animation(.easeInOut(duration: 0.22), value: expandedRelationships)
+      .animation(
+        .easeInOut(duration: 0.22),
+        value: relationshipItems[relationship, default: .idle].animationID
       )
     }
-    .animation(.easeInOut(duration: 0.18), value: binding.wrappedValue)
-  }
-
-  private func expansionBinding(
-    for relationship: SWAPIDataStore.Relationship,
-    film: Film
-  ) -> Binding<Bool> {
-    Binding {
-      expandedRelationships.contains(relationship)
-    } set: { isExpanded in
-      if isExpanded {
-        expandedRelationships.insert(relationship)
-        Task {
-          await loadRelationshipItems(for: relationship, film: film)
-        }
-      } else {
-        expandedRelationships.remove(relationship)
-      }
-    }
   }
 
   @ViewBuilder
-  private func relationshipDetailContent(
+  private func relationshipExpandedRows(
     for relationship: SWAPIDataStore.Relationship,
     film: Film
   ) -> some View {
-    switch relationshipItems[relationship, default: .idle] {
-    case .idle:
-      VStack(alignment: .leading, spacing: 8) {
+    let state = relationshipItems[relationship, default: .idle]
+
+    Group {
+      switch state {
+      case .idle:
         Text("Expand to load details.")
           .font(.footnote)
           .foregroundStyle(.secondary)
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-
-    case .loading:
-      HStack(spacing: 12) {
-        ProgressView()
-        Text("Fetching \(relationship.displayTitle.lowercased()).")
-          .font(.footnote)
-          .foregroundStyle(.secondary)
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-
-    case .loaded(let entities):
-      if entities.isEmpty {
-        Text("No \(relationship.emptyDescription) recorded for this film.")
-          .font(.footnote)
-          .foregroundStyle(.secondary)
           .frame(maxWidth: .infinity, alignment: .leading)
-      } else {
-        LazyVStack(alignment: .leading, spacing: 0) {
-          ForEach(Array(entities.enumerated()), id: \.element.id) { index, entity in
+          .listRowInsets(Self.relationshipRowInsets)
+
+      case .loading:
+        HStack(spacing: 12) {
+          ProgressView()
+          Text("Fetching \(relationship.displayTitle.lowercased()).")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .listRowInsets(Self.relationshipRowInsets)
+
+      case .loaded(let entities):
+        if entities.isEmpty {
+          Text("No \(relationship.emptyDescription) recorded for this film.")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .listRowInsets(Self.relationshipRowInsets)
+        } else {
+          ForEach(entities) { entity in
             Button {
               navigateToRelationshipEntity(entity)
             } label: {
               RelationshipItemRow(entity: entity)
-                .padding(.vertical, 6)
             }
             .buttonStyle(.plain)
             .accessibilityElement(children: .combine)
+            .listRowInsets(Self.relationshipRowInsets)
+            .transition(Self.expandedRowsTransition)
+          }
+        }
 
-            if index < entities.count - 1 {
-              Divider()
-                .padding(.leading, 56)
+      case .failed(let message):
+        VStack(alignment: .leading, spacing: 10) {
+          Label {
+            Text("We couldn't load the latest \(relationship.emptyDescription).")
+              .font(.footnote)
+            Text(message)
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          } icon: {
+            Image(systemName: "exclamationmark.triangle")
+              .foregroundStyle(.orange)
+          }
+
+          Button("Retry") {
+            Task {
+              await loadRelationshipItems(for: relationship, film: film, forceReload: true)
             }
           }
+          .buttonStyle(.borderedProminent)
+          .tint(relationship.accentColor)
+          .font(.footnote)
         }
-        .padding(.top, 4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 4)
+        .listRowInsets(Self.relationshipRowInsets)
+      }
+    }
+    .animation(.easeInOut(duration: 0.22), value: state.animationID)
+  }
+
+  @MainActor
+  private func toggleRelationshipExpansion(
+    for relationship: SWAPIDataStore.Relationship,
+    film: Film
+  ) {
+    if expandedRelationships.contains(relationship) {
+      withAnimation(.easeInOut(duration: 0.18)) {
+        _ = expandedRelationships.remove(relationship)
+      }
+    } else {
+      withAnimation(.easeInOut(duration: 0.18)) {
+        _ = expandedRelationships.insert(relationship)
       }
 
-    case .failed(let message):
-      VStack(alignment: .leading, spacing: 10) {
-        Label {
-          Text("We couldn't load the latest \(relationship.emptyDescription).")
-            .font(.footnote)
-          Text(message)
-            .font(.caption)
-            .foregroundStyle(.secondary)
-        } icon: {
-          Image(systemName: "exclamationmark.triangle")
-            .foregroundStyle(.orange)
-        }
-
-        Button("Retry") {
-          Task {
-            await loadRelationshipItems(for: relationship, film: film, forceReload: true)
-          }
-        }
-        .buttonStyle(.borderedProminent)
-        .tint(relationship.accentColor)
-        .font(.footnote)
+      Task {
+        await loadRelationshipItems(for: relationship, film: film)
       }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(.vertical, 4)
     }
   }
 
@@ -387,6 +411,15 @@ struct FilmDetailView: View {
     var isLoaded: Bool {
       if case .loaded = self { return true }
       return false
+    }
+
+    var animationID: Int {
+      switch self {
+      case .idle: 0
+      case .loading: 1
+      case .loaded(let entities): 2 + entities.count
+      case .failed: 3
+      }
     }
   }
 
@@ -527,6 +560,7 @@ struct FilmDetailView: View {
   private struct RelationshipSummaryRow: View {
     let relationship: SWAPIDataStore.Relationship
     let summaryText: String
+    let isExpanded: Bool
 
     var body: some View {
       HStack(spacing: 12) {
@@ -540,6 +574,11 @@ struct FilmDetailView: View {
             .foregroundStyle(.secondary)
         }
         Spacer()
+        Image(systemName: "chevron.down")
+          .font(.subheadline.weight(.semibold))
+          .foregroundStyle(.secondary)
+          .rotationEffect(isExpanded ? .degrees(180) : .degrees(0))
+          .animation(.easeInOut(duration: 0.18), value: isExpanded)
       }
       .contentShape(Rectangle())
     }
@@ -597,6 +636,44 @@ struct FilmDetailView: View {
         headline: entity.placeholderTitle,
         message: entity.placeholderDescription
       )
+    }
+  }
+
+  private struct RelationshipDisclosureCell<DetailContent: View>: View {
+    let relationship: SWAPIDataStore.Relationship
+    let summaryText: String
+    let isExpanded: Bool
+    let onToggle: () -> Void
+    @ViewBuilder
+    let detailContent: () -> DetailContent
+
+    var body: some View {
+      VStack(spacing: 0) {
+        Button(action: onToggle) {
+          RelationshipSummaryRow(
+            relationship: relationship,
+            summaryText: summaryText,
+            isExpanded: isExpanded
+          )
+          .padding(.vertical, 10)
+        }
+        .buttonStyle(.plain)
+        .contentShape(Rectangle())
+
+        if isExpanded {
+          Divider()
+            .padding(.leading, 56)
+
+          detailContent()
+            .padding(.top, 12)
+            .transition(
+              .move(edge: .top)
+                .combined(with: .opacity)
+            )
+        }
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .animation(.easeInOut(duration: 0.18), value: isExpanded)
     }
   }
 

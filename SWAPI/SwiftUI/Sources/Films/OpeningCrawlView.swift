@@ -32,7 +32,8 @@ struct OpeningCrawlView: View {
           let pointsPerSecond: CGFloat = 32
           let duration = max(Double(effectiveDistance / pointsPerSecond), 24)
           let elapsed = timeline.date.timeIntervalSince(animationStartDate)
-          let normalizedProgress = duration > 0
+          let normalizedProgress =
+            duration > 0
             ? CGFloat((elapsed.truncatingRemainder(dividingBy: duration)) / duration)
             : 0
 
@@ -110,9 +111,9 @@ struct OpeningCrawlView: View {
     .onAppear {
       animationStartDate = .now
     }
-#if os(iOS)
-    .statusBarHidden(true)
-#endif
+    #if os(iOS)
+      .statusBarHidden(true)
+    #endif
   }
 
   private var crawlContent: some View {
@@ -163,7 +164,7 @@ struct OpeningCrawlView: View {
     let numerals: [(Int, String)] = [
       (1000, "M"), (900, "CM"), (500, "D"), (400, "CD"),
       (100, "C"), (90, "XC"), (50, "L"), (40, "XL"),
-      (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I")
+      (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I"),
     ]
 
     var number = max(1, value)
@@ -193,13 +194,17 @@ private struct StarfieldBackground: View {
     let id = UUID()
     let position: CGPoint
     let radius: CGFloat
-    let brightness: Double
+    let baseBrightness: Double
+    let twinkleSpeed: Double
+    let twinklePhase: Double
 
     static func random() -> Star {
       Star(
         position: CGPoint(x: CGFloat.random(in: 0...1), y: CGFloat.random(in: 0...1)),
         radius: CGFloat.random(in: 0.5...2.4),
-        brightness: Double.random(in: 0.35...1.0)
+        baseBrightness: Double.random(in: 0.35...1.0),
+        twinkleSpeed: Double.random(in: 0.4...1.2),
+        twinklePhase: Double.random(in: 0...(2 * .pi))
       )
     }
   }
@@ -212,30 +217,41 @@ private struct StarfieldBackground: View {
         LinearGradient(
           colors: [
             Color.black,
-            Color(red: 0.03, green: 0.03, blue: 0.08)
+            Color(red: 0.03, green: 0.03, blue: 0.08),
           ],
           startPoint: .top,
           endPoint: .bottom
         )
         .ignoresSafeArea()
 
-        Canvas { context, size in
-          for star in stars {
-            let point = CGPoint(
-              x: star.position.x * size.width,
-              y: star.position.y * size.height
-            )
-            let rect = CGRect(
-              x: point.x - star.radius / 2,
-              y: point.y - star.radius / 2,
-              width: star.radius,
-              height: star.radius
-            )
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+          Canvas { context, size in
+            let time = timeline.date.timeIntervalSinceReferenceDate
 
-            context.fill(
-              Path(ellipseIn: rect),
-              with: .color(Color.white.opacity(star.brightness))
-            )
+            for star in stars {
+              let point = CGPoint(
+                x: star.position.x * size.width,
+                y: star.position.y * size.height
+              )
+
+              let twinkle = 0.4 + 0.6 * sin(time * star.twinkleSpeed + star.twinklePhase)
+              let brightness = star.baseBrightness * (0.75 + 0.25 * twinkle)
+              let scale = 0.96 + 0.08 * twinkle
+
+              let clampedBrightness = max(0, min(1, brightness))
+
+              let rect = CGRect(
+                x: point.x - (star.radius * scale) / 2,
+                y: point.y - (star.radius * scale) / 2,
+                width: star.radius * scale,
+                height: star.radius * scale
+              )
+
+              context.fill(
+                Path(ellipseIn: rect),
+                with: .color(Color.white.opacity(clampedBrightness))
+              )
+            }
           }
         }
         .blendMode(.screen)
