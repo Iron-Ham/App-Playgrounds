@@ -45,5 +45,7 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-structured-queries", from: "0.21.0"),
     .package(url: "https://github.com/vapor/fluent", from: "4.13.0"),
     .package(url: "https://github.com/vapor/fluent-sqlite-driver", from: "4.8.1"),
+    .package(url: "https://github.com/apple/swift-log", from: "1.5.4"),
+    .package(url: "https://github.com/apple/swift-nio", from: "2.60.0"),
   ]
 )

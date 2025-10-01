@@ -121,9 +121,10 @@ let project = Project(
       ],
       scripts: [swiftFormatScript],
       dependencies: [
-        .external(name: "Dependencies"),
         .external(name: "Fluent"),
         .external(name: "FluentSQLiteDriver"),
+        .external(name: "Logging"),
+        .external(name: "NIO"),
         .target(name: "API"),
       ]
     ),
