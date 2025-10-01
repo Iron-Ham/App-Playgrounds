@@ -25,6 +25,9 @@ struct FilmDetailView: View {
   @State
   private var relationshipNavigationPath: [RelationshipEntity] = []
 
+  @State
+  private var lastLoadedFilmID: Film.ID?
+
   private static let defaultRelationshipState:
     [SWAPIDataStore.Relationship: RelationshipItemsState] =
       Dictionary(
@@ -615,18 +618,23 @@ struct FilmDetailView: View {
   }
 
   private func loadRelationships(for film: Film) async {
+    let filmURL = film.url
+    let dataStore = self.dataStore
+    let isNewFilm = lastLoadedFilmID != filmURL
+
     await MainActor.run {
-      relationshipSummary = .empty
       relationshipSummaryError = nil
-      relationshipItems = Self.defaultRelationshipState
-      expandedRelationships.removeAll()
-      relationshipNavigationPath.removeAll()
+      if isNewFilm {
+        relationshipSummary = .empty
+        relationshipItems = Self.defaultRelationshipState
+        expandedRelationships.removeAll()
+        relationshipNavigationPath.removeAll()
+      }
+      lastLoadedFilmID = filmURL
     }
 
     guard !Task.isCancelled else { return }
 
-    let filmURL = film.url
-    let dataStore = self.dataStore
     let summaryTask = Task.detached(priority: .userInitiated) {
       try dataStore.relationshipSummary(forFilmWithURL: filmURL)
     }
