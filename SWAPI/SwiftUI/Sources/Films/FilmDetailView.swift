@@ -28,6 +28,9 @@ struct FilmDetailView: View {
   @State
   private var lastLoadedFilmID: Film.ID?
 
+  @State
+  private var isPresentingOpeningCrawl = false
+
   private static let defaultRelationshipState:
     [SWAPIDataStore.Relationship: RelationshipItemsState] =
       Dictionary(
@@ -52,6 +55,16 @@ struct FilmDetailView: View {
           if let error = relationshipSummaryError {
             relationshipErrorBanner(error)
           }
+        }
+        .fullScreenCover(isPresented: $isPresentingOpeningCrawl) {
+          OpeningCrawlView(
+            content: .init(
+              title: film.title,
+              episodeNumber: film.episodeId,
+              openingText: film.openingCrawl
+            )
+          )
+          .environment(\.colorScheme, .dark)
         }
       } else {
         ContentUnavailableView {
@@ -128,10 +141,14 @@ struct FilmDetailView: View {
       featuredSection(for: film, summary: summary)
 
       Section {
-        Text(film.openingCrawl)
-          .foregroundStyle(.primary)
-          .accessibilityLabel(film.openingCrawlAccessibilityLabel)
-          .frame(maxWidth: .infinity, alignment: .leading)
+        Button {
+          isPresentingOpeningCrawl = true
+        } label: {
+          OpeningCrawlCallout()
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("View the Star Wars style opening crawl")
+        .accessibilityHint("Presents the opening crawl with animated Star Wars styling")
       } header: {
         Text("Opening Crawl")
           .font(.headline)
@@ -600,6 +617,68 @@ struct FilmDetailView: View {
     }
   }
 
+  private struct OpeningCrawlCallout: View {
+    @Environment(\.colorScheme)
+    private var colorScheme
+
+    var body: some View {
+      ZStack {
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+          .fill(.ultraThinMaterial)
+          .overlay {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+              .strokeBorder(Color.yellow.opacity(0.45), lineWidth: 1.5)
+              .blendMode(.screen)
+          }
+          .shadow(color: Color.black.opacity(colorScheme == .dark ? 0.4 : 0.2), radius: 14, y: 10)
+
+        VStack(alignment: .leading, spacing: 12) {
+          HStack(spacing: 12) {
+            Image(systemName: "sparkles.rectangle.stack")
+              .symbolRenderingMode(.hierarchical)
+              .font(.system(size: 32, weight: .semibold))
+              .foregroundStyle(
+                LinearGradient(
+                  colors: [Color.yellow, Color.orange.opacity(0.9)],
+                  startPoint: .topLeading,
+                  endPoint: .bottomTrailing
+                )
+              )
+              .shadow(color: Color.yellow.opacity(0.4), radius: 12, y: 6)
+
+            VStack(alignment: .leading, spacing: 4) {
+              Text("Experience the crawl")
+                .font(.headline)
+                .foregroundStyle(Color.primary)
+
+              Text("Watch the animated intro exactly how it appears on screen.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+          }
+
+          HStack(spacing: 8) {
+            Spacer()
+            Text("Launch cinematic crawl")
+              .font(.footnote.weight(.semibold))
+              .textCase(.uppercase)
+              .tracking(1.2)
+              .foregroundStyle(Color.yellow)
+            Image(systemName: "chevron.right")
+              .font(.footnote.weight(.bold))
+              .foregroundStyle(Color.yellow.opacity(0.9))
+          }
+        }
+        .padding(.vertical, 20)
+        .padding(.horizontal, 24)
+      }
+      .frame(maxWidth: .infinity)
+      .contentShape(Rectangle())
+      .padding(.vertical, 6)
+    }
+  }
+
   @ViewBuilder
   private func relationshipErrorBanner(_ error: Error) -> some View {
     Label {
@@ -629,6 +708,7 @@ struct FilmDetailView: View {
         relationshipItems = Self.defaultRelationshipState
         expandedRelationships.removeAll()
         relationshipNavigationPath.removeAll()
+        isPresentingOpeningCrawl = false
       }
       lastLoadedFilmID = filmURL
     }
