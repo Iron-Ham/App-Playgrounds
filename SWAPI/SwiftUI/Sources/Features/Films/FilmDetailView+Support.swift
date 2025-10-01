@@ -1,5 +1,5 @@
 import Foundation
-import Persistence
+import SQLiteDataPersistence
 import SwiftUI
 
 @Observable

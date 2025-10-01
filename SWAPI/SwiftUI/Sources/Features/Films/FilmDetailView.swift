@@ -1,6 +1,6 @@
 import Dependencies
 import Foundation
-import Persistence
+import SQLiteDataPersistence
 import SwiftUI
 
 struct FilmDetailView: View {

@@ -1,6 +1,6 @@
 import API
 import Dependencies
-import Persistence
+import SQLiteDataPersistence
 import SwiftUI
 
 @main

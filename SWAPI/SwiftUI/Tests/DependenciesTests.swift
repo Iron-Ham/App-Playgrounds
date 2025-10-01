@@ -2,7 +2,7 @@ import API
 import Dependencies
 import Foundation
 import GRDB
-import Persistence
+import SQLiteDataPersistence
 import Testing
 
 @testable import SWAPI_SwiftUI

@@ -3,7 +3,7 @@ import Foundation
 import GRDB
 import Testing
 
-@testable import Persistence
+@testable import SQLiteDataPersistence
 
 struct PersistenceTests {
   private let iso8601 = ISO8601DateFormatter()

@@ -19,7 +19,7 @@ let project = Project(
       name: "SWAPI-SwiftUI",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .app,
-      bundleId: "dev.tuist.SWAPI-SwiftUI",
+      bundleId: "dev.iron-ham.SWAPI-SwiftUI",
       infoPlist: .extendingDefault(
         with: [
           "UILaunchScreen": [
@@ -35,7 +35,7 @@ let project = Project(
       scripts: [swiftFormatScript],
       dependencies: [
         .target(name: "API"),
-        .target(name: "Persistence"),
+        .target(name: "SQLiteDataPersistence"),
         .external(name: "SQLiteData"),
         .external(name: "Dependencies"),
         .external(name: "StructuredQueries"),
@@ -45,7 +45,7 @@ let project = Project(
       name: "SwiftUI-Tests",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .unitTests,
-      bundleId: "dev.tuist.SwiftUI-Tests",
+      bundleId: "dev.iron-ham.SwiftUI-Tests",
       infoPlist: .default,
       buildableFolders: [
         "SwiftUI/Tests"
@@ -53,7 +53,7 @@ let project = Project(
       scripts: [swiftFormatScript],
       dependencies: [
         .target(name: "SWAPI-SwiftUI"),
-        .target(name: "Persistence"),
+        .target(name: "SQLiteDataPersistence"),
         .target(name: "API"),
         .external(name: "Dependencies"),
       ]
@@ -62,22 +62,19 @@ let project = Project(
       name: "API",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .framework,
-      bundleId: "dev.tuist.API",
+      bundleId: "dev.iron-ham.API",
       infoPlist: .default,
       buildableFolders: [
         "API/Sources",
-        "API/Resources",
       ],
       scripts: [swiftFormatScript],
-      dependencies: [
-        .external(name: "Dependencies")
-      ]
+      dependencies: []
     ),
     .target(
       name: "APITests",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .unitTests,
-      bundleId: "dev.tuist.APITests",
+      bundleId: "dev.iron-ham.APITests",
       infoPlist: .default,
       buildableFolders: [
         "API/Tests"
@@ -86,14 +83,13 @@ let project = Project(
       dependencies: [.target(name: "API")]
     ),
     .target(
-      name: "Persistence",
+      name: "SQLiteDataPersistence",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .framework,
-      bundleId: "dev.tuist.Persistence",
+      bundleId: "dev.iron-ham.SQLiteDataPersistence",
       infoPlist: .default,
       buildableFolders: [
-        "Persistence/Sources",
-        "Persistence/Resources",
+        "Persistence/SQLiteData/Sources",
       ],
       scripts: [swiftFormatScript],
       dependencies: [
@@ -103,16 +99,45 @@ let project = Project(
       ]
     ),
     .target(
-      name: "PersistenceTests",
+      name: "SQliteDataPersistenceTests",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .unitTests,
-      bundleId: "dev.tuist.PersistenceTests",
+      bundleId: "dev.iron-ham.SQliteDataPersistenceTests",
       infoPlist: .default,
       buildableFolders: [
-        "Persistence/Tests"
+        "Persistence/SQLiteData/Tests"
       ],
       scripts: [swiftFormatScript],
-      dependencies: [.target(name: "Persistence")]
+      dependencies: [.target(name: "SQLiteDataPersistence")]
+    ),
+    .target(
+      name: "FluentPersistence",
+      destinations: [.iPad, .iPhone, .mac, .appleVision],
+      product: .framework,
+      bundleId: "dev.iron-ham.FluentPersistence",
+      infoPlist: .default,
+      buildableFolders: [
+        "Persistence/Fluent/Sources",
+      ],
+      scripts: [swiftFormatScript],
+      dependencies: [
+        .external(name: "Dependencies"),
+        .external(name: "Fluent"),
+        .external(name: "FluentSQLiteDriver"),
+        .target(name: "API"),
+      ]
+    ),
+    .target(
+      name: "FluentPersistenceTests",
+      destinations: [.iPad, .iPhone, .mac, .appleVision],
+      product: .unitTests,
+      bundleId: "dev.iron-ham.FluentPersistenceTests",
+      infoPlist: .default,
+      buildableFolders: [
+        "Persistence/Fluent/Tests"
+      ],
+      scripts: [swiftFormatScript],
+      dependencies: [.target(name: "FluentPersistence")]
     ),
   ]
 )

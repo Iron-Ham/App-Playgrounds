@@ -1,7 +1,7 @@
 import API
 import Dependencies
-import Persistence
 import SQLiteData
+import SQLiteDataPersistence
 import SwiftUI
 
 struct RootSplitView: View {
