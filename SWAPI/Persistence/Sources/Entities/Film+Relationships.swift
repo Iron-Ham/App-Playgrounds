@@ -2,6 +2,7 @@ import API
 import Foundation
 import GRDB
 import SQLiteData
+import StructuredQueries
 
 extension SWAPIDataStore {
   public struct FilmRelationshipSummary: Sendable, Equatable {
@@ -88,13 +89,48 @@ extension SWAPIDataStore {
     _ relationship: Relationship
   ) throws -> [URL] {
     try database.read { db in
-      let identifiers = try String.fetchAll(
-        db,
-        sql:
-          "SELECT \"\(relationship.valueColumn)\" FROM \"\(relationship.tableName)\" WHERE \"filmUrl\" = ?",
-        arguments: [filmURL.absoluteString]
-      )
-      return identifiers.compactMap(URL.init(string:))
+      switch relationship {
+      case .characters:
+        try relatedURLs(
+          FilmCharacter.self,
+          filmURLColumn: \.filmURL,
+          valueColumn: \.personURL,
+          filmURL: filmURL,
+          db: db
+        )
+      case .planets:
+        try relatedURLs(
+          FilmPlanet.self,
+          filmURLColumn: \.filmURL,
+          valueColumn: \.planetURL,
+          filmURL: filmURL,
+          db: db
+        )
+      case .species:
+        try relatedURLs(
+          FilmSpecies.self,
+          filmURLColumn: \.filmURL,
+          valueColumn: \.speciesURL,
+          filmURL: filmURL,
+          db: db
+        )
+      case .starships:
+        try relatedURLs(
+          FilmStarship.self,
+          filmURLColumn: \.filmURL,
+          valueColumn: \.starshipURL,
+          filmURL: filmURL,
+          db: db
+        )
+      case .vehicles:
+        try relatedURLs(
+          FilmVehicle.self,
+          filmURLColumn: \.filmURL,
+          valueColumn: \.vehicleURL,
+          filmURL: filmURL,
+          db: db
+        )
+      }
     }
   }
 
@@ -103,12 +139,85 @@ extension SWAPIDataStore {
     _ relationship: Relationship
   ) throws -> Int {
     try database.read { db in
-      try Int.fetchOne(
-        db,
-        sql: "SELECT COUNT(*) FROM \"\(relationship.tableName)\" WHERE \"filmUrl\" = ?",
-        arguments: [filmURL.absoluteString]
-      ) ?? 0
+      switch relationship {
+      case .characters:
+        try countRelationships(
+          FilmCharacter.self,
+          filmURLColumn: \.filmURL,
+          filmURL: filmURL,
+          db: db
+        )
+      case .planets:
+        try countRelationships(
+          FilmPlanet.self,
+          filmURLColumn: \.filmURL,
+          filmURL: filmURL,
+          db: db
+        )
+      case .species:
+        try countRelationships(
+          FilmSpecies.self,
+          filmURLColumn: \.filmURL,
+          filmURL: filmURL,
+          db: db
+        )
+      case .starships:
+        try countRelationships(
+          FilmStarship.self,
+          filmURLColumn: \.filmURL,
+          filmURL: filmURL,
+          db: db
+        )
+      case .vehicles:
+        try countRelationships(
+          FilmVehicle.self,
+          filmURLColumn: \.filmURL,
+          filmURL: filmURL,
+          db: db
+        )
+      }
     }
+  }
+
+  private func countRelationships<RelationshipTable, FilmURLColumn>(
+    _ table: RelationshipTable.Type,
+    filmURLColumn: KeyPath<RelationshipTable.TableColumns, FilmURLColumn>,
+    filmURL: Film.ID,
+    db: Database
+  ) throws -> Int
+  where
+    RelationshipTable: StructuredQueries.Table,
+    FilmURLColumn: QueryExpression,
+    FilmURLColumn.QueryValue == URL
+  {
+    try table
+      .where { columns in
+        columns[keyPath: filmURLColumn] == filmURL
+      }
+      .select { _ in AggregateFunction<Int>.count() }
+      .fetchOne(db) ?? 0
+  }
+
+  private func relatedURLs<RelationshipTable, FilmURLColumn, ValueColumn>(
+    _ table: RelationshipTable.Type,
+    filmURLColumn: KeyPath<RelationshipTable.TableColumns, FilmURLColumn>,
+    valueColumn: KeyPath<RelationshipTable.TableColumns, ValueColumn>,
+    filmURL: Film.ID,
+    db: Database
+  ) throws -> [URL]
+  where
+    RelationshipTable: StructuredQueries.Table,
+    FilmURLColumn: QueryExpression,
+    FilmURLColumn.QueryValue == URL,
+    ValueColumn: QueryExpression,
+    ValueColumn.QueryValue == URL
+  {
+    try table
+      .where { columns in
+        columns[keyPath: filmURLColumn] == filmURL
+      }
+      .select(valueColumn)
+      .fetchAll(db)
   }
 
   public enum Relationship: CaseIterable, Sendable {
@@ -117,26 +226,6 @@ extension SWAPIDataStore {
     case species
     case starships
     case vehicles
-
-    var tableName: String {
-      switch self {
-      case .characters: "filmCharacters"
-      case .planets: "filmPlanets"
-      case .species: "filmSpecies"
-      case .starships: "filmStarships"
-      case .vehicles: "filmVehicles"
-      }
-    }
-
-    var valueColumn: String {
-      switch self {
-      case .characters: "personUrl"
-      case .planets: "planetUrl"
-      case .species: "speciesUrl"
-      case .starships: "starshipUrl"
-      case .vehicles: "vehicleUrl"
-      }
-    }
   }
 
   public func characters(for film: Film) throws -> [CharacterDetails] {
@@ -145,32 +234,22 @@ extension SWAPIDataStore {
 
   public func characters(forFilmWithURL filmURL: Film.ID) throws -> [CharacterDetails] {
     try database.read { db in
-      let rows = try Row.fetchAll(
-        db,
-        sql:
-          """
-          SELECT people.*
-          FROM people
-          INNER JOIN filmCharacters ON filmCharacters.personUrl = people.url
-          WHERE filmCharacters.filmUrl = ?
-          ORDER BY people.name COLLATE NOCASE
-          """,
-        arguments: [filmURL.absoluteString]
-      )
-      return rows.compactMap { row in
-        guard
-          let urlString: String = row["url"],
-          let url = URL(string: urlString),
-          let name: String = row["name"],
-          let genderRaw: String = row["gender"],
-          let birthYearRaw: String = row["birthYear"]
-        else { return nil }
+      let rows =
+        try Person
+        .order { $0.name.collate(.nocase) }
+        .join(
+          FilmCharacter
+            .where { $0.filmURL == filmURL }
+        ) { $0.url == $1.personURL }
+        .selectStar()
+        .fetchAll(db)
 
-        return CharacterDetails(
-          id: url,
-          name: name,
-          gender: PersonResponse.Gender(rawValue: genderRaw),
-          birthYear: PersonResponse.BirthYear(rawValue: birthYearRaw)
+      return rows.map { person, _ in
+        CharacterDetails(
+          id: person.url,
+          name: person.name,
+          gender: person.gender,
+          birthYear: person.birthYear
         )
       }
     }
@@ -182,32 +261,22 @@ extension SWAPIDataStore {
 
   public func planets(forFilmWithURL filmURL: Film.ID) throws -> [PlanetDetails] {
     try database.read { db in
-      let rows = try Row.fetchAll(
-        db,
-        sql:
-          """
-          SELECT planets.*
-          FROM planets
-          INNER JOIN filmPlanets ON filmPlanets.planetUrl = planets.url
-          WHERE filmPlanets.filmUrl = ?
-          ORDER BY planets.name COLLATE NOCASE
-          """,
-        arguments: [filmURL.absoluteString]
-      )
-      return rows.compactMap { row in
-        guard
-          let urlString: String = row["url"],
-          let url = URL(string: urlString),
-          let name: String = row["name"],
-          let climatesRaw: String = row["climates"],
-          let population: String = row["population"]
-        else { return nil }
+      let rows =
+        try Planet
+        .order { $0.name.collate(.nocase) }
+        .join(
+          FilmPlanet
+            .where { $0.filmURL == filmURL }
+        ) { $0.url == $1.planetURL }
+        .selectStar()
+        .fetchAll(db)
 
-        return PlanetDetails(
-          id: url,
-          name: name,
-          climates: PlanetResponse.ClimateDescriptor.descriptors(from: climatesRaw),
-          population: population
+      return rows.map { planet, _ in
+        PlanetDetails(
+          id: planet.url,
+          name: planet.name,
+          climates: planet.climates,
+          population: planet.population
         )
       }
     }
@@ -219,32 +288,22 @@ extension SWAPIDataStore {
 
   public func species(forFilmWithURL filmURL: Film.ID) throws -> [SpeciesDetails] {
     try database.read { db in
-      let rows = try Row.fetchAll(
-        db,
-        sql:
-          """
-          SELECT species.*
-          FROM species
-          INNER JOIN filmSpecies ON filmSpecies.speciesUrl = species.url
-          WHERE filmSpecies.filmUrl = ?
-          ORDER BY species.name COLLATE NOCASE
-          """,
-        arguments: [filmURL.absoluteString]
-      )
-      return rows.compactMap { row in
-        guard
-          let urlString: String = row["url"],
-          let url = URL(string: urlString),
-          let name: String = row["name"],
-          let classification: String = row["classification"],
-          let language: String = row["language"]
-        else { return nil }
+      let rows =
+        try Species
+        .order { $0.name.collate(.nocase) }
+        .join(
+          FilmSpecies
+            .where { $0.filmURL == filmURL }
+        ) { $0.url == $1.speciesURL }
+        .selectStar()
+        .fetchAll(db)
 
-        return SpeciesDetails(
-          id: url,
-          name: name,
-          classification: classification,
-          language: language
+      return rows.map { species, _ in
+        SpeciesDetails(
+          id: species.url,
+          name: species.name,
+          classification: species.classification,
+          language: species.language
         )
       }
     }
@@ -256,32 +315,22 @@ extension SWAPIDataStore {
 
   public func starships(forFilmWithURL filmURL: Film.ID) throws -> [StarshipDetails] {
     try database.read { db in
-      let rows = try Row.fetchAll(
-        db,
-        sql:
-          """
-          SELECT starships.*
-          FROM starships
-          INNER JOIN filmStarships ON filmStarships.starshipUrl = starships.url
-          WHERE filmStarships.filmUrl = ?
-          ORDER BY starships.name COLLATE NOCASE
-          """,
-        arguments: [filmURL.absoluteString]
-      )
-      return rows.compactMap { row in
-        guard
-          let urlString: String = row["url"],
-          let url = URL(string: urlString),
-          let name: String = row["name"],
-          let model: String = row["model"],
-          let classRaw: String = row["starshipClass"]
-        else { return nil }
+      let rows =
+        try Starship
+        .order { $0.name.collate(.nocase) }
+        .join(
+          FilmStarship
+            .where { $0.filmURL == filmURL }
+        ) { $0.url == $1.starshipURL }
+        .selectStar()
+        .fetchAll(db)
 
-        return StarshipDetails(
-          id: url,
-          name: name,
-          model: model,
-          starshipClass: StarshipResponse.StarshipClass(rawValue: classRaw)
+      return rows.map { starship, _ in
+        StarshipDetails(
+          id: starship.url,
+          name: starship.name,
+          model: starship.model,
+          starshipClass: starship.starshipClass
         )
       }
     }
@@ -293,32 +342,22 @@ extension SWAPIDataStore {
 
   public func vehicles(forFilmWithURL filmURL: Film.ID) throws -> [VehicleDetails] {
     try database.read { db in
-      let rows = try Row.fetchAll(
-        db,
-        sql:
-          """
-          SELECT vehicles.*
-          FROM vehicles
-          INNER JOIN filmVehicles ON filmVehicles.vehicleUrl = vehicles.url
-          WHERE filmVehicles.filmUrl = ?
-          ORDER BY vehicles.name COLLATE NOCASE
-          """,
-        arguments: [filmURL.absoluteString]
-      )
-      return rows.compactMap { row in
-        guard
-          let urlString: String = row["url"],
-          let url = URL(string: urlString),
-          let name: String = row["name"],
-          let model: String = row["model"],
-          let classRaw: String = row["vehicleClass"]
-        else { return nil }
+      let rows =
+        try Vehicle
+        .order { $0.name.collate(.nocase) }
+        .join(
+          FilmVehicle
+            .where { $0.filmURL == filmURL }
+        ) { $0.url == $1.vehicleURL }
+        .selectStar()
+        .fetchAll(db)
 
-        return VehicleDetails(
-          id: url,
-          name: name,
-          model: model,
-          vehicleClass: VehicleResponse.VehicleClass(rawValue: classRaw)
+      return rows.map { vehicle, _ in
+        VehicleDetails(
+          id: vehicle.url,
+          name: vehicle.name,
+          model: vehicle.model,
+          vehicleClass: vehicle.vehicleClass
         )
       }
     }

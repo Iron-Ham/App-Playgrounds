@@ -11,16 +11,16 @@ struct RelationshipDetailPlaceholder: View {
   var body: some View {
     ScrollView {
       VStack(spacing: 24) {
-          RoundedRectangle(cornerRadius: 20, style: .continuous)
-            .fill(accentGradient)
-            .frame(width: 120, height: 120)
-            .overlay {
-              Image(systemName: iconName)
-                .font(.system(size: 48, weight: .bold))
-                .foregroundStyle(.white)
-            }
-            .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 8)
-            .padding(.top, 48)
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+          .fill(accentGradient)
+          .frame(width: 120, height: 120)
+          .overlay {
+            Image(systemName: iconName)
+              .font(.system(size: 48, weight: .bold))
+              .foregroundStyle(.white)
+          }
+          .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 8)
+          .padding(.top, 48)
 
         VStack(spacing: 8) {
           Text(headline)
@@ -41,6 +41,8 @@ struct RelationshipDetailPlaceholder: View {
       .padding(.bottom, 48)
     }
     .navigationTitle(title)
-    .navigationBarTitleDisplayMode(.inline)
+    #if os(iOS)
+      .navigationBarTitleDisplayMode(.inline)
+    #endif
   }
 }
