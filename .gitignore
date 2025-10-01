@@ -65,3 +65,5 @@ fastlane/test_output
 
 SWAPI/SWAPI.xcodeproj 
 SWAPI/SWAPI.xcworkspace
+# Generated derived data (should not be versioned)
+SWAPI/Derived/
