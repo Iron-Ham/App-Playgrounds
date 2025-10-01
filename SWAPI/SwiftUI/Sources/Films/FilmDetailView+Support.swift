@@ -2,6 +2,11 @@ import Foundation
 import Persistence
 import SwiftUI
 
+@Observable
+final class RelationshipSummaryState {
+  var summary: SWAPIDataStore.FilmRelationshipSummary = .empty
+}
+
 extension SWAPIDataStore.FilmRelationshipSummary {
   static let empty = Self(
     characterCount: 0,

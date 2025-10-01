@@ -10,7 +10,7 @@ struct FilmDetailView: View {
   var dataStore: SWAPIDataStore
 
   @State
-  var relationshipSummary: SWAPIDataStore.FilmRelationshipSummary = .empty
+  private var relationshipSummaryState = RelationshipSummaryState()
   @State
   var relationshipSummaryError: Error?
   @State
@@ -42,7 +42,7 @@ struct FilmDetailView: View {
     Group {
       if let film {
         NavigationStack(path: $relationshipNavigationPath) {
-          detailContent(for: film, summary: relationshipSummary)
+          detailContent(for: film, summary: relationshipSummaryState.summary)
         }
         .navigationDestination(for: RelationshipEntity.self) { entity in
           RelationshipDestinationPlaceholder(entity: entity)
@@ -50,6 +50,11 @@ struct FilmDetailView: View {
         .id(film.url)
         .task(id: film) {
           await loadRelationships(for: film)
+        }
+        .onChange(of: film) {
+          Task {
+            await loadRelationships(for: film)
+          }
         }
         .overlay(alignment: .bottomLeading) {
           if let error = relationshipSummaryError {
@@ -186,7 +191,7 @@ struct FilmDetailView: View {
     await MainActor.run {
       relationshipSummaryError = nil
       if isNewFilm {
-        relationshipSummary = .empty
+        relationshipSummaryState.summary = .empty
         relationshipItems = Self.defaultRelationshipState
         expandedRelationships.removeAll()
         relationshipNavigationPath.removeAll()
@@ -205,7 +210,7 @@ struct FilmDetailView: View {
       let summary = try await summaryTask.value
       guard !Task.isCancelled else { return }
       await MainActor.run {
-        relationshipSummary = summary
+        relationshipSummaryState.summary = summary
         relationshipSummaryError = nil
       }
     } catch is CancellationError {

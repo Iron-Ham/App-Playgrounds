@@ -9,8 +9,8 @@ extension FilmDetailView {
     summary: SWAPIDataStore.FilmRelationshipSummary
   ) -> some View {
     let relationships = Array(SWAPIDataStore.Relationship.allCases.enumerated())
-    ForEach(relationships, id: \.element) { index, relationship in
-      Section {
+    Section {
+      ForEach(relationships, id: \.element) { index, relationship in
         let isExpanded = expandedRelationships.contains(relationship)
         Button {
           toggleRelationshipExpansion(for: relationship, film: film)
@@ -30,18 +30,11 @@ extension FilmDetailView {
           relationshipExpandedRows(for: relationship, film: film)
             .transition(Self.expandedRowsTransition)
         }
-      } header: {
-        if index == 0 {
-          Text("Featured In This Film")
-            .font(.headline)
-            .textCase(nil)
-        }
       }
-      .animation(.easeInOut(duration: 0.22), value: expandedRelationships)
-      .animation(
-        .easeInOut(duration: 0.22),
-        value: relationshipItems[relationship, default: .idle].animationID
-      )
+    } header: {
+      Text("Featured In This Film")
+        .font(.headline)
+        .textCase(nil)
     }
   }
 
