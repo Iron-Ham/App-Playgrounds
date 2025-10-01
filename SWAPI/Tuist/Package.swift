@@ -42,5 +42,6 @@ let package = Package(
     // You can read more about dependencies here: https://docs.tuist.io/documentation/tuist/dependencies
     .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.0.0"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
+    .package(url: "https://github.com/pointfreeco/swift-structured-queries", from: "0.21.0"),
   ]
 )

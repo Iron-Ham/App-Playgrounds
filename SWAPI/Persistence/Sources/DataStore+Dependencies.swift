@@ -13,8 +13,8 @@ extension SWAPIDataStore: DependencyKey {
   public static let previewValue: SWAPIDataStore = SWAPIDataStorePreview.inMemory()
 }
 
-public extension DependencyValues {
-  var dataStore: SWAPIDataStore {
+extension DependencyValues {
+  public var dataStore: SWAPIDataStore {
     get { self[SWAPIDataStore.self] }
     set { self[SWAPIDataStore.self] = newValue }
   }

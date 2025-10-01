@@ -1,4 +1,6 @@
+import API
 import Foundation
+import GRDB
 import SQLiteData
 
 extension SWAPIDataStore {
@@ -22,6 +24,41 @@ extension SWAPIDataStore {
       self.starshipCount = starshipCount
       self.vehicleCount = vehicleCount
     }
+  }
+
+  public struct CharacterDetails: Sendable, Equatable {
+    public let id: URL
+    public let name: String
+    public let gender: PersonResponse.Gender
+    public let birthYear: PersonResponse.BirthYear
+  }
+
+  public struct PlanetDetails: Sendable, Equatable {
+    public let id: URL
+    public let name: String
+    public let climates: [PlanetResponse.ClimateDescriptor]
+    public let population: String
+  }
+
+  public struct SpeciesDetails: Sendable, Equatable {
+    public let id: URL
+    public let name: String
+    public let classification: String
+    public let language: String
+  }
+
+  public struct StarshipDetails: Sendable, Equatable {
+    public let id: URL
+    public let name: String
+    public let model: String
+    public let starshipClass: StarshipResponse.StarshipClass
+  }
+
+  public struct VehicleDetails: Sendable, Equatable {
+    public let id: URL
+    public let name: String
+    public let model: String
+    public let vehicleClass: VehicleResponse.VehicleClass
   }
 
   public func relationshipSummary(for film: Film) throws -> FilmRelationshipSummary {
@@ -98,6 +135,191 @@ extension SWAPIDataStore {
       case .species: "speciesUrl"
       case .starships: "starshipUrl"
       case .vehicles: "vehicleUrl"
+      }
+    }
+  }
+
+  public func characters(for film: Film) throws -> [CharacterDetails] {
+    try characters(forFilmWithURL: film.url)
+  }
+
+  public func characters(forFilmWithURL filmURL: Film.ID) throws -> [CharacterDetails] {
+    try database.read { db in
+      let rows = try Row.fetchAll(
+        db,
+        sql:
+          """
+          SELECT people.*
+          FROM people
+          INNER JOIN filmCharacters ON filmCharacters.personUrl = people.url
+          WHERE filmCharacters.filmUrl = ?
+          ORDER BY people.name COLLATE NOCASE
+          """,
+        arguments: [filmURL.absoluteString]
+      )
+      return rows.compactMap { row in
+        guard
+          let urlString: String = row["url"],
+          let url = URL(string: urlString),
+          let name: String = row["name"],
+          let genderRaw: String = row["gender"],
+          let birthYearRaw: String = row["birthYear"]
+        else { return nil }
+
+        return CharacterDetails(
+          id: url,
+          name: name,
+          gender: PersonResponse.Gender(rawValue: genderRaw),
+          birthYear: PersonResponse.BirthYear(rawValue: birthYearRaw)
+        )
+      }
+    }
+  }
+
+  public func planets(for film: Film) throws -> [PlanetDetails] {
+    try planets(forFilmWithURL: film.url)
+  }
+
+  public func planets(forFilmWithURL filmURL: Film.ID) throws -> [PlanetDetails] {
+    try database.read { db in
+      let rows = try Row.fetchAll(
+        db,
+        sql:
+          """
+          SELECT planets.*
+          FROM planets
+          INNER JOIN filmPlanets ON filmPlanets.planetUrl = planets.url
+          WHERE filmPlanets.filmUrl = ?
+          ORDER BY planets.name COLLATE NOCASE
+          """,
+        arguments: [filmURL.absoluteString]
+      )
+      return rows.compactMap { row in
+        guard
+          let urlString: String = row["url"],
+          let url = URL(string: urlString),
+          let name: String = row["name"],
+          let climatesRaw: String = row["climates"],
+          let population: String = row["population"]
+        else { return nil }
+
+        return PlanetDetails(
+          id: url,
+          name: name,
+          climates: PlanetResponse.ClimateDescriptor.descriptors(from: climatesRaw),
+          population: population
+        )
+      }
+    }
+  }
+
+  public func species(for film: Film) throws -> [SpeciesDetails] {
+    try species(forFilmWithURL: film.url)
+  }
+
+  public func species(forFilmWithURL filmURL: Film.ID) throws -> [SpeciesDetails] {
+    try database.read { db in
+      let rows = try Row.fetchAll(
+        db,
+        sql:
+          """
+          SELECT species.*
+          FROM species
+          INNER JOIN filmSpecies ON filmSpecies.speciesUrl = species.url
+          WHERE filmSpecies.filmUrl = ?
+          ORDER BY species.name COLLATE NOCASE
+          """,
+        arguments: [filmURL.absoluteString]
+      )
+      return rows.compactMap { row in
+        guard
+          let urlString: String = row["url"],
+          let url = URL(string: urlString),
+          let name: String = row["name"],
+          let classification: String = row["classification"],
+          let language: String = row["language"]
+        else { return nil }
+
+        return SpeciesDetails(
+          id: url,
+          name: name,
+          classification: classification,
+          language: language
+        )
+      }
+    }
+  }
+
+  public func starships(for film: Film) throws -> [StarshipDetails] {
+    try starships(forFilmWithURL: film.url)
+  }
+
+  public func starships(forFilmWithURL filmURL: Film.ID) throws -> [StarshipDetails] {
+    try database.read { db in
+      let rows = try Row.fetchAll(
+        db,
+        sql:
+          """
+          SELECT starships.*
+          FROM starships
+          INNER JOIN filmStarships ON filmStarships.starshipUrl = starships.url
+          WHERE filmStarships.filmUrl = ?
+          ORDER BY starships.name COLLATE NOCASE
+          """,
+        arguments: [filmURL.absoluteString]
+      )
+      return rows.compactMap { row in
+        guard
+          let urlString: String = row["url"],
+          let url = URL(string: urlString),
+          let name: String = row["name"],
+          let model: String = row["model"],
+          let classRaw: String = row["starshipClass"]
+        else { return nil }
+
+        return StarshipDetails(
+          id: url,
+          name: name,
+          model: model,
+          starshipClass: StarshipResponse.StarshipClass(rawValue: classRaw)
+        )
+      }
+    }
+  }
+
+  public func vehicles(for film: Film) throws -> [VehicleDetails] {
+    try vehicles(forFilmWithURL: film.url)
+  }
+
+  public func vehicles(forFilmWithURL filmURL: Film.ID) throws -> [VehicleDetails] {
+    try database.read { db in
+      let rows = try Row.fetchAll(
+        db,
+        sql:
+          """
+          SELECT vehicles.*
+          FROM vehicles
+          INNER JOIN filmVehicles ON filmVehicles.vehicleUrl = vehicles.url
+          WHERE filmVehicles.filmUrl = ?
+          ORDER BY vehicles.name COLLATE NOCASE
+          """,
+        arguments: [filmURL.absoluteString]
+      )
+      return rows.compactMap { row in
+        guard
+          let urlString: String = row["url"],
+          let url = URL(string: urlString),
+          let name: String = row["name"],
+          let model: String = row["model"],
+          let classRaw: String = row["vehicleClass"]
+        else { return nil }
+
+        return VehicleDetails(
+          id: url,
+          name: name,
+          model: model,
+          vehicleClass: VehicleResponse.VehicleClass(rawValue: classRaw)
+        )
       }
     }
   }

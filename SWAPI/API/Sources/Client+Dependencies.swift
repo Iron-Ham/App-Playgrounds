@@ -6,8 +6,8 @@ extension Client: DependencyKey {
   public static let previewValue = Client()
 }
 
-public extension DependencyValues {
-  var client: Client {
+extension DependencyValues {
+  public var client: Client {
     get { self[Client.self] }
     set { self[Client.self] = newValue }
   }

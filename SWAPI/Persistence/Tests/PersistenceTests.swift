@@ -197,6 +197,21 @@ struct PersistenceTests {
 
     let characterURLs = try store.relationshipURLs(forFilmWithURL: filmURL, .characters)
     #expect(characterURLs == [personURL])
+
+    let characters = try store.characters(forFilmWithURL: filmURL)
+    #expect(characters.map(\.name) == ["Luke Skywalker"])
+
+    let planets = try store.planets(forFilmWithURL: filmURL)
+    #expect(planets.map(\.name) == ["Tatooine"])
+
+    let speciesCollection = try store.species(forFilmWithURL: filmURL)
+    #expect(speciesCollection.map(\.name) == ["Human"])
+
+    let starships = try store.starships(forFilmWithURL: filmURL)
+    #expect(starships.map(\.name) == ["X-wing"])
+
+    let vehiclesCollection = try store.vehicles(forFilmWithURL: filmURL)
+    #expect(vehiclesCollection.map(\.name) == ["Snowspeeder"])
   }
 
   @Test("import snapshot clears existing data before reimport")
