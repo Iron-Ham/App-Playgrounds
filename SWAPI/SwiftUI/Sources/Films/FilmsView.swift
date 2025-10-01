@@ -43,6 +43,10 @@ struct FilmsView: View {
 private struct CellView: View {
   let film: Film?
 
+  private var episodeNumber: String {
+    film.flatMap({ "Episode \($0.episodeId)" }) ?? .placeholder(length: 10)
+  }
+
   private var releaseDateText: String {
     film?.releaseDate?.formatted(date: .abbreviated, time: .omitted) ?? .placeholder(length: 20)
   }
@@ -53,13 +57,17 @@ private struct CellView: View {
 
   var body: some View {
     VStack(alignment: .leading) {
-      Text(releaseDateText)
+      Text(episodeNumber)
         .font(.subheadline)
         .foregroundStyle(.secondary)
 
       Text(filmTitle)
-        .font(.title2)
+        .font(.body)
         .foregroundStyle(.primary)
+
+      Text(releaseDateText)
+        .font(.footnote)
+        .foregroundStyle(.secondary)
     }.redacted(if: film == nil)
   }
 }
