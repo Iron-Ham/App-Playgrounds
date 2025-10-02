@@ -177,16 +177,20 @@ final class FluentPersistenceContainer {
       case .characters:
         let people = try await film.$characters
           .query(on: database)
+          .with(\.$homeworld)
+          .with(\.$species) { species in
+            species
+              .with(\.$homeworld)
+              .with(\.$films)
+          }
+          .with(\.$starships)
+          .with(\.$vehicles)
+          .with(\.$films)
           .sort(\.$name, .ascending)
           .all()
         return people.map { person in
           .character(
-            .init(
-              id: person.url,
-              name: person.name,
-              gender: person.gender,
-              birthYear: person.birthYear
-            )
+            Self.characterDetails(from: person)
           )
         }
 
@@ -197,28 +201,20 @@ final class FluentPersistenceContainer {
           .all()
         return planets.map { planet in
           .planet(
-            .init(
-              id: planet.url,
-              name: planet.name,
-              climates: planet.climates,
-              population: planet.population
-            )
+            Self.planetDetails(from: planet)
           )
         }
 
       case .species:
         let species = try await film.$species
           .query(on: database)
+          .with(\.$homeworld)
+          .with(\.$films)
           .sort(\.$name, .ascending)
           .all()
         return species.map { species in
           .species(
-            .init(
-              id: species.url,
-              name: species.name,
-              classification: species.classification,
-              language: species.language
-            )
+            Self.speciesDetails(from: species)
           )
         }
 
@@ -229,12 +225,7 @@ final class FluentPersistenceContainer {
           .all()
         return starships.map { starship in
           .starship(
-            .init(
-              id: starship.url,
-              name: starship.name,
-              model: starship.model,
-              starshipClass: starship.starshipClass
-            )
+            Self.starshipDetails(from: starship)
           )
         }
 
@@ -245,12 +236,7 @@ final class FluentPersistenceContainer {
           .all()
         return vehicles.map { vehicle in
           .vehicle(
-            .init(
-              id: vehicle.url,
-              name: vehicle.name,
-              model: vehicle.model,
-              vehicleClass: vehicle.vehicleClass
-            )
+            Self.vehicleDetails(from: vehicle)
           )
         }
       }
@@ -541,6 +527,164 @@ enum FluentPersistenceError: Error {
   case databaseNotConfigured
   case databaseAlreadyConfigured
   case databaseUnavailable
+}
+
+extension FluentPersistenceContainer {
+  fileprivate nonisolated static func characterDetails(
+    from person: Person
+  )
+    -> FluentPersistenceService.CharacterDetails
+  {
+    let homeworld: FluentPersistenceService.PlanetDetails?
+    if let homeworldModel = person.$homeworld.value, let planet = homeworldModel {
+      homeworld = Self.planetDetails(from: planet)
+    } else {
+      homeworld = nil
+    }
+
+    let speciesDetailsList = person.species
+      .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+      .map { Self.speciesDetails(from: $0) }
+
+    let starshipDetailList = person.starships
+      .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+      .map { Self.starshipDetails(from: $0) }
+
+    let vehicleDetailList = person.vehicles
+      .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+      .map { Self.vehicleDetails(from: $0) }
+
+    let filmSummariesList = Self.filmSummaries(from: person.films)
+
+    return .init(
+      id: person.url,
+      name: person.name,
+      gender: person.gender,
+      birthYear: person.birthYear,
+      height: person.height,
+      mass: person.mass,
+      hairColors: person.hairColors,
+      skinColors: person.skinColors,
+      eyeColors: person.eyeColors,
+      homeworld: homeworld,
+      species: speciesDetailsList,
+      starships: starshipDetailList,
+      vehicles: vehicleDetailList,
+      films: filmSummariesList
+    )
+  }
+
+  fileprivate nonisolated static func planetDetails(
+    from planet: Planet
+  )
+    -> FluentPersistenceService.PlanetDetails
+  {
+    .init(
+      id: planet.url,
+      name: planet.name,
+      climates: planet.climates,
+      population: planet.population,
+      rotationPeriod: planet.rotationPeriod,
+      orbitalPeriod: planet.orbitalPeriod,
+      diameter: planet.diameter,
+      gravityLevels: planet.gravityLevels,
+      terrains: planet.terrains,
+      surfaceWater: planet.surfaceWater
+    )
+  }
+
+  fileprivate nonisolated static func speciesDetails(
+    from species: Species
+  )
+    -> FluentPersistenceService.SpeciesDetails
+  {
+    let homeworld: FluentPersistenceService.PlanetDetails?
+    if let homeworldModel = species.$homeworld.value, let planet = homeworldModel {
+      homeworld = Self.planetDetails(from: planet)
+    } else {
+      homeworld = nil
+    }
+    let films = Self.filmSummaries(from: species.films)
+
+    return .init(
+      id: species.url,
+      name: species.name,
+      classification: species.classification,
+      designation: species.designation,
+      averageHeight: species.averageHeight,
+      averageLifespan: species.averageLifespan,
+      skinColors: species.skinColor,
+      hairColors: species.hairColor,
+      eyeColors: species.eyeColor,
+      homeworld: homeworld,
+      language: species.language,
+      films: films
+    )
+  }
+
+  fileprivate nonisolated static func starshipDetails(
+    from starship: Starship
+  )
+    -> FluentPersistenceService.StarshipDetails
+  {
+    .init(
+      id: starship.url,
+      name: starship.name,
+      model: starship.model,
+      starshipClass: starship.starshipClass
+    )
+  }
+
+  fileprivate nonisolated static func vehicleDetails(
+    from vehicle: Vehicle
+  )
+    -> FluentPersistenceService.VehicleDetails
+  {
+    .init(
+      id: vehicle.url,
+      name: vehicle.name,
+      model: vehicle.model,
+      vehicleClass: vehicle.vehicleClass
+    )
+  }
+
+  fileprivate nonisolated static func filmSummaries(
+    from films: [Film]
+  ) -> [FluentPersistenceService.FilmSummary] {
+    films
+      .sorted { Self.filmSort(lhs: $0, rhs: $1) }
+      .map { Self.filmSummary(from: $0) }
+  }
+
+  fileprivate nonisolated static func filmSummary(
+    from film: Film
+  ) -> FluentPersistenceService.FilmSummary {
+    .init(
+      id: film.url,
+      title: film.title,
+      episodeId: film.episodeID,
+      releaseDate: film.releaseDate
+    )
+  }
+
+  fileprivate nonisolated static func filmSort(lhs: Film, rhs: Film) -> Bool {
+    switch (lhs.releaseDate, rhs.releaseDate) {
+    case (let lhsDate?, let rhsDate?) where lhsDate != rhsDate:
+      return lhsDate < rhsDate
+    case (nil, .some):
+      return false
+    case (.some, nil):
+      return true
+    default:
+      break
+    }
+
+    if lhs.episodeID != rhs.episodeID {
+      return lhs.episodeID < rhs.episodeID
+    }
+
+    return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+  }
 }
 
 extension FluentPersistenceContainer {

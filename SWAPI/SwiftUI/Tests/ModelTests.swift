@@ -406,7 +406,17 @@ private enum TestData {
           id: URL(string: "https://example.com/people/\(index)")!,
           name: name,
           gender: PersonResponse.Gender.male,
-          birthYear: PersonResponse.BirthYear(rawValue: "19BBY")
+          birthYear: PersonResponse.BirthYear(rawValue: "19BBY"),
+          height: "180",
+          mass: "80",
+          hairColors: [],
+          skinColors: [],
+          eyeColors: [],
+          homeworld: nil,
+          species: [],
+          starships: [],
+          vehicles: [],
+          films: []
         )
       )
     }

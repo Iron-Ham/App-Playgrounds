@@ -113,14 +113,47 @@ extension FluentPersistenceService {
     public let name: String
     public let gender: PersonResponse.Gender
     public let birthYear: PersonResponse.BirthYear
+    public let height: String
+    public let mass: String
+    public let hairColors: [ColorDescriptor]
+    public let skinColors: [ColorDescriptor]
+    public let eyeColors: [ColorDescriptor]
+    public let homeworld: PlanetDetails?
+    public let species: [SpeciesDetails]
+    public let starships: [StarshipDetails]
+    public let vehicles: [VehicleDetails]
+    public let films: [FilmSummary]
 
     public init(
-      id: URL, name: String, gender: PersonResponse.Gender, birthYear: PersonResponse.BirthYear
+      id: URL,
+      name: String,
+      gender: PersonResponse.Gender,
+      birthYear: PersonResponse.BirthYear,
+      height: String,
+      mass: String,
+      hairColors: [ColorDescriptor],
+      skinColors: [ColorDescriptor],
+      eyeColors: [ColorDescriptor],
+      homeworld: PlanetDetails?,
+      species: [SpeciesDetails],
+      starships: [StarshipDetails],
+      vehicles: [VehicleDetails],
+      films: [FilmSummary]
     ) {
       self.id = id
       self.name = name
       self.gender = gender
       self.birthYear = birthYear
+      self.height = height
+      self.mass = mass
+      self.hairColors = hairColors
+      self.skinColors = skinColors
+      self.eyeColors = eyeColors
+      self.homeworld = homeworld
+      self.species = species
+      self.starships = starships
+      self.vehicles = vehicles
+      self.films = films
     }
   }
 
@@ -129,14 +162,35 @@ extension FluentPersistenceService {
     public let name: String
     public let climates: [PlanetResponse.ClimateDescriptor]
     public let population: String
+    public let rotationPeriod: String
+    public let orbitalPeriod: String
+    public let diameter: String
+    public let gravityLevels: [PlanetResponse.GravityDescriptor]
+    public let terrains: [PlanetResponse.TerrainDescriptor]
+    public let surfaceWater: String
 
     public init(
-      id: URL, name: String, climates: [PlanetResponse.ClimateDescriptor], population: String
+      id: URL,
+      name: String,
+      climates: [PlanetResponse.ClimateDescriptor],
+      population: String,
+      rotationPeriod: String,
+      orbitalPeriod: String,
+      diameter: String,
+      gravityLevels: [PlanetResponse.GravityDescriptor],
+      terrains: [PlanetResponse.TerrainDescriptor],
+      surfaceWater: String
     ) {
       self.id = id
       self.name = name
       self.climates = climates
       self.population = population
+      self.rotationPeriod = rotationPeriod
+      self.orbitalPeriod = orbitalPeriod
+      self.diameter = diameter
+      self.gravityLevels = gravityLevels
+      self.terrains = terrains
+      self.surfaceWater = surfaceWater
     }
   }
 
@@ -144,13 +198,42 @@ extension FluentPersistenceService {
     public let id: URL
     public let name: String
     public let classification: String
+    public let designation: String
+    public let averageHeight: String
+    public let averageLifespan: String
+    public let skinColors: [ColorDescriptor]
+    public let hairColors: [ColorDescriptor]
+    public let eyeColors: [ColorDescriptor]
+    public let homeworld: PlanetDetails?
     public let language: String
+    public let films: [FilmSummary]
 
-    public init(id: URL, name: String, classification: String, language: String) {
+    public init(
+      id: URL,
+      name: String,
+      classification: String,
+      designation: String,
+      averageHeight: String,
+      averageLifespan: String,
+      skinColors: [ColorDescriptor],
+      hairColors: [ColorDescriptor],
+      eyeColors: [ColorDescriptor],
+      homeworld: PlanetDetails?,
+      language: String,
+      films: [FilmSummary]
+    ) {
       self.id = id
       self.name = name
       self.classification = classification
+      self.designation = designation
+      self.averageHeight = averageHeight
+      self.averageLifespan = averageLifespan
+      self.skinColors = skinColors
+      self.hairColors = hairColors
+      self.eyeColors = eyeColors
+      self.homeworld = homeworld
       self.language = language
+      self.films = films
     }
   }
 
@@ -180,6 +263,20 @@ extension FluentPersistenceService {
       self.name = name
       self.model = model
       self.vehicleClass = vehicleClass
+    }
+  }
+
+  public struct FilmSummary: Sendable, Equatable, Hashable, Identifiable {
+    public let id: URL
+    public let title: String
+    public let episodeId: Int
+    public let releaseDate: Date?
+
+    public init(id: URL, title: String, episodeId: Int, releaseDate: Date?) {
+      self.id = id
+      self.title = title
+      self.episodeId = episodeId
+      self.releaseDate = releaseDate
     }
   }
 
