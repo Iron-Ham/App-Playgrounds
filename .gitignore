@@ -61,7 +61,9 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# macOS metadata
 .DS_Store
+**/.DS_Store
 
 SWAPI/StarWarsDB.xcodeproj 
 SWAPI/StarWarsDB.xcworkspace
