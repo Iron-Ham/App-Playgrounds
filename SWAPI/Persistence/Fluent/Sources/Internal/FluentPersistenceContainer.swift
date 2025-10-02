@@ -334,12 +334,22 @@ extension FluentPersistenceContainer {
   private func seedRelationships(
     from snapshot: FluentPersistenceService.Snapshot, on database: any Database
   ) async throws {
+    var attachedPersonSpecies: Set<RelationshipPair> = []
+    var attachedPersonStarships: Set<RelationshipPair> = []
+    var attachedPersonVehicles: Set<RelationshipPair> = []
+
     for film in snapshot.films {
       try await attachRelationships(for: film, on: database)
     }
 
     for person in snapshot.people {
-      try await attachRelationships(for: person, on: database)
+      try await attachRelationships(
+        for: person,
+        on: database,
+        attachedSpecies: &attachedPersonSpecies,
+        attachedStarships: &attachedPersonStarships,
+        attachedVehicles: &attachedPersonVehicles
+      )
     }
 
     for species in snapshot.species {
@@ -347,61 +357,99 @@ extension FluentPersistenceContainer {
     }
 
     for starship in snapshot.starships {
-      try await attachRelationships(for: starship, on: database)
+      try await attachRelationships(
+        for: starship,
+        on: database,
+        attachedPilots: &attachedPersonStarships
+      )
     }
 
     for vehicle in snapshot.vehicles {
-      try await attachRelationships(for: vehicle, on: database)
+      try await attachRelationships(
+        for: vehicle,
+        on: database,
+        attachedPilots: &attachedPersonVehicles
+      )
     }
   }
 
   private func attachRelationships(for film: FilmResponse, on database: any Database) async throws {
     guard let filmModel = try await Film.find(film.url, on: database) else { return }
 
-    if !film.characters.isEmpty {
-      let people = try await Person.query(on: database).filter(\.$id ~~ film.characters).all()
+    let characterIDs = uniqueOrderedURLs(film.characters)
+    if !characterIDs.isEmpty {
+      let people = try await Person.query(on: database).filter(\.$id ~~ characterIDs).all()
       try await filmModel.$characters.attach(people, on: database)
     }
 
-    if !film.planets.isEmpty {
-      let planets = try await Planet.query(on: database).filter(\.$id ~~ film.planets).all()
+    let planetIDs = uniqueOrderedURLs(film.planets)
+    if !planetIDs.isEmpty {
+      let planets = try await Planet.query(on: database).filter(\.$id ~~ planetIDs).all()
       try await filmModel.$planets.attach(planets, on: database)
     }
 
-    if !film.species.isEmpty {
-      let species = try await Species.query(on: database).filter(\.$id ~~ film.species).all()
+    let speciesIDs = uniqueOrderedURLs(film.species)
+    if !speciesIDs.isEmpty {
+      let species = try await Species.query(on: database).filter(\.$id ~~ speciesIDs).all()
       try await filmModel.$species.attach(species, on: database)
     }
 
-    if !film.starships.isEmpty {
-      let starships = try await Starship.query(on: database).filter(\.$id ~~ film.starships).all()
+    let starshipIDs = uniqueOrderedURLs(film.starships)
+    if !starshipIDs.isEmpty {
+      let starships = try await Starship.query(on: database).filter(\.$id ~~ starshipIDs).all()
       try await filmModel.$starships.attach(starships, on: database)
     }
 
-    if !film.vehicles.isEmpty {
-      let vehicles = try await Vehicle.query(on: database).filter(\.$id ~~ film.vehicles).all()
+    let vehicleIDs = uniqueOrderedURLs(film.vehicles)
+    if !vehicleIDs.isEmpty {
+      let vehicles = try await Vehicle.query(on: database).filter(\.$id ~~ vehicleIDs).all()
       try await filmModel.$vehicles.attach(vehicles, on: database)
     }
   }
 
   private func attachRelationships(
-    for person: PersonResponse, on database: any Database
+    for person: PersonResponse,
+    on database: any Database,
+    attachedSpecies: inout Set<RelationshipPair>,
+    attachedStarships: inout Set<RelationshipPair>,
+    attachedVehicles: inout Set<RelationshipPair>
   ) async throws {
     guard let personModel = try await Person.find(person.url, on: database) else { return }
 
-    if !person.species.isEmpty {
-      let species = try await Species.query(on: database).filter(\.$id ~~ person.species).all()
-      try await personModel.$species.attach(species, on: database)
+    let speciesIDs = uniqueOrderedURLs(person.species)
+    if !speciesIDs.isEmpty {
+      let species = try await Species.query(on: database).filter(\.$id ~~ speciesIDs).all()
+      let newSpecies = species.filter { species in
+        let pair = RelationshipPair(first: person.url, second: species.url)
+        return attachedSpecies.insert(pair).inserted
+      }
+      if !newSpecies.isEmpty {
+        try await personModel.$species.attach(newSpecies, on: database)
+      }
     }
 
-    if !person.starships.isEmpty {
-      let starships = try await Starship.query(on: database).filter(\.$id ~~ person.starships).all()
-      try await personModel.$starships.attach(starships, on: database)
+    let starshipIDs = uniqueOrderedURLs(person.starships)
+    if !starshipIDs.isEmpty {
+      let starships = try await Starship.query(on: database).filter(\.$id ~~ starshipIDs).all()
+      let newStarships = starships.filter { starship in
+        let pair = RelationshipPair(first: person.url, second: starship.url)
+        return attachedStarships.insert(pair).inserted
+      }
+      if !newStarships.isEmpty {
+        try await personModel.$starships.attach(newStarships, on: database)
+      }
     }
 
-    if !person.vehicles.isEmpty {
-      let vehicles = try await Vehicle.query(on: database).filter(\.$id ~~ person.vehicles).all()
-      try await personModel.$vehicles.attach(vehicles, on: database)
+    let vehicleIDs = uniqueOrderedURLs(person.vehicles)
+    if !vehicleIDs.isEmpty {
+      let vehicles = try await Vehicle.query(on: database).filter(\.$id ~~ vehicleIDs).all()
+      let newVehicles = vehicles.filter { vehicle in
+        let pair = RelationshipPair(first: person.url, second: vehicle.url)
+        return attachedVehicles.insert(pair).inserted
+      }
+      if !newVehicles.isEmpty {
+        try await personModel.$vehicles.attach(newVehicles, on: database)
+      }
     }
   }
 
@@ -417,26 +465,76 @@ extension FluentPersistenceContainer {
   }
 
   private func attachRelationships(
-    for starship: StarshipResponse, on database: any Database
+    for starship: StarshipResponse,
+    on database: any Database,
+    attachedPilots: inout Set<RelationshipPair>
   ) async throws {
     guard let starshipModel = try await Starship.find(starship.url, on: database) else { return }
 
-    if !starship.pilots.isEmpty {
-      let pilots = try await Person.query(on: database).filter(\.$id ~~ starship.pilots).all()
-      try await starshipModel.$pilots.attach(pilots, on: database)
+    let pilotIDs = uniqueOrderedURLs(starship.pilots)
+    guard !pilotIDs.isEmpty else { return }
+
+    let pendingPilotIDs = pilotIDs.filter { pilotURL in
+      let pair = RelationshipPair(first: pilotURL, second: starship.url)
+      return !attachedPilots.contains(pair)
+    }
+
+    guard !pendingPilotIDs.isEmpty else { return }
+
+    let pilots = try await Person.query(on: database).filter(\.$id ~~ pendingPilotIDs).all()
+    let pilotsToAttach = pilots.filter { pilot in
+      let pair = RelationshipPair(first: pilot.url, second: starship.url)
+      return attachedPilots.insert(pair).inserted
+    }
+
+    if !pilotsToAttach.isEmpty {
+      try await starshipModel.$pilots.attach(pilotsToAttach, on: database)
     }
   }
 
   private func attachRelationships(
-    for vehicle: VehicleResponse, on database: any Database
+    for vehicle: VehicleResponse,
+    on database: any Database,
+    attachedPilots: inout Set<RelationshipPair>
   ) async throws {
     guard let vehicleModel = try await Vehicle.find(vehicle.url, on: database) else { return }
 
-    if !vehicle.pilots.isEmpty {
-      let pilots = try await Person.query(on: database).filter(\.$id ~~ vehicle.pilots).all()
-      try await vehicleModel.$pilots.attach(pilots, on: database)
+    let pilotIDs = uniqueOrderedURLs(vehicle.pilots)
+    guard !pilotIDs.isEmpty else { return }
+
+    let pendingPilotIDs = pilotIDs.filter { pilotURL in
+      let pair = RelationshipPair(first: pilotURL, second: vehicle.url)
+      return !attachedPilots.contains(pair)
+    }
+
+    guard !pendingPilotIDs.isEmpty else { return }
+
+    let pilots = try await Person.query(on: database).filter(\.$id ~~ pendingPilotIDs).all()
+    let pilotsToAttach = pilots.filter { pilot in
+      let pair = RelationshipPair(first: pilot.url, second: vehicle.url)
+      return attachedPilots.insert(pair).inserted
+    }
+
+    if !pilotsToAttach.isEmpty {
+      try await vehicleModel.$pilots.attach(pilotsToAttach, on: database)
     }
   }
+}
+
+private func uniqueOrderedURLs(_ urls: [URL]) -> [URL] {
+  var seen: Set<URL> = []
+  var ordered: [URL] = []
+
+  for url in urls where seen.insert(url).inserted {
+    ordered.append(url)
+  }
+
+  return ordered
+}
+
+private struct RelationshipPair: Hashable {
+  let first: URL
+  let second: URL
 }
 
 enum FluentPersistenceError: Error {

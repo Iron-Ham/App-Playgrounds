@@ -214,6 +214,165 @@ struct PersistenceTests {
     #expect(vehiclesCollection.map(\.name) == ["Snowspeeder"])
   }
 
+  @Test("import snapshot deduplicates relationship references")
+  func importSnapshot_deduplicatesRelationshipReferences() throws {
+    let created = iso8601.string(from: Date(timeIntervalSince1970: 1_706_000_000))
+    let edited = iso8601.string(from: Date(timeIntervalSince1970: 1_706_360_000))
+
+    let filmURL = URL(string: "https://swapi.info/api/films/3/")!
+    let personURL = URL(string: "https://swapi.info/api/people/5/")!
+    let planetURL = URL(string: "https://swapi.info/api/planets/7/")!
+    let speciesURL = URL(string: "https://swapi.info/api/species/11/")!
+    let starshipURL = URL(string: "https://swapi.info/api/starships/13/")!
+    let vehicleURL = URL(string: "https://swapi.info/api/vehicles/17/")!
+
+    let duplicateCharacterList = [personURL.absoluteString, personURL.absoluteString]
+    let duplicatePlanetList = [planetURL.absoluteString, planetURL.absoluteString]
+    let duplicateSpeciesList = [speciesURL.absoluteString, speciesURL.absoluteString]
+    let duplicateStarshipList = [starshipURL.absoluteString, starshipURL.absoluteString]
+    let duplicateVehicleList = [vehicleURL.absoluteString, vehicleURL.absoluteString]
+
+    let film = try FilmResponse(
+      data: makeJSON([
+        "title": "Return of the Jedi",
+        "episode_id": 6,
+        "opening_crawl": "The Empire is constructing a new Death Star...",
+        "director": "Richard Marquand",
+        "producer": "Howard G. Kazanjian, George Lucas",
+        "release_date": "1983-05-25",
+        "characters": duplicateCharacterList,
+        "planets": duplicatePlanetList,
+        "starships": duplicateStarshipList,
+        "vehicles": duplicateVehicleList,
+        "species": duplicateSpeciesList,
+        "created": created,
+        "edited": edited,
+        "url": filmURL.absoluteString,
+      ]))
+
+    let person = try PersonResponse(
+      data: makeJSON([
+        "name": "Leia Organa",
+        "height": "150",
+        "mass": "49",
+        "hair_color": "brown",
+        "skin_color": "light",
+        "eye_color": "brown",
+        "birth_year": "19BBY",
+        "gender": "female",
+        "homeworld": planetURL.absoluteString,
+        "films": [filmURL.absoluteString],
+        "species": duplicateSpeciesList,
+        "vehicles": duplicateVehicleList,
+        "starships": duplicateStarshipList,
+        "created": created,
+        "edited": edited,
+        "url": personURL.absoluteString,
+      ]))
+
+    let planet = try PlanetResponse(
+      data: makeJSON([
+        "name": "Endor",
+        "rotation_period": "18",
+        "orbital_period": "402",
+        "diameter": "4900",
+        "climate": "temperate",
+        "gravity": "0.85 standard",
+        "terrain": "forests, mountains, lakes",
+        "surface_water": "8",
+        "population": "30000000",
+        "residents": duplicateCharacterList,
+        "films": [filmURL.absoluteString],
+        "created": created,
+        "edited": edited,
+        "url": planetURL.absoluteString,
+      ]))
+
+    let species = try SpeciesResponse(
+      data: makeJSON([
+        "name": "Ewok",
+        "classification": "mammal",
+        "designation": "sentient",
+        "average_height": "100",
+        "average_lifespan": "unknown",
+        "skin_colors": "brown",
+        "hair_colors": "white",
+        "eye_colors": "brown",
+        "homeworld": planetURL.absoluteString,
+        "language": "Ewokese",
+        "people": duplicateCharacterList,
+        "films": [filmURL.absoluteString],
+        "created": created,
+        "edited": edited,
+        "url": speciesURL.absoluteString,
+      ]))
+
+    let starship = try StarshipResponse(
+      data: makeJSON([
+        "name": "Imperial Shuttle",
+        "model": "Lambda-class T-4a shuttle",
+        "manufacturer": "Sienar Fleet Systems",
+        "cost_in_credits": "240000",
+        "length": "20",
+        "max_atmosphering_speed": "850",
+        "crew": "6",
+        "passengers": "20",
+        "cargo_capacity": "80000",
+        "consumables": "2 months",
+        "hyperdrive_rating": "1.0",
+        "MGLT": "50",
+        "starship_class": "Shuttle",
+        "pilots": duplicateCharacterList,
+        "films": [filmURL.absoluteString],
+        "created": created,
+        "edited": edited,
+        "url": starshipURL.absoluteString,
+      ]))
+
+    let vehicle = try VehicleResponse(
+      data: makeJSON([
+        "name": "Speeder Bike",
+        "model": "74-Z speeder bike",
+        "manufacturer": "Aratech Repulsor Company",
+        "cost_in_credits": "8000",
+        "length": "3",
+        "max_atmosphering_speed": "500",
+        "crew": "1",
+        "passengers": "1",
+        "cargo_capacity": "4",
+        "consumables": "1 day",
+        "vehicle_class": "speeder",
+        "pilots": duplicateCharacterList,
+        "films": [filmURL.absoluteString],
+        "created": created,
+        "edited": edited,
+        "url": vehicleURL.absoluteString,
+      ]))
+
+    let store = SWAPIDataStorePreview.inMemory()
+    let importer = store.makeImporter()
+
+    try importer.importSnapshot(
+      films: [film],
+      people: [person],
+      planets: [planet],
+      species: [species],
+      starships: [starship],
+      vehicles: [vehicle]
+    )
+
+    try store.database.read { db in
+      #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM filmCharacters") == 1)
+      #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM filmPlanets") == 1)
+      #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM filmSpecies") == 1)
+      #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM filmStarships") == 1)
+      #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM filmVehicles") == 1)
+      #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM personSpecies") == 1)
+      #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM personStarships") == 1)
+      #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM personVehicles") == 1)
+    }
+  }
+
   @Test("import snapshot clears existing data before reimport")
   func importSnapshot_clearsExistingDataBeforeReimport() throws {
     let created = iso8601.string(from: Date(timeIntervalSince1970: 1_705_000_000))

@@ -1,7 +1,7 @@
 import FluentPersistence
 import Foundation
-import os.log
 import SwiftUI
+import os.log
 
 @MainActor
 final class FilmsModel: ObservableObject {
@@ -11,11 +11,16 @@ final class FilmsModel: ObservableObject {
   private var observationTask: Task<Void, Never>?
   private var refreshTask: Task<[Film], Error>?
 
-  @Published var films: [Film] = []
-  @Published var selectedFilm: Film?
-  @Published var isLoading = false
-  @Published var hasLoadedInitialData = false
-  @Published var error: Error?
+  @Published
+  var films: [Film] = []
+  @Published
+  var selectedFilm: Film?
+  @Published
+  var isLoading = false
+  @Published
+  var hasLoadedInitialData = false
+  @Published
+  var error: Error?
 
   init(coordinator: PersistenceCoordinator) {
     self.coordinator = coordinator
@@ -75,8 +80,8 @@ final class FilmsModel: ObservableObject {
   }
 }
 
-private extension FilmsModel {
-  func applyLoadedFilms(_ newFilms: [Film]) {
+extension FilmsModel {
+  fileprivate func applyLoadedFilms(_ newFilms: [Film]) {
     let currentSelectionID = selectedFilm?.id
     films = newFilms
 
@@ -89,7 +94,7 @@ private extension FilmsModel {
     }
   }
 
-  func startObservingChangesIfNeeded() {
+  fileprivate func startObservingChangesIfNeeded() {
     guard observationTask == nil else { return }
 
     observationTask = Task { [weak self] in

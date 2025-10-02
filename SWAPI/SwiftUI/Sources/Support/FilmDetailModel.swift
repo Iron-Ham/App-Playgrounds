@@ -17,13 +17,20 @@ final class FilmDetailModel: ObservableObject {
   private var summaryTask: Task<RelationshipSummary, Error>?
   private var observationTask: Task<Void, Never>?
 
-  @Published var film: Film?
-  @Published var summary: RelationshipSummary = .empty
-  @Published var summaryError: Error?
-  @Published var isLoadingSummary = false
-  @Published var expandedRelationships: Set<Relationship> = []
-  @Published var navigationPath: [RelationshipEntity] = []
-  @Published var relationshipStates: [Relationship: RelationshipItemsState] =
+  @Published
+  var film: Film?
+  @Published
+  var summary: RelationshipSummary = .empty
+  @Published
+  var summaryError: Error?
+  @Published
+  var isLoadingSummary = false
+  @Published
+  var expandedRelationships: Set<Relationship> = []
+  @Published
+  var navigationPath: [RelationshipEntity] = []
+  @Published
+  var relationshipStates: [Relationship: RelationshipItemsState] =
     Relationship.defaultStates()
 
   init(
@@ -108,8 +115,8 @@ final class FilmDetailModel: ObservableObject {
   }
 }
 
-private extension FilmDetailModel {
-  func loadSummary(for film: Film, force: Bool) async {
+extension FilmDetailModel {
+  fileprivate func loadSummary(for film: Film, force: Bool) async {
     if isLoadingSummary, !force {
       return
     }
@@ -140,7 +147,7 @@ private extension FilmDetailModel {
     }
   }
 
-  func bootstrapRelationshipState(for film: Film) async {
+  fileprivate func bootstrapRelationshipState(for film: Film) async {
     let cached = await relationshipStore.cachedEntities(for: film.id)
     var currentStates = Relationship.defaultStates()
 
@@ -151,7 +158,7 @@ private extension FilmDetailModel {
     relationshipStates = currentStates
   }
 
-  func loadRelationship(
+  fileprivate func loadRelationship(
     _ relationship: Relationship,
     for film: Film,
     force: Bool
@@ -180,7 +187,7 @@ private extension FilmDetailModel {
     }
   }
 
-  func startObservingChanges(for film: Film) {
+  fileprivate func startObservingChanges(for film: Film) {
     observationTask = Task { [weak self] in
       guard let self else { return }
       let filmID = film.id
@@ -202,7 +209,7 @@ private extension FilmDetailModel {
     }
   }
 
-  func refreshCurrentFilm(expectedFilmID: Film.ID) async {
+  fileprivate func refreshCurrentFilm(expectedFilmID: Film.ID) async {
     guard let film, film.id == expectedFilmID else { return }
 
     await loadSummary(for: film, force: true)
@@ -242,8 +249,8 @@ extension FilmDetailModel {
   }
 }
 
-private extension FilmDetailModel.Relationship {
-  static func defaultStates() -> [Self: FilmDetailModel.RelationshipItemsState] {
+extension FilmDetailModel.Relationship {
+  fileprivate static func defaultStates() -> [Self: FilmDetailModel.RelationshipItemsState] {
     Dictionary(uniqueKeysWithValues: Self.allCases.map { ($0, .idle) })
   }
 }

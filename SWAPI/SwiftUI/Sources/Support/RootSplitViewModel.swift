@@ -1,3 +1,4 @@
+import Combine
 import FluentPersistence
 import SwiftUI
 
@@ -7,6 +8,7 @@ final class RootSplitViewModel: ObservableObject {
 
   let filmsModel: FilmsModel
   let detailModel: FilmDetailModel
+  private var cancellables: Set<AnyCancellable> = []
 
   init(
     coordinator: PersistenceCoordinator,
@@ -19,6 +21,27 @@ final class RootSplitViewModel: ObservableObject {
       persistenceService: persistenceService,
       configurePersistence: configurePersistence
     )
+
+    filmsModel.objectWillChange
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] _ in
+        self?.objectWillChange.send()
+      }
+      .store(in: &cancellables)
+
+    detailModel.objectWillChange
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] _ in
+        self?.objectWillChange.send()
+      }
+      .store(in: &cancellables)
+
+    filmsModel.$selectedFilm
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] film in
+        self?.detailModel.updateSelectedFilm(film)
+      }
+      .store(in: &cancellables)
   }
 
   var films: [Film] { filmsModel.films }
@@ -36,16 +59,13 @@ final class RootSplitViewModel: ObservableObject {
 
   func loadInitialIfNeeded() async {
     await filmsModel.loadInitialIfNeeded()
-    detailModel.updateSelectedFilm(filmsModel.selectedFilm)
   }
 
   func refresh(force: Bool) async {
     await filmsModel.refresh(force: force)
-    detailModel.updateSelectedFilm(filmsModel.selectedFilm)
   }
 
   func selectFilm(_ film: Film?) {
     filmsModel.updateSelection(film)
-    detailModel.updateSelectedFilm(film)
   }
 }

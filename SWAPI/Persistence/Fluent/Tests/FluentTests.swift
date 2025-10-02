@@ -69,6 +69,25 @@ struct FluentPersistenceContainerTests {
   }
 
   @Test
+  func importingSnapshotDeduplicatesPivotRelationships() async throws {
+    let container = FluentPersistenceContainer()
+    defer { Task { try? await container.shutdown() } }
+    try await container.configure(
+      .init(storage: .inMemory(identifier: #function), loggingLevel: .critical))
+
+    let snapshot = try DuplicatePivotSnapshot.make()
+    try await container.importSnapshot(snapshot)
+
+    let films = try await container.filmsOrderedByReleaseDate()
+    #expect(films.count == 1)
+
+    let filmURL = try #require(films.first?.id)
+    let summary = try await container.relationshipSummary(forFilmWithURL: filmURL)
+    #expect(summary.starshipCount == 1)
+    #expect(summary.vehicleCount == 1)
+  }
+
+  @Test
   func liveServiceSupportsFetching() async throws {
     let service = FluentPersistenceService.live()
     defer { Task { try? await service.shutdown() } }
@@ -256,6 +275,184 @@ private enum SampleSnapshot {
         "created": "2014-12-15T12:22:12Z",
         "edited": "2014-12-20T21:30:21Z",
         "url": "https://swapi.info/api/vehicles/14"
+      }
+    ]
+    """#.utf8)
+}
+
+private enum DuplicatePivotSnapshot {
+  static func make() throws -> FluentPersistenceService.Snapshot {
+    FluentPersistenceService.Snapshot(
+      films: try FilmResponse.films(from: Self.films),
+      people: try PersonResponse.people(from: Self.people),
+      planets: try PlanetResponse.planets(from: Self.planets),
+      species: try SpeciesResponse.species(from: Self.species),
+      starships: try StarshipResponse.starships(from: Self.starships),
+      vehicles: try VehicleResponse.vehicles(from: Self.vehicles)
+    )
+  }
+
+  private static let films = Data(
+    #"""
+    [
+      {
+        "title": "Return of the Jedi",
+        "episode_id": 6,
+        "opening_crawl": "The Empire is constructing a new Death Star...",
+        "director": "Richard Marquand",
+        "producer": "Howard G. Kazanjian, George Lucas",
+        "release_date": "1983-05-25",
+        "characters": [
+          "https://swapi.info/api/people/5",
+          "https://swapi.info/api/people/5"
+        ],
+        "planets": ["https://swapi.info/api/planets/7"],
+        "starships": [
+          "https://swapi.info/api/starships/13",
+          "https://swapi.info/api/starships/13"
+        ],
+        "vehicles": [
+          "https://swapi.info/api/vehicles/17",
+          "https://swapi.info/api/vehicles/17"
+        ],
+        "species": ["https://swapi.info/api/species/11"],
+        "created": "2014-12-18T10:39:33Z",
+        "edited": "2014-12-20T21:47:50Z",
+        "url": "https://swapi.info/api/films/3"
+      }
+    ]
+    """#.utf8)
+
+  private static let people = Data(
+    #"""
+    [
+      {
+        "name": "Leia Organa",
+        "height": "150",
+        "mass": "49",
+        "hair_color": "brown",
+        "skin_color": "light",
+        "eye_color": "brown",
+        "birth_year": "19BBY",
+        "gender": "female",
+        "homeworld": "https://swapi.info/api/planets/7",
+        "films": ["https://swapi.info/api/films/3"],
+        "species": [
+          "https://swapi.info/api/species/11",
+          "https://swapi.info/api/species/11"
+        ],
+        "vehicles": [
+          "https://swapi.info/api/vehicles/17",
+          "https://swapi.info/api/vehicles/17"
+        ],
+        "starships": [
+          "https://swapi.info/api/starships/13",
+          "https://swapi.info/api/starships/13"
+        ],
+        "created": "2014-12-10T15:20:09Z",
+        "edited": "2014-12-20T21:17:50Z",
+        "url": "https://swapi.info/api/people/5"
+      }
+    ]
+    """#.utf8)
+
+  private static let planets = Data(
+    #"""
+    [
+      {
+        "name": "Endor",
+        "rotation_period": "18",
+        "orbital_period": "402",
+        "diameter": "4900",
+        "climate": "temperate",
+        "gravity": "0.85 standard",
+        "terrain": "forests, mountains, lakes",
+        "surface_water": "8",
+        "population": "30000000",
+        "residents": ["https://swapi.info/api/people/5"],
+        "films": ["https://swapi.info/api/films/3"],
+        "created": "2014-12-10T11:50:29Z",
+        "edited": "2014-12-20T20:58:18Z",
+        "url": "https://swapi.info/api/planets/7"
+      }
+    ]
+    """#.utf8)
+
+  private static let species = Data(
+    #"""
+    [
+      {
+        "name": "Ewok",
+        "classification": "mammal",
+        "designation": "sentient",
+        "average_height": "100",
+        "average_lifespan": "unknown",
+        "skin_colors": "brown",
+        "hair_colors": "white",
+        "eye_colors": "brown",
+        "homeworld": "https://swapi.info/api/planets/7",
+        "language": "Ewokese",
+        "people": ["https://swapi.info/api/people/5"],
+        "films": ["https://swapi.info/api/films/3"],
+        "created": "2014-12-18T11:22:45Z",
+        "edited": "2014-12-20T21:36:42Z",
+        "url": "https://swapi.info/api/species/11"
+      }
+    ]
+    """#.utf8)
+
+  private static let starships = Data(
+    #"""
+    [
+      {
+        "name": "Imperial Shuttle",
+        "model": "Lambda-class T-4a shuttle",
+        "manufacturer": "Sienar Fleet Systems",
+        "cost_in_credits": "240000",
+        "length": "20",
+        "max_atmosphering_speed": "850",
+        "crew": "6",
+        "passengers": "20",
+        "cargo_capacity": "80000",
+        "consumables": "2 months",
+        "hyperdrive_rating": "1.0",
+        "MGLT": "50",
+        "starship_class": "Shuttle",
+        "pilots": [
+          "https://swapi.info/api/people/5",
+          "https://swapi.info/api/people/5"
+        ],
+        "films": ["https://swapi.info/api/films/3"],
+        "created": "2014-12-15T13:04:47Z",
+        "edited": "2014-12-20T21:23:49Z",
+        "url": "https://swapi.info/api/starships/13"
+      }
+    ]
+    """#.utf8)
+
+  private static let vehicles = Data(
+    #"""
+    [
+      {
+        "name": "Speeder Bike",
+        "model": "74-Z speeder bike",
+        "manufacturer": "Aratech Repulsor Company",
+        "cost_in_credits": "8000",
+        "length": "3",
+        "max_atmosphering_speed": "500",
+        "crew": "1",
+        "passengers": "1",
+        "cargo_capacity": "4",
+        "consumables": "1 day",
+        "vehicle_class": "speeder",
+        "pilots": [
+          "https://swapi.info/api/people/5",
+          "https://swapi.info/api/people/5"
+        ],
+        "films": ["https://swapi.info/api/films/3"],
+        "created": "2014-12-18T11:20:04Z",
+        "edited": "2014-12-20T21:30:21Z",
+        "url": "https://swapi.info/api/vehicles/17"
       }
     ]
     """#.utf8)

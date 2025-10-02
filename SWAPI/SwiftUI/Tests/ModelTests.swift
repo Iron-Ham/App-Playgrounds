@@ -12,7 +12,7 @@ struct FilmsModelTests {
   func loadInitialSetsFilmsAndSelection() async throws {
     let initialFilms = [
       TestData.film(id: 1, title: "A New Hope"),
-      TestData.film(id: 2, title: "The Empire Strikes Back")
+      TestData.film(id: 2, title: "The Empire Strikes Back"),
     ]
 
     let harness = await FilmsModelHarness(initialFilms: initialFilms)
@@ -29,7 +29,7 @@ struct FilmsModelTests {
   func refreshKeepsSelectionWhenFilmStillExists() async throws {
     let initialFilms = [
       TestData.film(id: 1, title: "A New Hope"),
-      TestData.film(id: 2, title: "The Empire Strikes Back")
+      TestData.film(id: 2, title: "The Empire Strikes Back"),
     ]
     let harness = await FilmsModelHarness(initialFilms: initialFilms)
 
@@ -51,7 +51,7 @@ struct FilmsModelTests {
   func changeStreamRefreshesFilms() async throws {
     let initialFilms = [
       TestData.film(id: 1, title: "A New Hope"),
-      TestData.film(id: 2, title: "The Empire Strikes Back")
+      TestData.film(id: 2, title: "The Empire Strikes Back"),
     ]
     let harness = await FilmsModelHarness(initialFilms: initialFilms)
 
@@ -60,7 +60,7 @@ struct FilmsModelTests {
     let refreshedList = [
       TestData.film(id: 1, title: "A New Hope"),
       TestData.film(id: 2, title: "Empire Extended"),
-      TestData.film(id: 3, title: "Return of the Jedi")
+      TestData.film(id: 3, title: "Return of the Jedi"),
     ]
     await harness.storage.replaceFilms(with: refreshedList)
 
@@ -202,8 +202,7 @@ private struct FilmsModelHarness {
 private actor FilmsServiceStorage {
   private var films: [PersistenceCoordinator.Film]
   private var configurationCount = 0
-  private var changeContinuation:
-    AsyncStream<FluentPersistenceService.ChangeBatch>.Continuation?
+  private var changeContinuation: AsyncStream<FluentPersistenceService.ChangeBatch>.Continuation?
 
   init(films: [PersistenceCoordinator.Film]) {
     self.films = films
@@ -215,8 +214,8 @@ private actor FilmsServiceStorage {
       importSnapshot: { _ in },
       observeChanges: { await self.makeChangeStream() },
       shutdown: {},
-  fetchFilms: { await self.films },
-  fetchRelationshipSummary: { _ in FluentPersistenceService.FilmRelationshipSummary() },
+      fetchFilms: { await self.films },
+      fetchRelationshipSummary: { _ in FluentPersistenceService.FilmRelationshipSummary() },
       fetchRelationshipEntities: { _, _ in [] }
     )
   }
@@ -302,8 +301,7 @@ private actor FilmDetailServiceSpy {
   private var summaryCallCount = 0
   private var relationshipCallCounts: [Relationship: Int] = [:]
   private var configureCallCount = 0
-  private var changeContinuation:
-    AsyncStream<FluentPersistenceService.ChangeBatch>.Continuation?
+  private var changeContinuation: AsyncStream<FluentPersistenceService.ChangeBatch>.Continuation?
 
   init(
     films: [Film],
@@ -397,7 +395,9 @@ private enum TestData {
     )
   }
 
-  static func characterEntities(names: [String])
+  static func characterEntities(
+    names: [String]
+  )
     -> [FluentPersistenceService.RelationshipEntity]
   {
     names.enumerated().map { index, name in

@@ -103,58 +103,74 @@ public struct SnapshotImporter {
     db: Database
   ) throws {
     try seed(
-      films.flatMap { film in
-        film.characters.map { FilmCharacter(film: film.url, person: $0) }
-      },
+      uniqueRelationshipPairs(
+        films.flatMap { film in
+          film.characters.map { (film.url, $0) }
+        }
+      ).map { FilmCharacter(film: $0.0, person: $0.1) },
       db: db
     )
 
     try seed(
-      films.flatMap { film in
-        film.planets.map { FilmPlanet(film: film.url, planet: $0) }
-      },
+      uniqueRelationshipPairs(
+        films.flatMap { film in
+          film.planets.map { (film.url, $0) }
+        }
+      ).map { FilmPlanet(film: $0.0, planet: $0.1) },
       db: db
     )
 
     try seed(
-      films.flatMap { film in
-        film.species.map { FilmSpecies(film: film.url, species: $0) }
-      },
+      uniqueRelationshipPairs(
+        films.flatMap { film in
+          film.species.map { (film.url, $0) }
+        }
+      ).map { FilmSpecies(film: $0.0, species: $0.1) },
       db: db
     )
 
     try seed(
-      films.flatMap { film in
-        film.starships.map { FilmStarship(film: film.url, starship: $0) }
-      },
+      uniqueRelationshipPairs(
+        films.flatMap { film in
+          film.starships.map { (film.url, $0) }
+        }
+      ).map { FilmStarship(film: $0.0, starship: $0.1) },
       db: db
     )
 
     try seed(
-      films.flatMap { film in
-        film.vehicles.map { FilmVehicle(film: film.url, vehicle: $0) }
-      },
+      uniqueRelationshipPairs(
+        films.flatMap { film in
+          film.vehicles.map { (film.url, $0) }
+        }
+      ).map { FilmVehicle(film: $0.0, vehicle: $0.1) },
       db: db
     )
 
     try seed(
-      people.flatMap { person in
-        person.species.map { PersonSpecies(person: person.url, species: $0) }
-      },
+      uniqueRelationshipPairs(
+        people.flatMap { person in
+          person.species.map { (person.url, $0) }
+        }
+      ).map { PersonSpecies(person: $0.0, species: $0.1) },
       db: db
     )
 
     try seed(
-      starships.flatMap { starship in
-        starship.pilots.map { PersonStarship(person: $0, starship: starship.url) }
-      },
+      uniqueRelationshipPairs(
+        starships.flatMap { starship in
+          starship.pilots.map { ($0, starship.url) }
+        }
+      ).map { PersonStarship(person: $0.0, starship: $0.1) },
       db: db
     )
 
     try seed(
-      vehicles.flatMap { vehicle in
-        vehicle.pilots.map { PersonVehicle(person: $0, vehicle: vehicle.url) }
-      },
+      uniqueRelationshipPairs(
+        vehicles.flatMap { vehicle in
+          vehicle.pilots.map { ($0, vehicle.url) }
+        }
+      ).map { PersonVehicle(person: $0.0, vehicle: $0.1) },
       db: db
     )
   }
@@ -197,6 +213,27 @@ extension SnapshotImporter {
         record
       }
     }
+  }
+
+  private func uniqueRelationshipPairs<S: Sequence>(
+    _ sequence: S
+  ) -> [(URL, URL)] where S.Element == (URL, URL) {
+    var seen: Set<RelationshipPair> = []
+    var ordered: [(URL, URL)] = []
+
+    for (first, second) in sequence {
+      let pair = RelationshipPair(first: first, second: second)
+      if seen.insert(pair).inserted {
+        ordered.append((first, second))
+      }
+    }
+
+    return ordered
+  }
+
+  private struct RelationshipPair: Hashable {
+    let first: URL
+    let second: URL
   }
 }
 
