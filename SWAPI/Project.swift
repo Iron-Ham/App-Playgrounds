@@ -30,13 +30,13 @@ let project = Project(
         ]
       ),
       buildableFolders: [
-        "SwiftUI/Sources",
-        "SwiftUI/Resources",
+        "App/Sources",
+        "App/Resources",
       ],
       scripts: [swiftFormatScript],
       dependencies: [
         .target(name: "API"),
-        .target(name: "FluentPersistence"),
+        .target(name: "Persistence"),
         .external(name: "Dependencies"),
       ]
     ),
@@ -47,12 +47,12 @@ let project = Project(
       bundleId: "dev.iron-ham.StarWarsDBTests",
       infoPlist: .default,
       buildableFolders: [
-        "SwiftUI/Tests"
+        "App/Tests"
       ],
       scripts: [swiftFormatScript],
       dependencies: [
         .target(name: "StarWarsDB"),
-        .target(name: "FluentPersistence"),
+        .target(name: "Persistence"),
         .target(name: "API"),
         .external(name: "Dependencies"),
       ]
@@ -82,41 +82,13 @@ let project = Project(
       dependencies: [.target(name: "API")]
     ),
     .target(
-      name: "SQLiteDataPersistence",
+      name: "Persistence",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .framework,
-      bundleId: "dev.iron-ham.SQLiteDataPersistence",
+      bundleId: "dev.iron-ham.Persistence",
       infoPlist: .default,
       buildableFolders: [
-        "Persistence/SQLiteData/Sources"
-      ],
-      scripts: [swiftFormatScript],
-      dependencies: [
-        .external(name: "Dependencies"),
-        .external(name: "SQLiteData"),
-        .target(name: "API"),
-      ]
-    ),
-    .target(
-      name: "SQliteDataPersistenceTests",
-      destinations: [.iPad, .iPhone, .mac, .appleVision],
-      product: .unitTests,
-      bundleId: "dev.iron-ham.SQliteDataPersistenceTests",
-      infoPlist: .default,
-      buildableFolders: [
-        "Persistence/SQLiteData/Tests"
-      ],
-      scripts: [swiftFormatScript],
-      dependencies: [.target(name: "SQLiteDataPersistence")]
-    ),
-    .target(
-      name: "FluentPersistence",
-      destinations: [.iPad, .iPhone, .mac, .appleVision],
-      product: .framework,
-      bundleId: "dev.iron-ham.FluentPersistence",
-      infoPlist: .default,
-      buildableFolders: [
-        "Persistence/Fluent/Sources"
+        "Persistence/Sources"
       ],
       scripts: [swiftFormatScript],
       dependencies: [
@@ -128,16 +100,16 @@ let project = Project(
       ]
     ),
     .target(
-      name: "FluentPersistenceTests",
+      name: "PersistenceTests",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .unitTests,
-      bundleId: "dev.iron-ham.FluentPersistenceTests",
+      bundleId: "dev.iron-ham.PersistenceTests",
       infoPlist: .default,
       buildableFolders: [
-        "Persistence/Fluent/Tests"
+        "Persistence/Tests"
       ],
       scripts: [swiftFormatScript],
-      dependencies: [.target(name: "FluentPersistence")]
+      dependencies: [.target(name: "Persistence")]
     ),
   ]
 )
