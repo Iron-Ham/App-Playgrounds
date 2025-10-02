@@ -71,7 +71,7 @@
           .buttonStyle(.plain)
           .accessibilityLabel("View the Star Wars style opening crawl")
           .accessibilityHint("Presents the opening crawl with animated Star Wars styling")
-          .listRowInsets(EdgeInsets(top: 12, leading: 0, bottom: 16, trailing: 0))
+          .listRowInsets(EdgeInsets(top: 12, leading: 0, bottom: 24, trailing: 0))
           .listRowSeparator(.hidden)
           .listRowBackground(Color.clear)
         } header: {
