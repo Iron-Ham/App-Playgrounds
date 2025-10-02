@@ -12,7 +12,7 @@ struct PersistenceCoordinatorTests {
       films: [Self.sampleFilm(title: "Cached Hope")]
     )
 
-  let service = await storage.makeService()
+    let service = await storage.makeService()
     let snapshotProvider = SnapshotProviderRecorder(result: .init())
 
     let coordinator = PersistenceCoordinator(
@@ -47,7 +47,9 @@ struct PersistenceCoordinatorTests {
       starships: [],
       vehicles: []
     )
-  let service = await storage.makeService(changingFilmsTo: [Self.sampleFilm(title: "Fetched Hope")])
+    let service = await storage.makeService(changingFilmsTo: [
+      Self.sampleFilm(title: "Fetched Hope")
+    ])
     let snapshotProvider = SnapshotProviderRecorder(result: snapshot)
 
     let coordinator = PersistenceCoordinator(
@@ -76,7 +78,7 @@ struct PersistenceCoordinatorTests {
     let storage = PersistenceServiceStorage(
       films: [Self.sampleFilm(title: "First Cache")]
     )
-  let service = await storage.makeService(changingFilmsTo: [Self.sampleFilm(title: "Reloaded")])
+    let service = await storage.makeService(changingFilmsTo: [Self.sampleFilm(title: "Reloaded")])
     let snapshotProvider = SnapshotProviderRecorder(result: .init())
 
     let coordinator = PersistenceCoordinator(
@@ -103,8 +105,8 @@ struct PersistenceCoordinatorTests {
   }
 }
 
-private extension PersistenceCoordinatorTests {
-  static func sampleFilm(title: String) -> FluentPersistenceService.FilmDetails {
+extension PersistenceCoordinatorTests {
+  fileprivate static func sampleFilm(title: String) -> FluentPersistenceService.FilmDetails {
     FluentPersistenceService.FilmDetails(
       id: URL(string: "https://example.com/films/\(UUID().uuidString)")!,
       title: title,
@@ -128,7 +130,9 @@ private actor PersistenceServiceStorage {
     self.films = films
   }
 
-  func makeService(changingFilmsTo newFilms: [FluentPersistenceService.FilmDetails]? = nil)
+  func makeService(
+    changingFilmsTo newFilms: [FluentPersistenceService.FilmDetails]? = nil
+  )
     -> FluentPersistenceService
   {
     FluentPersistenceService(
@@ -150,7 +154,7 @@ private actor PersistenceServiceStorage {
       fetchFilms: {
         await self.films
       },
-  fetchRelationshipSummary: { _ in FluentPersistenceService.FilmRelationshipSummary() },
+      fetchRelationshipSummary: { _ in FluentPersistenceService.FilmRelationshipSummary() },
       fetchRelationshipEntities: { _, _ in [] }
     )
   }

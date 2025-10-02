@@ -15,7 +15,7 @@ actor PersistenceCoordinator {
 
   init(
     persistenceService: FluentPersistenceService,
-  configurationProvider: @escaping @Sendable () async throws -> FluentPersistenceConfiguration,
+    configurationProvider: @escaping @Sendable () async throws -> FluentPersistenceConfiguration,
     snapshotProvider: @escaping @Sendable () async throws -> Snapshot
   ) {
     self.persistenceService = persistenceService
@@ -29,7 +29,7 @@ actor PersistenceCoordinator {
     }
 
     let task = Task {
-  let configuration = try await configurationProvider()
+      let configuration = try await configurationProvider()
       try await persistenceService.setup(configuration)
     }
 
@@ -69,6 +69,11 @@ actor PersistenceCoordinator {
       refreshTask = nil
       throw error
     }
+  }
+
+  func observeChanges() async throws -> AsyncStream<FluentPersistenceService.ChangeBatch> {
+    try await preparePersistence()
+    return await persistenceService.observeChanges()
   }
 
   func clearCache() {

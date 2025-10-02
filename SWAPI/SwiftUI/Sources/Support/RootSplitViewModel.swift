@@ -1,53 +1,51 @@
+import FluentPersistence
 import SwiftUI
 
 @MainActor
 final class RootSplitViewModel: ObservableObject {
-  private let coordinator: PersistenceCoordinator
+  typealias Film = PersistenceCoordinator.Film
 
-  @Published var films: [Film] = []
-  @Published var selectedFilm: Film?
-  @Published var isLoading = false
-  @Published var hasLoadedInitialData = false
-  @Published var error: Error?
+  let filmsModel: FilmsModel
+  let detailModel: FilmDetailModel
 
-  init(coordinator: PersistenceCoordinator) {
-    self.coordinator = coordinator
+  init(
+    coordinator: PersistenceCoordinator,
+    persistenceService: FluentPersistenceService,
+    configurePersistence: @escaping @Sendable () async throws -> Void
+  ) {
+    self.filmsModel = FilmsModel(coordinator: coordinator)
+    self.detailModel = FilmDetailModel(
+      coordinator: coordinator,
+      persistenceService: persistenceService,
+      configurePersistence: configurePersistence
+    )
   }
 
+  var films: [Film] { filmsModel.films }
+
+  var isLoadingFilms: Bool { filmsModel.isLoading }
+
+  var filmsError: Error? { filmsModel.error }
+
+  var selectedFilm: Film? {
+    get { filmsModel.selectedFilm }
+    set { selectFilm(newValue) }
+  }
+
+  var hasLoadedInitialData: Bool { filmsModel.hasLoadedInitialData }
+
   func loadInitialIfNeeded() async {
-    guard !hasLoadedInitialData else { return }
-    await refresh(force: false)
+    await filmsModel.loadInitialIfNeeded()
+    detailModel.updateSelectedFilm(filmsModel.selectedFilm)
   }
 
   func refresh(force: Bool) async {
-    if isLoading { return }
-    isLoading = true
-    defer {
-      isLoading = false
-      hasLoadedInitialData = true
-    }
-
-    do {
-      let fetchedFilms = try await coordinator.loadFilms(force: force)
-      updateFilms(with: fetchedFilms)
-      error = nil
-    } catch {
-      guard !Task.isCancelled else { return }
-      self.error = error
-    }
+    await filmsModel.refresh(force: force)
+    detailModel.updateSelectedFilm(filmsModel.selectedFilm)
   }
 
-  private func updateFilms(with newFilms: [Film]) {
-    let previouslySelectedID = selectedFilm?.id
-    films = newFilms
-
-    if let previouslySelectedID,
-       let match = newFilms.first(where: { $0.id == previouslySelectedID }) {
-      selectedFilm = match
-    } else if let firstFilm = newFilms.first {
-      selectedFilm = firstFilm
-    } else {
-      selectedFilm = nil
-    }
+  func selectFilm(_ film: Film?) {
+    filmsModel.updateSelection(film)
+    detailModel.updateSelectedFilm(film)
   }
 }

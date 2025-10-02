@@ -9,13 +9,13 @@ struct RootSplitView: View {
       FilmsView(
         films: model.films,
         selection: filmSelection,
-        isLoading: model.isLoading,
+        isLoading: model.isLoadingFilms,
         onRefresh: {
           await model.refresh(force: true)
         }
       )
       .overlay {
-        if let error = model.error, model.films.isEmpty {
+        if let error = model.filmsError, model.films.isEmpty {
           VStack {
             Spacer()
             ErrorView(
@@ -30,11 +30,7 @@ struct RootSplitView: View {
         }
       }
     } detail: {
-      FilmDetailView(
-        film: filmSelection
-      )
-      .redacted(if: model.isLoading)
-      .allowsHitTesting(!model.isLoading)
+      FilmDetailView(model: model.detailModel)
     }
     .task {
       await model.loadInitialIfNeeded()
@@ -43,11 +39,11 @@ struct RootSplitView: View {
 }
 
 extension RootSplitView {
-  fileprivate var filmSelection: Binding<PersistenceCoordinator.Film?> {
+  fileprivate var filmSelection: Binding<RootSplitViewModel.Film?> {
     Binding(
       get: { model.selectedFilm },
       set: { selection in
-        model.selectedFilm = selection
+        model.selectFilm(selection)
       }
     )
   }

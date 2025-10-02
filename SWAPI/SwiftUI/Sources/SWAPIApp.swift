@@ -54,16 +54,24 @@ struct StarWarsDBApp: App {
 
     self.persistenceCoordinator = coordinator
 
+    let configurePersistenceClosure: @Sendable () async throws -> Void = {
+      try await coordinator.preparePersistence()
+    }
+
     prepareDependencies { values in
       values.client = appClient
       values.persistenceService = appService
-      values.configurePersistence = {
-        try await coordinator.preparePersistence()
-      }
+      values.configurePersistence = configurePersistenceClosure
       values.persistenceCoordinator = coordinator
     }
 
-    _rootViewModel = StateObject(wrappedValue: RootSplitViewModel(coordinator: coordinator))
+    _rootViewModel = StateObject(
+      wrappedValue: RootSplitViewModel(
+        coordinator: coordinator,
+        persistenceService: appService,
+        configurePersistence: configurePersistenceClosure
+      )
+    )
   }
 
   var body: some Scene {
