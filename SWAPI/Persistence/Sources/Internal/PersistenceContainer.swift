@@ -176,10 +176,14 @@ final class PersistenceContainer {
       case .characters:
         let people = try await film.$characters
           .query(on: database)
-          .with(\.$homeworld)
+          .with(\.$homeworld) { homeworld in
+            homeworld.with(\.$films)
+          }
           .with(\.$species) { species in
             species
-              .with(\.$homeworld)
+              .with(\.$homeworld) { homeworld in
+                homeworld.with(\.$films)
+              }
               .with(\.$films)
           }
           .with(\.$starships) { starships in
@@ -212,7 +216,9 @@ final class PersistenceContainer {
       case .species:
         let species = try await film.$species
           .query(on: database)
-          .with(\.$homeworld)
+          .with(\.$homeworld) { homeworld in
+            homeworld.with(\.$films)
+          }
           .with(\.$films)
           .sort(\.$name, .ascending)
           .all()
