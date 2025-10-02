@@ -1,23 +1,26 @@
 import Dependencies
+import FluentPersistence
 import Foundation
-import SQLiteDataPersistence
 import SwiftUI
 
 struct FilmDetailView: View {
   @Binding
   var film: Film?
-  @Dependency(\.dataStore)
-  var dataStore: SWAPIDataStore
+  @Dependency(\.persistenceService)
+  var persistenceService: FluentPersistenceService
+
+  @Dependency(\.configurePersistence)
+  var configurePersistence: @Sendable () async throws -> Void
 
   @State
   private var relationshipSummaryState = RelationshipSummaryState()
   @State
   var relationshipSummaryError: Error?
   @State
-  var relationshipItems: [SWAPIDataStore.Relationship: RelationshipItemsState] =
+  var relationshipItems: [Relationship: RelationshipItemsState] =
     Self.defaultRelationshipState
   @State
-  var expandedRelationships: Set<SWAPIDataStore.Relationship> = []
+  var expandedRelationships: Set<Relationship> = []
   @State
   var relationshipNavigationPath: [RelationshipEntity] = []
   @State
@@ -25,9 +28,9 @@ struct FilmDetailView: View {
   @State
   var isPresentingOpeningCrawl = false
 
-  static let defaultRelationshipState: [SWAPIDataStore.Relationship: RelationshipItemsState] =
+  static let defaultRelationshipState: [Relationship: RelationshipItemsState] =
     Dictionary(
-      uniqueKeysWithValues: SWAPIDataStore.Relationship.allCases.map { relationship in
+      uniqueKeysWithValues: Relationship.allCases.map { relationship in
         (relationship, .idle)
       })
 
@@ -47,7 +50,7 @@ struct FilmDetailView: View {
         .navigationDestination(for: RelationshipEntity.self) { entity in
           RelationshipDestinationPlaceholder(entity: entity)
         }
-        .id(film.url)
+        .id(film.id)
         .task(id: film) {
           await loadRelationships(for: film)
         }
@@ -80,7 +83,7 @@ struct FilmDetailView: View {
 
   private func detailContent(
     for film: Film,
-    summary: SWAPIDataStore.FilmRelationshipSummary
+    summary: RelationshipSummary
   ) -> some View {
     List {
       Section {
@@ -184,9 +187,17 @@ struct FilmDetailView: View {
   }
 
   private func loadRelationships(for film: Film) async {
-    let filmURL = film.url
-    let dataStore = self.dataStore
-    let isNewFilm = lastLoadedFilmID != filmURL
+    let filmID = film.id
+    let isNewFilm = lastLoadedFilmID != filmID
+
+    do {
+      try await configurePersistence()
+    } catch {
+      await MainActor.run {
+        relationshipSummaryError = error
+      }
+      return
+    }
 
     await MainActor.run {
       relationshipSummaryError = nil
@@ -197,28 +208,21 @@ struct FilmDetailView: View {
         relationshipNavigationPath.removeAll()
         isPresentingOpeningCrawl = false
       }
-      lastLoadedFilmID = filmURL
+      lastLoadedFilmID = filmID
     }
 
     guard !Task.isCancelled else { return }
-
-    let summaryTask = Task.detached(priority: .userInitiated) {
-      try dataStore.relationshipSummary(forFilmWithURL: filmURL)
-    }
-
     do {
-      let summary = try await summaryTask.value
+      let summary = try await persistenceService.relationshipSummary(forFilmWithURL: filmID)
       guard !Task.isCancelled else { return }
       await MainActor.run {
         relationshipSummaryState.summary = summary
         relationshipSummaryError = nil
       }
     } catch is CancellationError {
-      summaryTask.cancel()
-      // Ignore cancellations triggered by SwiftUI refreshing the task.
+      return
     } catch {
       guard !Task.isCancelled else {
-        summaryTask.cancel()
         return
       }
       await MainActor.run {
@@ -231,8 +235,33 @@ struct FilmDetailView: View {
 #Preview {
   @Previewable
   @State
-  var film: Film? = Film(
-    url: URL(string: "https://swapi.dev/api/films/1/")!,
+  var film: Film? = .preview
+
+  let previewFilm = Film.preview
+
+  let previewService = FluentPersistenceService(
+    setup: { _ in },
+    importSnapshot: { _ in },
+    observeChanges: { AsyncStream { _ in } },
+    shutdown: {},
+    fetchFilms: { [previewFilm] },
+    fetchRelationshipSummary: { _ in .empty },
+    fetchRelationshipEntities: { _, _ in [] as [FluentPersistenceService.RelationshipEntity] }
+  )
+
+  withDependencies {
+    $0.persistenceService = previewService
+    $0.configurePersistence = {}
+  } operation: {
+    NavigationStack {
+      FilmDetailView(film: $film)
+    }
+  }
+}
+
+extension Film {
+  fileprivate static let preview = Self(
+    id: URL(string: "https://swapi.dev/api/films/1/")!,
     title: "A New Hope",
     episodeId: 4,
     openingCrawl: "It is a period of civil war...",
@@ -242,12 +271,4 @@ struct FilmDetailView: View {
     created: Date(timeIntervalSince1970: 236_102_400),
     edited: Date(timeIntervalSince1970: 236_102_400)
   )
-
-  withDependencies {
-    $0.dataStore = SWAPIDataStorePreview.inMemory()
-  } operation: {
-    NavigationStack {
-      FilmDetailView(film: $film)
-    }
-  }
 }

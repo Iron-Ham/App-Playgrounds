@@ -1,14 +1,14 @@
+import FluentPersistence
 import Foundation
-import SQLiteDataPersistence
 import SwiftUI
 
 extension FilmDetailView {
   @ViewBuilder
   func relationshipSections(
     for film: Film,
-    summary: SWAPIDataStore.FilmRelationshipSummary
+    summary: RelationshipSummary
   ) -> some View {
-    let relationships = Array(SWAPIDataStore.Relationship.allCases.enumerated())
+    let relationships = Array(Relationship.allCases.enumerated())
     Section {
       ForEach(relationships, id: \.element) { index, relationship in
         let isExpanded = expandedRelationships.contains(relationship)
@@ -40,7 +40,7 @@ extension FilmDetailView {
 
   @ViewBuilder
   func relationshipExpandedRows(
-    for relationship: SWAPIDataStore.Relationship,
+    for relationship: Relationship,
     film: Film
   ) -> some View {
     let state = relationshipItems[relationship, default: .idle]
@@ -117,7 +117,7 @@ extension FilmDetailView {
 
   @MainActor
   func toggleRelationshipExpansion(
-    for relationship: SWAPIDataStore.Relationship,
+    for relationship: Relationship,
     film: Film
   ) {
     if expandedRelationships.contains(relationship) {
@@ -144,7 +144,7 @@ extension FilmDetailView {
   }
 
   func loadRelationshipItems(
-    for relationship: SWAPIDataStore.Relationship,
+    for relationship: Relationship,
     film: Film,
     forceReload: Bool = false
   ) async {
@@ -156,23 +156,20 @@ extension FilmDetailView {
 
     guard !Task.isCancelled else { return }
 
-    let filmURL = film.url
-    let dataStore = self.dataStore
-    let fetchTask = Task(priority: .userInitiated) { () throws -> [RelationshipEntity] in
-      try fetchEntities(for: relationship, filmURL: filmURL, dataStore: dataStore)
-    }
-
     do {
-      let entities = try await fetchTask.value
+      try await configurePersistence()
+      let entities = try await persistenceService.relationshipEntities(
+        forFilmWithURL: film.id,
+        relationship: relationship
+      )
       guard !Task.isCancelled else { return }
       await MainActor.run {
         relationshipItems[relationship] = .loaded(entities)
       }
     } catch is CancellationError {
-      fetchTask.cancel()
+      return
     } catch {
       guard !Task.isCancelled else {
-        fetchTask.cancel()
         return
       }
       await MainActor.run {
@@ -183,32 +180,13 @@ extension FilmDetailView {
 
   @MainActor
   func shouldStartLoading(
-    _ relationship: SWAPIDataStore.Relationship,
+    _ relationship: Relationship,
     forceReload: Bool
   ) -> Bool {
     let state = relationshipItems[relationship] ?? .idle
     if forceReload { return true }
     if state.isLoading || state.isLoaded { return false }
     return true
-  }
-
-  func fetchEntities(
-    for relationship: SWAPIDataStore.Relationship,
-    filmURL: Film.ID,
-    dataStore: SWAPIDataStore
-  ) throws -> [RelationshipEntity] {
-    switch relationship {
-    case .characters:
-      return try dataStore.characters(forFilmWithURL: filmURL).map(RelationshipEntity.character)
-    case .planets:
-      return try dataStore.planets(forFilmWithURL: filmURL).map(RelationshipEntity.planet)
-    case .species:
-      return try dataStore.species(forFilmWithURL: filmURL).map(RelationshipEntity.species)
-    case .starships:
-      return try dataStore.starships(forFilmWithURL: filmURL).map(RelationshipEntity.starship)
-    case .vehicles:
-      return try dataStore.vehicles(forFilmWithURL: filmURL).map(RelationshipEntity.vehicle)
-    }
   }
 
   enum RelationshipItemsState: Equatable {
@@ -236,137 +214,11 @@ extension FilmDetailView {
       }
     }
   }
-
-  enum RelationshipEntity: Identifiable, Hashable {
-    case character(SWAPIDataStore.CharacterDetails)
-    case planet(SWAPIDataStore.PlanetDetails)
-    case species(SWAPIDataStore.SpeciesDetails)
-    case starship(SWAPIDataStore.StarshipDetails)
-    case vehicle(SWAPIDataStore.VehicleDetails)
-
-    var id: String {
-      switch self {
-      case .character(let details): return details.id.absoluteString
-      case .planet(let details): return details.id.absoluteString
-      case .species(let details): return details.id.absoluteString
-      case .starship(let details): return details.id.absoluteString
-      case .vehicle(let details): return details.id.absoluteString
-      }
-    }
-
-    var title: String {
-      switch self {
-      case .character(let details): return details.name
-      case .planet(let details): return details.name
-      case .species(let details): return details.name
-      case .starship(let details): return details.name
-      case .vehicle(let details): return details.name
-      }
-    }
-
-    var subtitle: String? {
-      switch self {
-      case .character(let details):
-        return joinedDescription([
-          details.gender.displayName,
-          details.birthYear.rawValue,
-        ])
-
-      case .planet(let details):
-        let population: String? = {
-          let trimmed = details.population.trimmingCharacters(in: .whitespacesAndNewlines)
-          guard !trimmed.isEmpty, trimmed.lowercased() != "unknown" else { return nil }
-          return "Population \(trimmed.capitalized)"
-        }()
-
-        let climates = details.climates
-          .map(\.displayName)
-          .filter { !$0.isEmpty }
-
-        let climateSummary =
-          climates.isEmpty
-          ? nil
-          : "Climate \(ListFormatter.localizedString(byJoining: climates))"
-
-        return joinedDescription([population, climateSummary])
-
-      case .species(let details):
-        return joinedDescription([
-          details.classification.localizedCapitalized,
-          details.language.localizedCapitalized,
-        ])
-
-      case .starship(let details):
-        return joinedDescription([
-          details.model,
-          details.starshipClass.displayName,
-        ])
-
-      case .vehicle(let details):
-        return joinedDescription([
-          details.model,
-          details.vehicleClass.displayName,
-        ])
-      }
-    }
-
-    var relationship: SWAPIDataStore.Relationship {
-      switch self {
-      case .character: .characters
-      case .planet: .planets
-      case .species: .species
-      case .starship: .starships
-      case .vehicle: .vehicles
-      }
-    }
-
-    var iconName: String { relationship.iconName }
-
-    var placeholderTitle: String {
-      switch relationship {
-      case .characters:
-        return "Character details coming soon"
-      case .planets:
-        return "Planet profile coming soon"
-      case .species:
-        return "Species encyclopedia coming soon"
-      case .starships:
-        return "Starship hangar coming soon"
-      case .vehicles:
-        return "Vehicle bay coming soon"
-      }
-    }
-
-    var placeholderDescription: String {
-      switch relationship {
-      case .characters:
-        return "We're building rich biographies for every hero and villain in the saga."
-      case .planets:
-        return "Detailed planetary data, maps, and lore will land in a future release."
-      case .species:
-        return "Species spotlights will highlight cultures, traits, and homeworlds soon."
-      case .starships:
-        return "Deck plans and performance stats are on the flight deck for a later update."
-      case .vehicles:
-        return "Specs and operational history will roll out in an upcoming build."
-      }
-    }
-
-    private func joinedDescription(_ components: [String?]) -> String? {
-      let values = components.compactMap { component -> String? in
-        guard let component else { return nil }
-        let trimmed = component.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-      }
-      guard !values.isEmpty else { return nil }
-      return values.joined(separator: " • ")
-    }
-  }
 }
 
 extension FilmDetailView {
   struct RelationshipSummaryRow: View {
-    let relationship: SWAPIDataStore.Relationship
+    let relationship: Relationship
     let summaryText: String
     let isExpanded: Bool
 
@@ -448,7 +300,7 @@ extension FilmDetailView {
   }
 
   struct RelationshipBadge: View {
-    let relationship: SWAPIDataStore.Relationship
+    let relationship: Relationship
 
     var body: some View {
       RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -462,5 +314,125 @@ extension FilmDetailView {
         .shadow(color: relationship.accentColor.opacity(0.16), radius: 4, x: 0, y: 2)
         .accessibilityHidden(true)
     }
+  }
+}
+
+extension RelationshipEntity {
+  fileprivate var title: String {
+    switch self {
+    case .character(let details):
+      return details.name
+    case .planet(let details):
+      return details.name
+    case .species(let details):
+      return details.name
+    case .starship(let details):
+      return details.name
+    case .vehicle(let details):
+      return details.name
+    }
+  }
+
+  fileprivate var subtitle: String? {
+    switch self {
+    case .character(let details):
+      return joinedDescription([
+        details.gender.displayName,
+        details.birthYear.rawValue,
+      ])
+
+    case .planet(let details):
+      let population: String? = {
+        let trimmed = details.population.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed.lowercased() != "unknown" else { return nil }
+        return "Population \(trimmed.capitalized)"
+      }()
+
+      let climates = details.climates
+        .map(\.displayName)
+        .filter { !$0.isEmpty }
+
+      let climateSummary =
+        climates.isEmpty
+        ? nil
+        : "Climate \(ListFormatter.localizedString(byJoining: climates))"
+
+      return joinedDescription([population, climateSummary])
+
+    case .species(let details):
+      return joinedDescription([
+        details.classification.localizedCapitalized,
+        details.language.localizedCapitalized,
+      ])
+
+    case .starship(let details):
+      return joinedDescription([
+        details.model,
+        details.starshipClass.displayName,
+      ])
+
+    case .vehicle(let details):
+      return joinedDescription([
+        details.model,
+        details.vehicleClass.displayName,
+      ])
+    }
+  }
+
+  fileprivate var relationship: Relationship {
+    switch self {
+    case .character:
+      return .characters
+    case .planet:
+      return .planets
+    case .species:
+      return .species
+    case .starship:
+      return .starships
+    case .vehicle:
+      return .vehicles
+    }
+  }
+
+  fileprivate var iconName: String { relationship.iconName }
+
+  fileprivate var placeholderTitle: String {
+    switch relationship {
+    case .characters:
+      return "Character details coming soon"
+    case .planets:
+      return "Planet profile coming soon"
+    case .species:
+      return "Species encyclopedia coming soon"
+    case .starships:
+      return "Starship hangar coming soon"
+    case .vehicles:
+      return "Vehicle bay coming soon"
+    }
+  }
+
+  fileprivate var placeholderDescription: String {
+    switch relationship {
+    case .characters:
+      return "We're building rich biographies for every hero and villain in the saga."
+    case .planets:
+      return "Detailed planetary data, maps, and lore will land in a future release."
+    case .species:
+      return "Species spotlights will highlight cultures, traits, and homeworlds soon."
+    case .starships:
+      return "Deck plans and performance stats are on the flight deck for a later update."
+    case .vehicles:
+      return "Specs and operational history will roll out in an upcoming build."
+    }
+  }
+
+  fileprivate func joinedDescription(_ components: [String?]) -> String? {
+    let values = components.compactMap { component -> String? in
+      guard let component else { return nil }
+      let trimmed = component.trimmingCharacters(in: .whitespacesAndNewlines)
+      return trimmed.isEmpty ? nil : trimmed
+    }
+    guard !values.isEmpty else { return nil }
+    return values.joined(separator: " • ")
   }
 }

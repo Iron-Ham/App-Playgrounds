@@ -86,7 +86,7 @@ public final class Film: Model, @unchecked Sendable {
     edited: Date
   ) {
     self.init()
-  self.url = url
+    self.url = url
     self.title = title
     self.episodeID = episodeID
     self.openingCrawl = openingCrawl

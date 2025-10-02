@@ -9,17 +9,37 @@ public struct FluentPersistenceService: Sendable {
   public var importSnapshot: @Sendable (_ snapshot: Snapshot) async throws -> Void
   public var observeChanges: @Sendable () async -> AsyncStream<ChangeBatch>
   public var shutdown: @Sendable () async throws -> Void
+  public var fetchFilms: @Sendable () async throws -> [FilmDetails]
+  public var fetchRelationshipSummary:
+    @Sendable (_ filmURL: URL) async throws -> FilmRelationshipSummary
+  public var fetchRelationshipEntities:
+    @Sendable (
+      _ filmURL: URL,
+      _ relationship: Relationship
+    ) async throws -> [RelationshipEntity]
 
   public init(
-    setup: @escaping @Sendable (_ configuration: FluentPersistenceConfiguration) async throws -> Void,
+    setup:
+      @escaping @Sendable (_ configuration: FluentPersistenceConfiguration) async throws -> Void,
     importSnapshot: @escaping @Sendable (_ snapshot: Snapshot) async throws -> Void,
     observeChanges: @escaping @Sendable () async -> AsyncStream<ChangeBatch>,
-    shutdown: @escaping @Sendable () async throws -> Void
+    shutdown: @escaping @Sendable () async throws -> Void,
+    fetchFilms: @escaping @Sendable () async throws -> [FilmDetails],
+    fetchRelationshipSummary:
+      @escaping @Sendable (_ filmURL: URL) async throws -> FilmRelationshipSummary,
+    fetchRelationshipEntities:
+      @escaping @Sendable (
+        _ filmURL: URL,
+        _ relationship: Relationship
+      ) async throws -> [RelationshipEntity]
   ) {
     self.setup = setup
     self.importSnapshot = importSnapshot
     self.observeChanges = observeChanges
     self.shutdown = shutdown
+    self.fetchFilms = fetchFilms
+    self.fetchRelationshipSummary = fetchRelationshipSummary
+    self.fetchRelationshipEntities = fetchRelationshipEntities
   }
 }
 
@@ -38,8 +58,189 @@ public struct FluentPersistenceConfiguration: Sendable {
   }
 }
 
-public extension FluentPersistenceService {
-  struct Snapshot: Sendable {
+extension FluentPersistenceService {
+  public func films() async throws -> [FilmDetails] {
+    try await fetchFilms()
+  }
+
+  public func relationshipSummary(
+    forFilmWithURL filmURL: URL
+  ) async throws -> FilmRelationshipSummary {
+    try await fetchRelationshipSummary(filmURL)
+  }
+
+  public func relationshipEntities(
+    forFilmWithURL filmURL: URL,
+    relationship: Relationship
+  ) async throws -> [RelationshipEntity] {
+    try await fetchRelationshipEntities(filmURL, relationship)
+  }
+
+  public struct FilmRelationshipSummary: Sendable, Equatable {
+    public let characterCount: Int
+    public let planetCount: Int
+    public let speciesCount: Int
+    public let starshipCount: Int
+    public let vehicleCount: Int
+
+    public init(
+      characterCount: Int = 0,
+      planetCount: Int = 0,
+      speciesCount: Int = 0,
+      starshipCount: Int = 0,
+      vehicleCount: Int = 0
+    ) {
+      self.characterCount = characterCount
+      self.planetCount = planetCount
+      self.speciesCount = speciesCount
+      self.starshipCount = starshipCount
+      self.vehicleCount = vehicleCount
+    }
+
+    public static let empty = Self()
+  }
+
+  public enum Relationship: CaseIterable, Sendable {
+    case characters
+    case planets
+    case species
+    case starships
+    case vehicles
+  }
+
+  public struct CharacterDetails: Sendable, Equatable, Hashable, Identifiable {
+    public let id: URL
+    public let name: String
+    public let gender: PersonResponse.Gender
+    public let birthYear: PersonResponse.BirthYear
+
+    public init(
+      id: URL, name: String, gender: PersonResponse.Gender, birthYear: PersonResponse.BirthYear
+    ) {
+      self.id = id
+      self.name = name
+      self.gender = gender
+      self.birthYear = birthYear
+    }
+  }
+
+  public struct PlanetDetails: Sendable, Equatable, Hashable, Identifiable {
+    public let id: URL
+    public let name: String
+    public let climates: [PlanetResponse.ClimateDescriptor]
+    public let population: String
+
+    public init(
+      id: URL, name: String, climates: [PlanetResponse.ClimateDescriptor], population: String
+    ) {
+      self.id = id
+      self.name = name
+      self.climates = climates
+      self.population = population
+    }
+  }
+
+  public struct SpeciesDetails: Sendable, Equatable, Hashable, Identifiable {
+    public let id: URL
+    public let name: String
+    public let classification: String
+    public let language: String
+
+    public init(id: URL, name: String, classification: String, language: String) {
+      self.id = id
+      self.name = name
+      self.classification = classification
+      self.language = language
+    }
+  }
+
+  public struct StarshipDetails: Sendable, Equatable, Hashable, Identifiable {
+    public let id: URL
+    public let name: String
+    public let model: String
+    public let starshipClass: StarshipResponse.StarshipClass
+
+    public init(id: URL, name: String, model: String, starshipClass: StarshipResponse.StarshipClass)
+    {
+      self.id = id
+      self.name = name
+      self.model = model
+      self.starshipClass = starshipClass
+    }
+  }
+
+  public struct VehicleDetails: Sendable, Equatable, Hashable, Identifiable {
+    public let id: URL
+    public let name: String
+    public let model: String
+    public let vehicleClass: VehicleResponse.VehicleClass
+
+    public init(id: URL, name: String, model: String, vehicleClass: VehicleResponse.VehicleClass) {
+      self.id = id
+      self.name = name
+      self.model = model
+      self.vehicleClass = vehicleClass
+    }
+  }
+
+  public enum RelationshipEntity: Sendable, Hashable, Identifiable {
+    case character(CharacterDetails)
+    case planet(PlanetDetails)
+    case species(SpeciesDetails)
+    case starship(StarshipDetails)
+    case vehicle(VehicleDetails)
+
+    public var id: URL {
+      switch self {
+      case .character(let details):
+        return details.id
+      case .planet(let details):
+        return details.id
+      case .species(let details):
+        return details.id
+      case .starship(let details):
+        return details.id
+      case .vehicle(let details):
+        return details.id
+      }
+    }
+  }
+
+  public struct FilmDetails: Sendable, Equatable, Hashable, Identifiable {
+    public let id: URL
+    public let title: String
+    public let episodeId: Int
+    public let openingCrawl: String
+    public let director: String
+    public let producers: [String]
+    public let releaseDate: Date?
+    public let created: Date
+    public let edited: Date
+
+    public init(
+      id: URL,
+      title: String,
+      episodeId: Int,
+      openingCrawl: String,
+      director: String,
+      producers: [String],
+      releaseDate: Date?,
+      created: Date,
+      edited: Date
+    ) {
+      self.id = id
+      self.title = title
+      self.episodeId = episodeId
+      self.openingCrawl = openingCrawl
+      self.director = director
+      self.producers = producers
+      self.releaseDate = releaseDate
+      self.created = created
+      self.edited = edited
+    }
+  }
+
+  public struct Snapshot: Sendable {
     public var films: [FilmResponse]
     public var people: [PersonResponse]
     public var planets: [PlanetResponse]
@@ -64,7 +265,7 @@ public extension FluentPersistenceService {
     }
   }
 
-  struct ChangeBatch: Sendable {
+  public struct ChangeBatch: Sendable {
     public enum Entity: Sendable {
       case film
       case planet

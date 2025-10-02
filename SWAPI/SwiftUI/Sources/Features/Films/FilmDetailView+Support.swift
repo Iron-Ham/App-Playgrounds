@@ -1,13 +1,18 @@
+import FluentPersistence
 import Foundation
-import SQLiteDataPersistence
 import SwiftUI
+
+typealias Film = FluentPersistenceService.FilmDetails
+typealias Relationship = FluentPersistenceService.Relationship
+typealias RelationshipSummary = FluentPersistenceService.FilmRelationshipSummary
+typealias RelationshipEntity = FluentPersistenceService.RelationshipEntity
 
 @Observable
 final class RelationshipSummaryState {
-  var summary: SWAPIDataStore.FilmRelationshipSummary = .empty
+  var summary: RelationshipSummary = .empty
 }
 
-extension SWAPIDataStore.FilmRelationshipSummary {
+extension RelationshipSummary {
   static let empty = Self(
     characterCount: 0,
     planetCount: 0,
@@ -37,7 +42,7 @@ extension SWAPIDataStore.FilmRelationshipSummary {
     return String.localizedStringWithFormat(format, count)
   }
 
-  func localizedCount(for relationship: SWAPIDataStore.Relationship) -> String {
+  func localizedCount(for relationship: Relationship) -> String {
     switch relationship {
     case .characters:
       localizedCount(.characters)
@@ -61,7 +66,7 @@ extension SWAPIDataStore.FilmRelationshipSummary {
   }
 }
 
-extension SWAPIDataStore.Relationship {
+extension Relationship {
   var displayTitle: String {
     switch self {
     case .characters: "Characters"

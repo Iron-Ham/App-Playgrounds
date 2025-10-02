@@ -1,4 +1,4 @@
-import SQLiteDataPersistence
+import FluentPersistence
 import SwiftUI
 
 extension FilmDetailView {

@@ -1,8 +1,7 @@
 import API
 import Dependencies
+import FluentPersistence
 import Foundation
-import GRDB
-import SQLiteDataPersistence
 import Testing
 
 @testable import SWAPI_SwiftUI
@@ -40,26 +39,45 @@ struct SwiftUIDependenciesTests {
   }
 
   @Test
-  func dataStoreDependencyCanBeOverridden() throws {
-    let store = SWAPIDataStorePreview.inMemory()
-    let expectedIdentifier = (store.database as? DatabaseQueue).map(ObjectIdentifier.init)
+  func persistenceServiceDependencyCanBeOverridden() async throws {
+    let sampleFilm = FluentPersistenceService.FilmDetails(
+      id: URL(string: "https://swapi.dev/api/films/preview")!,
+      title: "Preview Hope",
+      episodeId: 0,
+      openingCrawl: "Preview crawl...",
+      director: "Preview Director",
+      producers: ["Preview Producer"],
+      releaseDate: nil,
+      created: .now,
+      edited: .now
+    )
 
-    withDependencies {
-      $0.dataStore = store
+    let service = FluentPersistenceService(
+      setup: { _ in },
+      importSnapshot: { _ in },
+      observeChanges: { AsyncStream { _ in } },
+      shutdown: {},
+      fetchFilms: { [sampleFilm] },
+      fetchRelationshipSummary: { _ in .empty },
+      fetchRelationshipEntities: { _, _ in [] }
+    )
+
+    try await withDependencies {
+      $0.persistenceService = service
+      $0.configurePersistence = {}
     } operation: {
       struct Harness {
-        @Dependency(\.dataStore)
-        var dataStore: SWAPIDataStore
+        @Dependency(\.persistenceService)
+        var persistenceService: FluentPersistenceService
 
-        func databaseIdentifier() -> ObjectIdentifier? {
-          guard let queue = dataStore.database as? DatabaseQueue else { return nil }
-          return ObjectIdentifier(queue)
+        func filmCount() async throws -> Int {
+          try await persistenceService.films().count
         }
       }
 
       let harness = Harness()
-      let identifier = harness.databaseIdentifier()
-      #expect(identifier == expectedIdentifier)
+      let count = try await harness.filmCount()
+      #expect(count == 1)
     }
   }
 }

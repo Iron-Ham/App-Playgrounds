@@ -75,7 +75,8 @@ final class FluentPersistenceContainer {
     migrations.add(CreateSWAPISchema(), to: databaseID)
 
     logger.log(level: configuration.loggingLevel, "Running Fluent migrations")
-    let migrator = Migrator(databases: databases, migrations: migrations, logger: logger, on: eventLoopGroup.next())
+    let migrator = Migrator(
+      databases: databases, migrations: migrations, logger: logger, on: eventLoopGroup.next())
     self.migrator = migrator
 
     try await migrator.setupIfNeeded().value()
@@ -92,11 +93,13 @@ final class FluentPersistenceContainer {
       throw FluentPersistenceError.databaseNotConfigured
     }
 
-    guard let database = databases.database(
-      databaseID,
-      logger: logger,
-      on: eventLoopGroup.next()
-    ) else {
+    guard
+      let database = databases.database(
+        databaseID,
+        logger: logger,
+        on: eventLoopGroup.next()
+      )
+    else {
       throw FluentPersistenceError.databaseUnavailable
     }
 
@@ -113,9 +116,146 @@ final class FluentPersistenceContainer {
     changeStream
   }
 
+  func filmsOrderedByReleaseDate() async throws -> [FluentPersistenceService.FilmDetails] {
+    try await withDatabase { database in
+      try await Film.query(on: database)
+        .sort(\.$releaseDate, .ascending)
+        .sort(\.$episodeID, .ascending)
+        .sort(\.$title, .ascending)
+        .all()
+        .map { film in
+          FluentPersistenceService.FilmDetails(
+            id: film.url,
+            title: film.title,
+            episodeId: film.episodeID,
+            openingCrawl: film.openingCrawl,
+            director: film.director,
+            producers: film.producers,
+            releaseDate: film.releaseDate,
+            created: film.created,
+            edited: film.edited
+          )
+        }
+    }
+  }
+
+  func relationshipSummary(
+    forFilmWithURL filmURL: URL
+  ) async throws -> FluentPersistenceService.FilmRelationshipSummary {
+    try await withDatabase { database in
+      return FluentPersistenceService.FilmRelationshipSummary(
+        characterCount: try await FilmCharacterPivot.query(on: database)
+          .filter(\.$film.$id == filmURL)
+          .count(),
+        planetCount: try await FilmPlanetPivot.query(on: database)
+          .filter(\.$film.$id == filmURL)
+          .count(),
+        speciesCount: try await FilmSpeciesPivot.query(on: database)
+          .filter(\.$film.$id == filmURL)
+          .count(),
+        starshipCount: try await FilmStarshipPivot.query(on: database)
+          .filter(\.$film.$id == filmURL)
+          .count(),
+        vehicleCount: try await FilmVehiclePivot.query(on: database)
+          .filter(\.$film.$id == filmURL)
+          .count()
+      )
+    }
+  }
+
+  func relationshipEntities(
+    forFilmWithURL filmURL: URL,
+    relationship: FluentPersistenceService.Relationship
+  ) async throws -> [FluentPersistenceService.RelationshipEntity] {
+    try await withDatabase { database in
+      guard let film = try await Film.find(filmURL, on: database) else { return [] }
+      switch relationship {
+      case .characters:
+        let people = try await film.$characters
+          .query(on: database)
+          .sort(\.$name, .ascending)
+          .all()
+        return people.map { person in
+          .character(
+            .init(
+              id: person.url,
+              name: person.name,
+              gender: person.gender,
+              birthYear: person.birthYear
+            )
+          )
+        }
+
+      case .planets:
+        let planets = try await film.$planets
+          .query(on: database)
+          .sort(\.$name, .ascending)
+          .all()
+        return planets.map { planet in
+          .planet(
+            .init(
+              id: planet.url,
+              name: planet.name,
+              climates: planet.climates,
+              population: planet.population
+            )
+          )
+        }
+
+      case .species:
+        let species = try await film.$species
+          .query(on: database)
+          .sort(\.$name, .ascending)
+          .all()
+        return species.map { species in
+          .species(
+            .init(
+              id: species.url,
+              name: species.name,
+              classification: species.classification,
+              language: species.language
+            )
+          )
+        }
+
+      case .starships:
+        let starships = try await film.$starships
+          .query(on: database)
+          .sort(\.$name, .ascending)
+          .all()
+        return starships.map { starship in
+          .starship(
+            .init(
+              id: starship.url,
+              name: starship.name,
+              model: starship.model,
+              starshipClass: starship.starshipClass
+            )
+          )
+        }
+
+      case .vehicles:
+        let vehicles = try await film.$vehicles
+          .query(on: database)
+          .sort(\.$name, .ascending)
+          .all()
+        return vehicles.map { vehicle in
+          .vehicle(
+            .init(
+              id: vehicle.url,
+              name: vehicle.name,
+              model: vehicle.model,
+              vehicleClass: vehicle.vehicleClass
+            )
+          )
+        }
+      }
+    }
+  }
+
   func shutdown() async throws {
-  changeStreamContinuation.finish()
-  await databases.shutdownAsync()
+    changeStreamContinuation.finish()
+    await databases.shutdownAsync()
     try await threadPool.shutdownGracefully()
     try await eventLoopGroup.shutdownGracefully()
     migrator = nil
@@ -159,7 +299,9 @@ extension FluentPersistenceContainer {
     try await Vehicle.query(on: database).delete()
   }
 
-  private func seedEntities(from snapshot: FluentPersistenceService.Snapshot, on database: any Database) async throws {
+  private func seedEntities(
+    from snapshot: FluentPersistenceService.Snapshot, on database: any Database
+  ) async throws {
     for film in snapshot.films {
       try await Film(from: film).create(on: database)
     }
@@ -185,7 +327,9 @@ extension FluentPersistenceContainer {
     }
   }
 
-  private func seedRelationships(from snapshot: FluentPersistenceService.Snapshot, on database: any Database) async throws {
+  private func seedRelationships(
+    from snapshot: FluentPersistenceService.Snapshot, on database: any Database
+  ) async throws {
     for film in snapshot.films {
       try await attachRelationships(for: film, on: database)
     }
@@ -211,51 +355,55 @@ extension FluentPersistenceContainer {
     guard let filmModel = try await Film.find(film.url, on: database) else { return }
 
     if !film.characters.isEmpty {
-  let people = try await Person.query(on: database).filter(\.$id ~~ film.characters).all()
+      let people = try await Person.query(on: database).filter(\.$id ~~ film.characters).all()
       try await filmModel.$characters.attach(people, on: database)
     }
 
     if !film.planets.isEmpty {
-  let planets = try await Planet.query(on: database).filter(\.$id ~~ film.planets).all()
+      let planets = try await Planet.query(on: database).filter(\.$id ~~ film.planets).all()
       try await filmModel.$planets.attach(planets, on: database)
     }
 
     if !film.species.isEmpty {
-  let species = try await Species.query(on: database).filter(\.$id ~~ film.species).all()
+      let species = try await Species.query(on: database).filter(\.$id ~~ film.species).all()
       try await filmModel.$species.attach(species, on: database)
     }
 
     if !film.starships.isEmpty {
-  let starships = try await Starship.query(on: database).filter(\.$id ~~ film.starships).all()
+      let starships = try await Starship.query(on: database).filter(\.$id ~~ film.starships).all()
       try await filmModel.$starships.attach(starships, on: database)
     }
 
     if !film.vehicles.isEmpty {
-  let vehicles = try await Vehicle.query(on: database).filter(\.$id ~~ film.vehicles).all()
+      let vehicles = try await Vehicle.query(on: database).filter(\.$id ~~ film.vehicles).all()
       try await filmModel.$vehicles.attach(vehicles, on: database)
     }
   }
 
-  private func attachRelationships(for person: PersonResponse, on database: any Database) async throws {
+  private func attachRelationships(
+    for person: PersonResponse, on database: any Database
+  ) async throws {
     guard let personModel = try await Person.find(person.url, on: database) else { return }
 
     if !person.species.isEmpty {
-  let species = try await Species.query(on: database).filter(\.$id ~~ person.species).all()
+      let species = try await Species.query(on: database).filter(\.$id ~~ person.species).all()
       try await personModel.$species.attach(species, on: database)
     }
 
     if !person.starships.isEmpty {
-  let starships = try await Starship.query(on: database).filter(\.$id ~~ person.starships).all()
+      let starships = try await Starship.query(on: database).filter(\.$id ~~ person.starships).all()
       try await personModel.$starships.attach(starships, on: database)
     }
 
     if !person.vehicles.isEmpty {
-  let vehicles = try await Vehicle.query(on: database).filter(\.$id ~~ person.vehicles).all()
+      let vehicles = try await Vehicle.query(on: database).filter(\.$id ~~ person.vehicles).all()
       try await personModel.$vehicles.attach(vehicles, on: database)
     }
   }
 
-  private func attachRelationships(for species: SpeciesResponse, on database: any Database) async throws {
+  private func attachRelationships(
+    for species: SpeciesResponse, on database: any Database
+  ) async throws {
     guard let speciesModel = try await Species.find(species.url, on: database) else { return }
 
     if let homeworld = species.homeworld {
@@ -264,20 +412,24 @@ extension FluentPersistenceContainer {
     }
   }
 
-  private func attachRelationships(for starship: StarshipResponse, on database: any Database) async throws {
+  private func attachRelationships(
+    for starship: StarshipResponse, on database: any Database
+  ) async throws {
     guard let starshipModel = try await Starship.find(starship.url, on: database) else { return }
 
     if !starship.pilots.isEmpty {
-  let pilots = try await Person.query(on: database).filter(\.$id ~~ starship.pilots).all()
+      let pilots = try await Person.query(on: database).filter(\.$id ~~ starship.pilots).all()
       try await starshipModel.$pilots.attach(pilots, on: database)
     }
   }
 
-  private func attachRelationships(for vehicle: VehicleResponse, on database: any Database) async throws {
+  private func attachRelationships(
+    for vehicle: VehicleResponse, on database: any Database
+  ) async throws {
     guard let vehicleModel = try await Vehicle.find(vehicle.url, on: database) else { return }
 
     if !vehicle.pilots.isEmpty {
-  let pilots = try await Person.query(on: database).filter(\.$id ~~ vehicle.pilots).all()
+      let pilots = try await Person.query(on: database).filter(\.$id ~~ vehicle.pilots).all()
       try await vehicleModel.$pilots.attach(pilots, on: database)
     }
   }
@@ -289,8 +441,30 @@ enum FluentPersistenceError: Error {
   case databaseUnavailable
 }
 
-private extension FluentPersistenceContainer {
-  func runInTransaction(on database: any Database, _ body: @escaping @Sendable (any Database) async throws -> Void) async throws {
+extension FluentPersistenceContainer {
+  fileprivate func withDatabase<T>(
+    _ operation: @escaping @Sendable (any Database) async throws -> T
+  ) async throws -> T {
+    guard configuration != nil else {
+      throw FluentPersistenceError.databaseNotConfigured
+    }
+
+    guard
+      let database = databases.database(
+        databaseID,
+        logger: logger,
+        on: eventLoopGroup.next()
+      )
+    else {
+      throw FluentPersistenceError.databaseUnavailable
+    }
+
+    return try await operation(database)
+  }
+
+  fileprivate func runInTransaction(
+    on database: any Database, _ body: @escaping @Sendable (any Database) async throws -> Void
+  ) async throws {
     try await database.transaction { transaction in
       transaction.eventLoop.makeFutureWithTask {
         try await body(transaction)
@@ -299,8 +473,8 @@ private extension FluentPersistenceContainer {
   }
 }
 
-private extension EventLoopFuture where Value: Sendable {
-  func value() async throws -> Value {
+extension EventLoopFuture where Value: Sendable {
+  fileprivate func value() async throws -> Value {
     try await withCheckedThrowingContinuation { continuation in
       self.whenComplete { result in
         switch result {

@@ -11,7 +11,8 @@ let project = Project(
   name: "SWAPI",
   settings: .settings(
     base: [
-      "SWIFT_VERSION": "6.0"
+      "SWIFT_VERSION": "6.0",
+      "EXCLUDED_ARCHS[sdk=macosx*]": "x86_64",
     ]
   ),
   targets: [
@@ -35,10 +36,8 @@ let project = Project(
       scripts: [swiftFormatScript],
       dependencies: [
         .target(name: "API"),
-        .target(name: "SQLiteDataPersistence"),
-        .external(name: "SQLiteData"),
+        .target(name: "FluentPersistence"),
         .external(name: "Dependencies"),
-        .external(name: "StructuredQueries"),
       ]
     ),
     .target(
@@ -53,7 +52,7 @@ let project = Project(
       scripts: [swiftFormatScript],
       dependencies: [
         .target(name: "SWAPI-SwiftUI"),
-        .target(name: "SQLiteDataPersistence"),
+        .target(name: "FluentPersistence"),
         .target(name: "API"),
         .external(name: "Dependencies"),
       ]

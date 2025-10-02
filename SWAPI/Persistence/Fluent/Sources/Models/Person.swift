@@ -140,7 +140,7 @@ public final class Person: Model, @unchecked Sendable {
     edited: Date
   ) {
     self.init()
-  self.url = url
+    self.url = url
     self.name = name
     self.height = height
     self.mass = mass

@@ -130,7 +130,7 @@ public final class Species: Model, @unchecked Sendable {
     edited: Date
   ) {
     self.init()
-  self.url = url
+    self.url = url
     self.name = name
     self.classification = classification
     self.designation = designation

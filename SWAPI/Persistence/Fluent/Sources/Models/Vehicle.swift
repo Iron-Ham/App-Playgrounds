@@ -132,7 +132,7 @@ public final class Vehicle: Model, @unchecked Sendable {
     edited: Date
   ) {
     self.init()
-  self.url = url
+    self.url = url
     self.name = name
     self.model = model
     self.manufacturersRaw = Self.joinedManufacturerRaw(from: manufacturers)

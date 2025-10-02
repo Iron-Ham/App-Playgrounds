@@ -1,4 +1,4 @@
-import SQLiteDataPersistence
+import FluentPersistence
 import SwiftUI
 
 struct FilmsView: View {
@@ -77,7 +77,7 @@ private struct CellView: View {
     FilmsView(
       films: [
         Film(
-          url: URL(string: "https://swapi.dev/api/films/1/")!,
+          id: URL(string: "https://swapi.dev/api/films/1/")!,
           title: "A New Hope",
           episodeId: 4,
           openingCrawl: "It is a period of civil war...",

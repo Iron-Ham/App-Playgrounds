@@ -37,6 +37,59 @@ struct FluentPersistenceContainerTests {
     let entityNames = changeBatch.entities.map(\.name)
     #expect(entityNames == ["film", "planet", "person", "species", "starship", "vehicle"])
   }
+
+  @Test
+  func fetchingFilmsAndRelationships() async throws {
+    let container = FluentPersistenceContainer()
+    defer { Task { try? await container.shutdown() } }
+    try await container.configure(
+      .init(storage: .inMemory(identifier: #function), loggingLevel: .critical))
+
+    let snapshot = try SampleSnapshot.make()
+    try await container.importSnapshot(snapshot)
+
+    let films = try await container.filmsOrderedByReleaseDate()
+    #expect(films.count == 1)
+
+    let filmURL = try #require(films.first?.id)
+    let summary = try await container.relationshipSummary(forFilmWithURL: filmURL)
+    #expect(summary.characterCount == 1)
+    #expect(summary.planetCount == 1)
+    #expect(summary.speciesCount == 1)
+    #expect(summary.starshipCount == 1)
+    #expect(summary.vehicleCount == 1)
+
+    let characters = try await container.relationshipEntities(
+      forFilmWithURL: filmURL, relationship: .characters)
+    #expect(characters.count == 1)
+
+    let starships = try await container.relationshipEntities(
+      forFilmWithURL: filmURL, relationship: .starships)
+    #expect(starships.count == 1)
+  }
+
+  @Test
+  func liveServiceSupportsFetching() async throws {
+    let service = FluentPersistenceService.live()
+    defer { Task { try? await service.shutdown() } }
+
+    try await service.setup(
+      .init(storage: .inMemory(identifier: #function), loggingLevel: .critical))
+
+    let snapshot = try SampleSnapshot.make()
+    try await service.importSnapshot(snapshot)
+
+    let films = try await service.films()
+    #expect(films.count == 1)
+
+    let filmURL = try #require(films.first?.id)
+    let summary = try await service.relationshipSummary(forFilmWithURL: filmURL)
+    #expect(summary.characterCount == 1)
+
+    let relationships = try await service.relationshipEntities(
+      forFilmWithURL: filmURL, relationship: .vehicles)
+    #expect(relationships.count == 1)
+  }
 }
 
 extension FluentPersistenceService.ChangeBatch.Entity {

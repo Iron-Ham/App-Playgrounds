@@ -39,8 +39,8 @@ public struct CreateSWAPISchema: AsyncMigration {
   }
 }
 
-private extension CreateSWAPISchema {
-  func createFilms(on database: any Database) async throws {
+extension CreateSWAPISchema {
+  fileprivate func createFilms(on database: any Database) async throws {
     try await database.schema(Film.schema)
       .field("url", .string, .identifier(auto: false))
       .field("title", .string, .required)
@@ -54,7 +54,7 @@ private extension CreateSWAPISchema {
       .create()
   }
 
-  func createPlanets(on database: any Database) async throws {
+  fileprivate func createPlanets(on database: any Database) async throws {
     try await database.schema(Planet.schema)
       .field("url", .string, .identifier(auto: false))
       .field("name", .string, .required)
@@ -71,7 +71,7 @@ private extension CreateSWAPISchema {
       .create()
   }
 
-  func createSpecies(on database: any Database) async throws {
+  fileprivate func createSpecies(on database: any Database) async throws {
     try await database.schema(Species.schema)
       .field("url", .string, .identifier(auto: false))
       .field("name", .string, .required)
@@ -89,7 +89,7 @@ private extension CreateSWAPISchema {
       .create()
   }
 
-  func createPeople(on database: any Database) async throws {
+  fileprivate func createPeople(on database: any Database) async throws {
     try await database.schema(Person.schema)
       .field("url", .string, .identifier(auto: false))
       .field("name", .string, .required)
@@ -106,7 +106,7 @@ private extension CreateSWAPISchema {
       .create()
   }
 
-  func createStarships(on database: any Database) async throws {
+  fileprivate func createStarships(on database: any Database) async throws {
     try await database.schema(Starship.schema)
       .field("url", .string, .identifier(auto: false))
       .field("name", .string, .required)
@@ -127,7 +127,7 @@ private extension CreateSWAPISchema {
       .create()
   }
 
-  func createVehicles(on database: any Database) async throws {
+  fileprivate func createVehicles(on database: any Database) async throws {
     try await database.schema(Vehicle.schema)
       .field("url", .string, .identifier(auto: false))
       .field("name", .string, .required)
@@ -146,7 +146,7 @@ private extension CreateSWAPISchema {
       .create()
   }
 
-  func createFilmCharacterPivot(on database: any Database) async throws {
+  fileprivate func createFilmCharacterPivot(on database: any Database) async throws {
     try await database.schema(FilmCharacterPivot.schema)
       .id()
       .field("filmUrl", .string, .required, .references(Film.schema, "url", onDelete: .cascade))
@@ -155,7 +155,7 @@ private extension CreateSWAPISchema {
       .create()
   }
 
-  func createFilmPlanetPivot(on database: any Database) async throws {
+  fileprivate func createFilmPlanetPivot(on database: any Database) async throws {
     try await database.schema(FilmPlanetPivot.schema)
       .id()
       .field("filmUrl", .string, .required, .references(Film.schema, "url", onDelete: .cascade))
@@ -164,56 +164,68 @@ private extension CreateSWAPISchema {
       .create()
   }
 
-  func createFilmSpeciesPivot(on database: any Database) async throws {
+  fileprivate func createFilmSpeciesPivot(on database: any Database) async throws {
     try await database.schema(FilmSpeciesPivot.schema)
       .id()
       .field("filmUrl", .string, .required, .references(Film.schema, "url", onDelete: .cascade))
-      .field("speciesUrl", .string, .required, .references(Species.schema, "url", onDelete: .cascade))
+      .field(
+        "speciesUrl", .string, .required, .references(Species.schema, "url", onDelete: .cascade)
+      )
       .unique(on: "filmUrl", "speciesUrl")
       .create()
   }
 
-  func createFilmStarshipPivot(on database: any Database) async throws {
+  fileprivate func createFilmStarshipPivot(on database: any Database) async throws {
     try await database.schema(FilmStarshipPivot.schema)
       .id()
       .field("filmUrl", .string, .required, .references(Film.schema, "url", onDelete: .cascade))
-      .field("starshipUrl", .string, .required, .references(Starship.schema, "url", onDelete: .cascade))
+      .field(
+        "starshipUrl", .string, .required, .references(Starship.schema, "url", onDelete: .cascade)
+      )
       .unique(on: "filmUrl", "starshipUrl")
       .create()
   }
 
-  func createFilmVehiclePivot(on database: any Database) async throws {
+  fileprivate func createFilmVehiclePivot(on database: any Database) async throws {
     try await database.schema(FilmVehiclePivot.schema)
       .id()
       .field("filmUrl", .string, .required, .references(Film.schema, "url", onDelete: .cascade))
-      .field("vehicleUrl", .string, .required, .references(Vehicle.schema, "url", onDelete: .cascade))
+      .field(
+        "vehicleUrl", .string, .required, .references(Vehicle.schema, "url", onDelete: .cascade)
+      )
       .unique(on: "filmUrl", "vehicleUrl")
       .create()
   }
 
-  func createPersonSpeciesPivot(on database: any Database) async throws {
+  fileprivate func createPersonSpeciesPivot(on database: any Database) async throws {
     try await database.schema(PersonSpeciesPivot.schema)
       .id()
       .field("personUrl", .string, .required, .references(Person.schema, "url", onDelete: .cascade))
-      .field("speciesUrl", .string, .required, .references(Species.schema, "url", onDelete: .cascade))
+      .field(
+        "speciesUrl", .string, .required, .references(Species.schema, "url", onDelete: .cascade)
+      )
       .unique(on: "personUrl", "speciesUrl")
       .create()
   }
 
-  func createPersonStarshipPivot(on database: any Database) async throws {
+  fileprivate func createPersonStarshipPivot(on database: any Database) async throws {
     try await database.schema(PersonStarshipPivot.schema)
       .id()
       .field("personUrl", .string, .required, .references(Person.schema, "url", onDelete: .cascade))
-      .field("starshipUrl", .string, .required, .references(Starship.schema, "url", onDelete: .cascade))
+      .field(
+        "starshipUrl", .string, .required, .references(Starship.schema, "url", onDelete: .cascade)
+      )
       .unique(on: "personUrl", "starshipUrl")
       .create()
   }
 
-  func createPersonVehiclePivot(on database: any Database) async throws {
+  fileprivate func createPersonVehiclePivot(on database: any Database) async throws {
     try await database.schema(PersonVehiclePivot.schema)
       .id()
       .field("personUrl", .string, .required, .references(Person.schema, "url", onDelete: .cascade))
-      .field("vehicleUrl", .string, .required, .references(Vehicle.schema, "url", onDelete: .cascade))
+      .field(
+        "vehicleUrl", .string, .required, .references(Vehicle.schema, "url", onDelete: .cascade)
+      )
       .unique(on: "personUrl", "vehicleUrl")
       .create()
   }

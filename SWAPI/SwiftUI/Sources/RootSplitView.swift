@@ -1,18 +1,20 @@
 import API
 import Dependencies
-import SQLiteData
-import SQLiteDataPersistence
+import FluentPersistence
 import SwiftUI
 
 struct RootSplitView: View {
-  @Dependency(\.dataStore)
-  private var dataStore: SWAPIDataStore
-
   @Dependency(\.client)
   private var client: Client
 
-  @FetchAll(Film.order(by: \.releaseDate))
-  private var films
+  @Dependency(\.persistenceService)
+  private var persistenceService: FluentPersistenceService
+
+  @Dependency(\.configurePersistence)
+  private var configurePersistence: @Sendable () async throws -> Void
+
+  @State
+  private var films: [Film] = []
 
   @State
   private var error: Error?
@@ -61,18 +63,17 @@ extension RootSplitView {
     }
 
     do {
-      try await loadSnapshot()
+      try await configurePersistence()
+      let snapshot = try await fetchSnapshot()
+      try Task.checkCancellation()
+      try await importSnapshot(snapshot)
+      let fetchedFilms = try await persistenceService.films()
+      updateFilms(with: fetchedFilms)
       error = nil
     } catch {
       guard !Task.isCancelled else { return }
       self.error = error
     }
-  }
-
-  private func loadSnapshot() async throws {
-    let snapshot = try await fetchSnapshot()
-    try Task.checkCancellation()
-    try await importSnapshot(snapshot)
   }
 
   private func fetchSnapshot() async throws -> SnapshotPayload {
@@ -95,9 +96,8 @@ extension RootSplitView {
   }
 
   private func importSnapshot(_ snapshot: SnapshotPayload) async throws {
-    try await Task(priority: .userInitiated) {
-      let importer = dataStore.makeImporter()
-      try importer.importSnapshot(
+    try await persistenceService.importSnapshot(
+      .init(
         films: snapshot.films,
         people: snapshot.people,
         planets: snapshot.planets,
@@ -105,8 +105,23 @@ extension RootSplitView {
         starships: snapshot.starships,
         vehicles: snapshot.vehicles
       )
+    )
+  }
+
+  @MainActor
+  private func updateFilms(with newFilms: [Film]) {
+    let currentSelectionID = selectedFilm?.id
+    films = newFilms
+
+    if let currentSelectionID,
+      let matchingFilm = newFilms.first(where: { $0.id == currentSelectionID })
+    {
+      selectedFilm = matchingFilm
+    } else if let firstFilm = newFilms.first {
+      selectedFilm = firstFilm
+    } else {
+      selectedFilm = nil
     }
-    .value
   }
 }
 
@@ -117,16 +132,4 @@ private struct SnapshotPayload: Sendable {
   let species: [SpeciesResponse]
   let starships: [StarshipResponse]
   let vehicles: [VehicleResponse]
-}
-
-#Preview {
-  let store = SWAPIDataStorePreview.inMemory()
-
-  withDependencies {
-    $0.dataStore = store
-  } operation: {
-    NavigationStack {
-      RootSplitView()
-    }
-  }
 }
