@@ -182,8 +182,12 @@ final class PersistenceContainer {
               .with(\.$homeworld)
               .with(\.$films)
           }
-          .with(\.$starships)
-          .with(\.$vehicles)
+          .with(\.$starships) { starships in
+            starships.with(\.$films)
+          }
+          .with(\.$vehicles) { vehicles in
+            vehicles.with(\.$films)
+          }
           .with(\.$films)
           .sort(\.$name, .ascending)
           .all()
@@ -196,6 +200,7 @@ final class PersistenceContainer {
       case .planets:
         let planets = try await film.$planets
           .query(on: database)
+          .with(\.$films)
           .sort(\.$name, .ascending)
           .all()
         return planets.map { planet in
@@ -220,6 +225,7 @@ final class PersistenceContainer {
       case .starships:
         let starships = try await film.$starships
           .query(on: database)
+          .with(\.$films)
           .sort(\.$name, .ascending)
           .all()
         return starships.map { starship in
@@ -231,6 +237,7 @@ final class PersistenceContainer {
       case .vehicles:
         let vehicles = try await film.$vehicles
           .query(on: database)
+          .with(\.$films)
           .sort(\.$name, .ascending)
           .all()
         return vehicles.map { vehicle in
@@ -578,18 +585,21 @@ extension PersistenceContainer {
   )
     -> PersistenceService.PlanetDetails
   {
-    .init(
-      id: planet.url,
-      name: planet.name,
-      climates: planet.climates,
-      population: planet.population,
-      rotationPeriod: planet.rotationPeriod,
-      orbitalPeriod: planet.orbitalPeriod,
-      diameter: planet.diameter,
-      gravityLevels: planet.gravityLevels,
-      terrains: planet.terrains,
-      surfaceWater: planet.surfaceWater
-    )
+    let films = Self.filmSummaries(from: planet.films)
+
+      .init(
+        id: planet.url,
+        name: planet.name,
+        climates: planet.climates,
+        population: planet.population,
+        rotationPeriod: planet.rotationPeriod,
+        orbitalPeriod: planet.orbitalPeriod,
+        diameter: planet.diameter,
+        gravityLevels: planet.gravityLevels,
+        terrains: planet.terrains,
+        surfaceWater: planet.surfaceWater,
+        films: films
+      )
   }
 
   fileprivate nonisolated static func speciesDetails(
@@ -626,12 +636,25 @@ extension PersistenceContainer {
   )
     -> PersistenceService.StarshipDetails
   {
-    .init(
-      id: starship.url,
-      name: starship.name,
-      model: starship.model,
-      starshipClass: starship.starshipClass
-    )
+    let films = Self.filmSummaries(from: starship.films)
+
+      .init(
+        id: starship.url,
+        name: starship.name,
+        model: starship.model,
+        manufacturers: starship.manufacturers,
+        costInCredits: starship.costInCredits,
+        length: starship.length,
+        maxAtmospheringSpeed: starship.maxAtmospheringSpeed,
+        crew: starship.crew,
+        passengers: starship.passengers,
+        cargoCapacity: starship.cargoCapacity,
+        consumables: starship.consumables,
+        hyperdriveRating: starship.hyperdriveRating,
+        mglt: starship.mglt,
+        starshipClass: starship.starshipClass,
+        films: films
+      )
   }
 
   fileprivate nonisolated static func vehicleDetails(
@@ -639,12 +662,23 @@ extension PersistenceContainer {
   )
     -> PersistenceService.VehicleDetails
   {
-    .init(
-      id: vehicle.url,
-      name: vehicle.name,
-      model: vehicle.model,
-      vehicleClass: vehicle.vehicleClass
-    )
+    let films = Self.filmSummaries(from: vehicle.films)
+
+      .init(
+        id: vehicle.url,
+        name: vehicle.name,
+        model: vehicle.model,
+        vehicleClass: vehicle.vehicleClass,
+        manufacturers: vehicle.manufacturers,
+        costInCredits: vehicle.costInCredits,
+        length: vehicle.length,
+        maxAtmospheringSpeed: vehicle.maxAtmospheringSpeed,
+        crew: vehicle.crew,
+        passengers: vehicle.passengers,
+        cargoCapacity: vehicle.cargoCapacity,
+        consumables: vehicle.consumables,
+        films: films
+      )
   }
 
   fileprivate nonisolated static func filmSummaries(

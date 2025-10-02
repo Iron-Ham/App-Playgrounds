@@ -111,5 +111,31 @@ let project = Project(
       scripts: [swiftFormatScript],
       dependencies: [.target(name: "Persistence")]
     ),
+  ],
+  schemes: [
+    .scheme(
+      name: "StarWarsDB",
+      shared: true,
+      buildAction: .buildAction(targets: ["StarWarsDB"]),
+      testAction: .testPlans([
+        .relativeToRoot("TestPlans/StarWarsDB.xctestplan")
+      ])
+    ),
+    .scheme(
+      name: "API",
+      shared: true,
+      buildAction: .buildAction(targets: ["API"]),
+      testAction: .testPlans([
+        .relativeToRoot("TestPlans/API.xctestplan")
+      ])
+    ),
+    .scheme(
+      name: "Persistence",
+      shared: true,
+      buildAction: .buildAction(targets: ["Persistence"]),
+      testAction: .testPlans([
+        .relativeToRoot("TestPlans/Persistence.xctestplan")
+      ])
+    ),
   ]
 )

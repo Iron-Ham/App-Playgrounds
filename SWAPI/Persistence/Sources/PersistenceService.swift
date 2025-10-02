@@ -168,6 +168,7 @@ extension PersistenceService {
     public let gravityLevels: [PlanetResponse.GravityDescriptor]
     public let terrains: [PlanetResponse.TerrainDescriptor]
     public let surfaceWater: String
+    public let films: [FilmSummary]
 
     public init(
       id: URL,
@@ -179,7 +180,8 @@ extension PersistenceService {
       diameter: String,
       gravityLevels: [PlanetResponse.GravityDescriptor],
       terrains: [PlanetResponse.TerrainDescriptor],
-      surfaceWater: String
+      surfaceWater: String,
+      films: [FilmSummary]
     ) {
       self.id = id
       self.name = name
@@ -191,6 +193,7 @@ extension PersistenceService {
       self.gravityLevels = gravityLevels
       self.terrains = terrains
       self.surfaceWater = surfaceWater
+      self.films = films
     }
   }
 
@@ -241,14 +244,51 @@ extension PersistenceService {
     public let id: URL
     public let name: String
     public let model: String
+    public let manufacturers: [Manufacturer]
+    public let costInCredits: String
+    public let length: String
+    public let maxAtmospheringSpeed: String
+    public let crew: String
+    public let passengers: String
+    public let cargoCapacity: String
+    public let consumables: String
+    public let hyperdriveRating: String
+    public let mglt: String
     public let starshipClass: StarshipResponse.StarshipClass
+    public let films: [FilmSummary]
 
-    public init(id: URL, name: String, model: String, starshipClass: StarshipResponse.StarshipClass)
-    {
+    public init(
+      id: URL,
+      name: String,
+      model: String,
+      manufacturers: [Manufacturer],
+      costInCredits: String,
+      length: String,
+      maxAtmospheringSpeed: String,
+      crew: String,
+      passengers: String,
+      cargoCapacity: String,
+      consumables: String,
+      hyperdriveRating: String,
+      mglt: String,
+      starshipClass: StarshipResponse.StarshipClass,
+      films: [FilmSummary]
+    ) {
       self.id = id
       self.name = name
       self.model = model
+      self.manufacturers = manufacturers
+      self.costInCredits = costInCredits
+      self.length = length
+      self.maxAtmospheringSpeed = maxAtmospheringSpeed
+      self.crew = crew
+      self.passengers = passengers
+      self.cargoCapacity = cargoCapacity
+      self.consumables = consumables
+      self.hyperdriveRating = hyperdriveRating
+      self.mglt = mglt
       self.starshipClass = starshipClass
+      self.films = films
     }
   }
 
@@ -257,12 +297,44 @@ extension PersistenceService {
     public let name: String
     public let model: String
     public let vehicleClass: VehicleResponse.VehicleClass
+    public let manufacturers: [Manufacturer]
+    public let costInCredits: String
+    public let length: String
+    public let maxAtmospheringSpeed: String
+    public let crew: String
+    public let passengers: String
+    public let cargoCapacity: String
+    public let consumables: String
+    public let films: [FilmSummary]
 
-    public init(id: URL, name: String, model: String, vehicleClass: VehicleResponse.VehicleClass) {
+    public init(
+      id: URL,
+      name: String,
+      model: String,
+      vehicleClass: VehicleResponse.VehicleClass,
+      manufacturers: [Manufacturer],
+      costInCredits: String,
+      length: String,
+      maxAtmospheringSpeed: String,
+      crew: String,
+      passengers: String,
+      cargoCapacity: String,
+      consumables: String,
+      films: [FilmSummary]
+    ) {
       self.id = id
       self.name = name
       self.model = model
       self.vehicleClass = vehicleClass
+      self.manufacturers = manufacturers
+      self.costInCredits = costInCredits
+      self.length = length
+      self.maxAtmospheringSpeed = maxAtmospheringSpeed
+      self.crew = crew
+      self.passengers = passengers
+      self.cargoCapacity = cargoCapacity
+      self.consumables = consumables
+      self.films = films
     }
   }
 

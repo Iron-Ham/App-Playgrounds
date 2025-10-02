@@ -11,7 +11,6 @@
       case species(PersistenceService.SpeciesDetails)
       case starship(PersistenceService.StarshipDetails)
       case vehicle(PersistenceService.VehicleDetails)
-      case film(PersistenceService.FilmSummary)
 
       init(entity: PersistenceService.RelationshipEntity) {
         switch entity {
@@ -28,43 +27,24 @@
         }
       }
 
-      var iconName: String {
+      var relationship: PersistenceService.Relationship {
         switch self {
         case .character:
-          return PersistenceService.Relationship.characters.iconName
+          return .characters
         case .planet:
-          return PersistenceService.Relationship.planets.iconName
+          return .planets
         case .species:
-          return PersistenceService.Relationship.species.iconName
+          return .species
         case .starship:
-          return PersistenceService.Relationship.starships.iconName
+          return .starships
         case .vehicle:
-          return PersistenceService.Relationship.vehicles.iconName
-        case .film:
-          return "film"
+          return .vehicles
         }
       }
 
-      var accentGradient: LinearGradient {
-        switch self {
-        case .character:
-          return PersistenceService.Relationship.characters.accentGradient
-        case .planet:
-          return PersistenceService.Relationship.planets.accentGradient
-        case .species:
-          return PersistenceService.Relationship.species.accentGradient
-        case .starship:
-          return PersistenceService.Relationship.starships.accentGradient
-        case .vehicle:
-          return PersistenceService.Relationship.vehicles.accentGradient
-        case .film:
-          return LinearGradient(
-            colors: [Color.orange.opacity(0.85), Color.pink.opacity(0.9)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-          )
-        }
-      }
+      var iconName: String { relationship.iconName }
+
+      var accentGradient: LinearGradient { relationship.accentGradient }
     }
 
     @ViewBuilder
@@ -80,8 +60,6 @@
         StarshipDetailView(screen: screen, details: details)
       case .vehicle(let details):
         VehicleDetailView(screen: screen, details: details)
-      case .film(let summary):
-        FilmSummaryDetailView(screen: screen, film: summary)
       }
     }
   }

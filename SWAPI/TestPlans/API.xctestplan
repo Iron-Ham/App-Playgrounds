@@ -1,0 +1,51 @@
+{
+  "configurations" : [
+    {
+      "id" : "499A98BA-0D9E-41F3-A21C-0E7F29B63B92",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:StarWarsDB.xcodeproj",
+      "identifier" : "E172DCD8160DFC2207E4AC1A",
+      "name" : "API"
+    }
+  },
+  "testDestinations" : [
+    {
+      "destination" : {
+        "name" : "iPhone 15",
+        "platform" : "iOS Simulator"
+      }
+    },
+    {
+      "destination" : {
+        "name" : "iPad (10th generation)",
+        "platform" : "iOS Simulator"
+      }
+    },
+    {
+      "destination" : {
+        "name" : "Any Mac",
+        "platform" : "macOS"
+      }
+    }
+  ],
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:StarWarsDB.xcodeproj",
+        "identifier" : "BE6DB2782E7BFDF24457A46E",
+        "name" : "APITests"
+      }
+    }
+  ],
+  "version" : 1
+}

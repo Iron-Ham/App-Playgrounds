@@ -191,10 +191,12 @@
 
     struct RelationshipDetailFilmRow: View {
       let film: PersistenceService.FilmSummary
+      @Environment(\.openFilmDetails)
+      private var openFilmDetails
 
       var body: some View {
-        NavigationLink {
-          RelationshipDetailScreens.makeView(for: .film(film))
+        Button {
+          openFilmDetails(film)
         } label: {
           HStack(alignment: .center, spacing: 12) {
             Image(systemName: "film")
