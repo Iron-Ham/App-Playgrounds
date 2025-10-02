@@ -1,14 +1,13 @@
-import Combine
 import FluentPersistence
-import SwiftUI
+import Observation
 
 @MainActor
-final class RootSplitViewModel: ObservableObject {
+@Observable
+final class RootSplitViewModel {
   typealias Film = PersistenceCoordinator.Film
 
   let filmsModel: FilmsModel
   let detailModel: FilmDetailModel
-  private var cancellables: Set<AnyCancellable> = []
 
   init(
     coordinator: PersistenceCoordinator,
@@ -22,26 +21,9 @@ final class RootSplitViewModel: ObservableObject {
       configurePersistence: configurePersistence
     )
 
-    filmsModel.objectWillChange
-      .receive(on: DispatchQueue.main)
-      .sink { [weak self] _ in
-        self?.objectWillChange.send()
-      }
-      .store(in: &cancellables)
-
-    detailModel.objectWillChange
-      .receive(on: DispatchQueue.main)
-      .sink { [weak self] _ in
-        self?.objectWillChange.send()
-      }
-      .store(in: &cancellables)
-
-    filmsModel.$selectedFilm
-      .receive(on: DispatchQueue.main)
-      .sink { [weak self] film in
-        self?.detailModel.updateSelectedFilm(film)
-      }
-      .store(in: &cancellables)
+    filmsModel.onSelectionChange { [detailModel] film in
+      detailModel.updateSelectedFilm(film)
+    }
   }
 
   var films: [Film] { filmsModel.films }

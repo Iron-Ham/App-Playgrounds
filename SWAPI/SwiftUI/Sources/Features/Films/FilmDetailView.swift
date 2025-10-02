@@ -1,10 +1,11 @@
 #if canImport(FluentPersistence)
   import FluentPersistence
   import Foundation
+  import Observation
   import SwiftUI
 
   struct FilmDetailView: View {
-    @ObservedObject
+    @Bindable
     var model: FilmDetailModel
     @State
     private var isPresentingOpeningCrawl = false
@@ -19,7 +20,7 @@
     var body: some View {
       Group {
         if let film = model.film {
-          NavigationStack(path: navigationPathBinding) {
+          NavigationStack(path: $model.navigationPath) {
             detailContent(for: film, summary: model.summary)
           }
           .navigationDestination(for: RelationshipEntity.self) { entity in
@@ -35,12 +36,22 @@
             isPresentingOpeningCrawl = false
           }
           #if os(macOS)
-            .sheet(isPresented: $isPresentingOpeningCrawl) {
-              openingCrawlExperience(for: film)
+            .overlay {
+              if isPresentingOpeningCrawl {
+                openingCrawlExperience(for: film) {
+                  isPresentingOpeningCrawl = false
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .transition(.opacity)
+                .zIndex(1)
+              }
             }
+            .animation(.easeInOut(duration: 0.2), value: isPresentingOpeningCrawl)
           #else
             .fullScreenCover(isPresented: $isPresentingOpeningCrawl) {
-              openingCrawlExperience(for: film)
+              openingCrawlExperience(for: film) {
+                isPresentingOpeningCrawl = false
+              }
             }
           #endif
         } else {
@@ -139,13 +150,6 @@
       .background(.quaternary, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
       .padding()
       .accessibilityElement(children: .combine)
-    }
-
-    private var navigationPathBinding: Binding<[RelationshipEntity]> {
-      Binding(
-        get: { model.navigationPath },
-        set: { model.navigationPath = $0 }
-      )
     }
 
     private func headerSection(for film: Film) -> some View {

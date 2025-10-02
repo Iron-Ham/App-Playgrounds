@@ -3,13 +3,14 @@ import SwiftUI
 
 extension FilmDetailView {
   @ViewBuilder
-  func openingCrawlExperience(for film: Film) -> some View {
+  func openingCrawlExperience(for film: Film, onClose: @escaping () -> Void) -> some View {
     OpeningCrawlView(
       content: .init(
         title: film.title,
         episodeNumber: film.episodeId,
         openingText: film.openingCrawl
-      )
+      ),
+      onClose: onClose
     )
     .environment(\.colorScheme, .dark)
   }

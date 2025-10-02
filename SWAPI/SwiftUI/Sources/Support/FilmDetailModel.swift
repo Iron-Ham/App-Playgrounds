@@ -1,35 +1,35 @@
 import FluentPersistence
 import Foundation
-import SwiftUI
+import Observation
 
 @MainActor
-final class FilmDetailModel: ObservableObject {
+@Observable
+final class FilmDetailModel {
   typealias Film = FluentPersistenceService.FilmDetails
   typealias Relationship = FluentPersistenceService.Relationship
   typealias RelationshipSummary = FluentPersistenceService.FilmRelationshipSummary
   typealias RelationshipEntity = FluentPersistenceService.RelationshipEntity
 
+  @ObservationIgnored
   private let coordinator: PersistenceCoordinator
+  @ObservationIgnored
   private let persistenceService: FluentPersistenceService
+  @ObservationIgnored
   private let configurePersistence: @Sendable () async throws -> Void
+  @ObservationIgnored
   private let relationshipStore: RelationshipStore
 
+  @ObservationIgnored
   private var summaryTask: Task<RelationshipSummary, Error>?
+  @ObservationIgnored
   private var observationTask: Task<Void, Never>?
 
-  @Published
   var film: Film?
-  @Published
   var summary: RelationshipSummary = .empty
-  @Published
   var summaryError: Error?
-  @Published
   var isLoadingSummary = false
-  @Published
   var expandedRelationships: Set<Relationship> = []
-  @Published
   var navigationPath: [RelationshipEntity] = []
-  @Published
   var relationshipStates: [Relationship: RelationshipItemsState] =
     Relationship.defaultStates()
 

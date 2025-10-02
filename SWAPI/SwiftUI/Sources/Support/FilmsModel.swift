@@ -1,25 +1,26 @@
 import FluentPersistence
 import Foundation
-import SwiftUI
+import Observation
 import os.log
 
 @MainActor
-final class FilmsModel: ObservableObject {
+@Observable
+final class FilmsModel {
   typealias Film = PersistenceCoordinator.Film
 
+  @ObservationIgnored
   private let coordinator: PersistenceCoordinator
+  @ObservationIgnored
   private var observationTask: Task<Void, Never>?
+  @ObservationIgnored
   private var refreshTask: Task<[Film], Error>?
+  @ObservationIgnored
+  private var selectionChangeHandler: (@MainActor (Film?) -> Void)?
 
-  @Published
   var films: [Film] = []
-  @Published
   var selectedFilm: Film?
-  @Published
   var isLoading = false
-  @Published
   var hasLoadedInitialData = false
-  @Published
   var error: Error?
 
   init(coordinator: PersistenceCoordinator) {
@@ -29,6 +30,10 @@ final class FilmsModel: ObservableObject {
   deinit {
     observationTask?.cancel()
     refreshTask?.cancel()
+  }
+
+  func onSelectionChange(_ handler: @escaping @MainActor (Film?) -> Void) {
+    selectionChangeHandler = handler
   }
 
   func loadInitialIfNeeded() async {
@@ -76,21 +81,31 @@ final class FilmsModel: ObservableObject {
   }
 
   func updateSelection(_ film: Film?) {
+    guard selectedFilm != film else { return }
     selectedFilm = film
+    selectionChangeHandler?(film)
   }
 }
 
 extension FilmsModel {
   fileprivate func applyLoadedFilms(_ newFilms: [Film]) {
     let currentSelectionID = selectedFilm?.id
+    let previousSelection = selectedFilm
     films = newFilms
+
+    let newSelection: Film?
 
     if let currentSelectionID,
       let matchingFilm = newFilms.first(where: { $0.id == currentSelectionID })
     {
-      selectedFilm = matchingFilm
+      newSelection = matchingFilm
     } else {
-      selectedFilm = newFilms.first
+      newSelection = newFilms.first
+    }
+
+    selectedFilm = newSelection
+    if previousSelection != newSelection {
+      selectionChangeHandler?(newSelection)
     }
   }
 

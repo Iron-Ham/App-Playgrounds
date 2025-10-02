@@ -1,7 +1,8 @@
+import Observation
 import SwiftUI
 
 struct RootSplitView: View {
-  @ObservedObject
+  @Bindable
   var model: RootSplitViewModel
 
   var body: some View {

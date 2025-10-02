@@ -9,6 +9,7 @@ struct OpeningCrawlView: View {
   }
 
   let content: Content
+  var onClose: (() -> Void)? = nil
 
   @Environment(\.dismiss)
   private var dismiss
@@ -89,7 +90,7 @@ struct OpeningCrawlView: View {
       VStack {
         HStack {
           Button {
-            dismiss()
+            close()
           } label: {
             Label("Close", systemImage: "xmark.circle.fill")
               .labelStyle(.iconOnly)
@@ -138,6 +139,14 @@ struct OpeningCrawlView: View {
         .padding(.horizontal)
     }
     .frame(maxWidth: .infinity)
+  }
+
+  private func close() {
+    if let onClose {
+      onClose()
+    } else {
+      dismiss()
+    }
   }
 
   private var episodeLine: String {

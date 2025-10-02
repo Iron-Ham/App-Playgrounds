@@ -8,7 +8,7 @@ struct StarWarsDBApp: App {
   private let client: Client
   private let persistenceService: FluentPersistenceService
   private let persistenceCoordinator: PersistenceCoordinator
-  @StateObject
+  @State
   private var rootViewModel: RootSplitViewModel
 
   init() {
@@ -65,8 +65,8 @@ struct StarWarsDBApp: App {
       values.persistenceCoordinator = coordinator
     }
 
-    _rootViewModel = StateObject(
-      wrappedValue: RootSplitViewModel(
+    _rootViewModel = State(
+      initialValue: RootSplitViewModel(
         coordinator: coordinator,
         persistenceService: appService,
         configurePersistence: configurePersistenceClosure
