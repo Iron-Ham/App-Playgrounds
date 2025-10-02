@@ -2,14 +2,18 @@ import FluentPersistence
 import SwiftUI
 
 extension FilmDetailView {
+  func openingCrawlContent(for film: Film) -> OpeningCrawlView.Content {
+    OpeningCrawlView.Content(
+      title: film.title,
+      episodeNumber: film.episodeId,
+      openingText: film.openingCrawl
+    )
+  }
+
   @ViewBuilder
   func openingCrawlExperience(for film: Film, onClose: @escaping () -> Void) -> some View {
     OpeningCrawlView(
-      content: .init(
-        title: film.title,
-        episodeNumber: film.episodeId,
-        openingText: film.openingCrawl
-      ),
+      content: openingCrawlContent(for: film),
       onClose: onClose
     )
     .environment(\.colorScheme, .dark)

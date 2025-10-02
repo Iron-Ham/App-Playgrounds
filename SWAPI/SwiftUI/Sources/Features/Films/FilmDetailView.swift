@@ -32,22 +32,13 @@
               relationshipErrorBanner(error)
             }
           }
-          .onChange(of: film.id) { _ in
-            isPresentingOpeningCrawl = false
+          .onChange(of: film.id) {
+            closeOpeningCrawl()
           }
-          #if os(macOS)
-            .overlay {
-              if isPresentingOpeningCrawl {
-                openingCrawlExperience(for: film) {
-                  isPresentingOpeningCrawl = false
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .transition(.opacity)
-                .zIndex(1)
-              }
-            }
-            .animation(.easeInOut(duration: 0.2), value: isPresentingOpeningCrawl)
-          #else
+          .onDisappear {
+            closeOpeningCrawl()
+          }
+          #if !os(macOS)
             .fullScreenCover(isPresented: $isPresentingOpeningCrawl) {
               openingCrawlExperience(for: film) {
                 isPresentingOpeningCrawl = false
@@ -73,7 +64,7 @@
 
         Section {
           Button {
-            isPresentingOpeningCrawl = true
+            presentOpeningCrawl(for: film)
           } label: {
             OpeningCrawlCallout()
           }
@@ -133,6 +124,28 @@
       #if os(iOS) || os(tvOS)
         .navigationBarTitleDisplayMode(.inline)
       #endif
+    }
+
+    @MainActor
+    private func presentOpeningCrawl(for film: Film) {
+      #if os(macOS)
+        OpeningCrawlFullScreenPresenter.shared.present(
+          content: openingCrawlContent(for: film)
+        ) {
+          isPresentingOpeningCrawl = false
+        }
+        isPresentingOpeningCrawl = true
+      #else
+        isPresentingOpeningCrawl = true
+      #endif
+    }
+
+    @MainActor
+    private func closeOpeningCrawl() {
+      #if os(macOS)
+        OpeningCrawlFullScreenPresenter.shared.dismiss()
+      #endif
+      isPresentingOpeningCrawl = false
     }
 
     @ViewBuilder

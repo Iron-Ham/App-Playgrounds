@@ -99,6 +99,9 @@ struct OpeningCrawlView: View {
               .padding(12)
           }
           .accessibilityLabel("Close opening crawl")
+          #if os(macOS)
+            .keyboardShortcut(.cancelAction)
+          #endif
 
           Spacer()
         }
@@ -112,6 +115,11 @@ struct OpeningCrawlView: View {
     .onAppear {
       animationStartDate = .now
     }
+    #if os(macOS)
+      .onExitCommand {
+        close()
+      }
+    #endif
     #if os(iOS)
       .statusBarHidden(true)
     #endif

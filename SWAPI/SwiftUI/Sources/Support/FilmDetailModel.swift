@@ -279,7 +279,7 @@ private actor RelationshipStore {
   }
 
   func cancelLoads(for filmID: Film.ID) {
-    guard var tasks = activeTasks.removeValue(forKey: filmID) else { return }
+    guard let tasks = activeTasks.removeValue(forKey: filmID) else { return }
     for task in tasks.values {
       task.cancel()
     }
