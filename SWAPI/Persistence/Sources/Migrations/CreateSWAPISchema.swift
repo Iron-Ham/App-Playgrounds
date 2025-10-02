@@ -51,6 +51,7 @@ extension CreateSWAPISchema {
       .field("releaseDate", .datetime)
       .field("created", .datetime, .required)
       .field("edited", .datetime, .required)
+      .ignoreExisting()
       .create()
   }
 
@@ -68,6 +69,7 @@ extension CreateSWAPISchema {
       .field("population", .string, .required)
       .field("created", .datetime, .required)
       .field("edited", .datetime, .required)
+      .ignoreExisting()
       .create()
   }
 
@@ -86,6 +88,7 @@ extension CreateSWAPISchema {
       .field("language", .string, .required)
       .field("created", .datetime, .required)
       .field("edited", .datetime, .required)
+      .ignoreExisting()
       .create()
   }
 
@@ -103,6 +106,7 @@ extension CreateSWAPISchema {
       .field("homeworldUrl", .string, .references(Planet.schema, "url", onDelete: .setNull))
       .field("created", .datetime, .required)
       .field("edited", .datetime, .required)
+      .ignoreExisting()
       .create()
   }
 
@@ -124,6 +128,7 @@ extension CreateSWAPISchema {
       .field("starshipClass", .string, .required)
       .field("created", .datetime, .required)
       .field("edited", .datetime, .required)
+      .ignoreExisting()
       .create()
   }
 
@@ -143,6 +148,7 @@ extension CreateSWAPISchema {
       .field("vehicleClass", .string, .required)
       .field("created", .datetime, .required)
       .field("edited", .datetime, .required)
+      .ignoreExisting()
       .create()
   }
 
@@ -152,6 +158,7 @@ extension CreateSWAPISchema {
       .field("filmUrl", .string, .required, .references(Film.schema, "url", onDelete: .cascade))
       .field("personUrl", .string, .required, .references(Person.schema, "url", onDelete: .cascade))
       .unique(on: "filmUrl", "personUrl")
+      .ignoreExisting()
       .create()
   }
 
@@ -161,6 +168,7 @@ extension CreateSWAPISchema {
       .field("filmUrl", .string, .required, .references(Film.schema, "url", onDelete: .cascade))
       .field("planetUrl", .string, .required, .references(Planet.schema, "url", onDelete: .cascade))
       .unique(on: "filmUrl", "planetUrl")
+      .ignoreExisting()
       .create()
   }
 
@@ -172,6 +180,7 @@ extension CreateSWAPISchema {
         "speciesUrl", .string, .required, .references(Species.schema, "url", onDelete: .cascade)
       )
       .unique(on: "filmUrl", "speciesUrl")
+      .ignoreExisting()
       .create()
   }
 
@@ -183,6 +192,7 @@ extension CreateSWAPISchema {
         "starshipUrl", .string, .required, .references(Starship.schema, "url", onDelete: .cascade)
       )
       .unique(on: "filmUrl", "starshipUrl")
+      .ignoreExisting()
       .create()
   }
 
@@ -194,6 +204,7 @@ extension CreateSWAPISchema {
         "vehicleUrl", .string, .required, .references(Vehicle.schema, "url", onDelete: .cascade)
       )
       .unique(on: "filmUrl", "vehicleUrl")
+      .ignoreExisting()
       .create()
   }
 
@@ -205,6 +216,7 @@ extension CreateSWAPISchema {
         "speciesUrl", .string, .required, .references(Species.schema, "url", onDelete: .cascade)
       )
       .unique(on: "personUrl", "speciesUrl")
+      .ignoreExisting()
       .create()
   }
 
@@ -216,6 +228,7 @@ extension CreateSWAPISchema {
         "starshipUrl", .string, .required, .references(Starship.schema, "url", onDelete: .cascade)
       )
       .unique(on: "personUrl", "starshipUrl")
+      .ignoreExisting()
       .create()
   }
 
@@ -227,6 +240,7 @@ extension CreateSWAPISchema {
         "vehicleUrl", .string, .required, .references(Vehicle.schema, "url", onDelete: .cascade)
       )
       .unique(on: "personUrl", "vehicleUrl")
+      .ignoreExisting()
       .create()
   }
 }
