@@ -49,6 +49,16 @@
               systemImage: "ruler")
           }
 
+          if !details.films.isEmpty {
+            RelationshipDetailSection(
+              title: String(localized: "Featured films"), iconName: "film"
+            ) {
+              ForEach(details.films) { film in
+                RelationshipDetailFilmRow(film: film)
+              }
+            }
+          }
+
           RelationshipDetailSection(
             title: String(localized: "Canonical reference"), iconName: "link"
           ) {
@@ -58,7 +68,7 @@
           RelationshipDetailCallout(
             text: String(
               localized:
-                "Atmospheric composition, notable residents, and trade data are on the roadmap."
+                "Notable settlements, cultural notes, and trade lanes are shipping in a future update."
             )
           )
         }

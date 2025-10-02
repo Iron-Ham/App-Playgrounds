@@ -304,6 +304,13 @@
         return formatter
       }()
 
+      private static let creditsFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        return formatter
+      }()
+
       private static let filmReleaseFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -406,6 +413,47 @@
         return trimmed
       }
 
+      static func credits(_ raw: String) -> String {
+        guard let numeric = numericValue(from: raw) else {
+          return fallback(for: raw)
+        }
+
+        let formatted =
+          creditsFormatter.string(from: NSNumber(value: numeric))
+          ?? String(numeric)
+        return String(localized: "\(formatted) credits")
+      }
+
+      static func manufacturers(_ manufacturers: [Manufacturer]) -> String {
+        guard !manufacturers.isEmpty else { return notDocumentedDisplay }
+        let names =
+          manufacturers
+          .map(\.displayName)
+          .compactMap { nonEmpty($0) }
+        guard !names.isEmpty else { return notDocumentedDisplay }
+        return ListFormatter.localizedString(byJoining: names)
+      }
+
+      static func primaryManufacturer(_ manufacturers: [Manufacturer]) -> String? {
+        guard let first = manufacturers.first else { return nil }
+        return nonEmpty(first.displayName)
+      }
+
+      static func mglt(_ raw: String) -> String {
+        guard let numeric = numericValue(from: raw) else {
+          return fallback(for: raw)
+        }
+
+        let formatted =
+          measurementNumberFormatter.string(from: NSNumber(value: numeric))
+          ?? String(numeric)
+        return String(localized: "\(formatted) MGLT")
+      }
+
+      static func manufacturerSummary(for manufacturers: [Manufacturer]) -> String? {
+        primaryManufacturer(manufacturers)
+      }
+
       static func planetSummary(for planet: PersistenceService.PlanetDetails) -> String {
         let climate = planet.climates.isEmpty ? nil : list(planet.climates.map(\.displayName))
         let populationValue = population(planet.population)
@@ -425,6 +473,7 @@
 
       static func starshipSummary(for starship: PersistenceService.StarshipDetails) -> String {
         joinedLine([
+          manufacturerSummary(for: starship.manufacturers),
           nonEmpty(starship.model),
           nonEmpty(starship.starshipClass.displayName),
         ]) ?? notDocumentedDisplay
@@ -432,6 +481,7 @@
 
       static func vehicleSummary(for vehicle: PersistenceService.VehicleDetails) -> String {
         joinedLine([
+          manufacturerSummary(for: vehicle.manufacturers),
           nonEmpty(vehicle.model),
           nonEmpty(vehicle.vehicleClass.displayName),
         ]) ?? notDocumentedDisplay

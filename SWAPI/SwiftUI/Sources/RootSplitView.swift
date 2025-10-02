@@ -31,19 +31,19 @@ struct RootSplitView: View {
         }
       }
     } detail: {
-        FilmDetailView(model: model.detailModel)
-          .environment(\.openFilmDetails) { summary in
-            Task { @MainActor in
-              if let target = model.films.first(where: { $0.id == summary.id }) {
-                model.selectFilm(target)
-              } else {
-                await model.refresh(force: true)
-                if let refreshed = model.films.first(where: { $0.id == summary.id }) {
-                  model.selectFilm(refreshed)
-                }
+      FilmDetailView(model: model.detailModel)
+        .environment(\.openFilmDetails) { summary in
+          Task { @MainActor in
+            if let target = model.films.first(where: { $0.id == summary.id }) {
+              model.selectFilm(target)
+            } else {
+              await model.refresh(force: true)
+              if let refreshed = model.films.first(where: { $0.id == summary.id }) {
+                model.selectFilm(refreshed)
               }
             }
           }
+        }
     }
     .task {
       await model.loadInitialIfNeeded()

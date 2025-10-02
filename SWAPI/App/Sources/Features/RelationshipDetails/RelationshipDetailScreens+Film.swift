@@ -3,11 +3,11 @@
   import SwiftUI
 
   private struct OpenFilmDetailsActionKey: EnvironmentKey {
-    static let defaultValue: (PersistenceService.FilmSummary) -> Void = { _ in }
+    static let defaultValue: @Sendable (PersistenceService.FilmSummary) -> Void = { _ in }
   }
 
   extension EnvironmentValues {
-    var openFilmDetails: (PersistenceService.FilmSummary) -> Void {
+    var openFilmDetails: @Sendable (PersistenceService.FilmSummary) -> Void {
       get { self[OpenFilmDetailsActionKey.self] }
       set { self[OpenFilmDetailsActionKey.self] = newValue }
     }

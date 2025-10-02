@@ -29,18 +29,16 @@ struct OpeningCrawlView: View {
       GeometryReader { geometry in
         TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { timeline in
           let containerHeight = geometry.size.height
-          let effectiveDistance = crawlHeight + containerHeight * 1.6
-          let pointsPerSecond: CGFloat = 32
-          let duration = max(Double(effectiveDistance / pointsPerSecond), 24)
-          let elapsed = timeline.date.timeIntervalSince(animationStartDate)
-          let normalizedProgress =
-            duration > 0
-            ? CGFloat((elapsed.truncatingRemainder(dividingBy: duration)) / duration)
-            : 0
+          let effectiveDistance = crawlHeight + containerHeight * 1.8
+          let pointsPerSecond: CGFloat = max(containerHeight * 0.15, 34)
+          let duration = max(Double(effectiveDistance / pointsPerSecond), 28)
+          let elapsed = max(0, timeline.date.timeIntervalSince(animationStartDate))
+          let normalizedTime = duration > 0 ? min(elapsed / duration, 1) : 1
+          let easedProgress = easeOutCubic(normalizedTime)
 
-          let startOffset = containerHeight * 0.6
-          let endOffset = -crawlHeight - containerHeight * 0.9
-          let offset = startOffset + (endOffset - startOffset) * normalizedProgress
+          let startOffset = containerHeight * 0.85
+          let endOffset = -crawlHeight - containerHeight * 0.7
+          let offset = startOffset + (endOffset - startOffset) * easedProgress
 
           VStack {
             Spacer(minLength: 0)
@@ -57,12 +55,12 @@ struct OpeningCrawlView: View {
               )
               .offset(y: offset)
               .rotation3DEffect(
-                .degrees(24),
+                .degrees(27),
                 axis: (x: 1, y: 0, z: 0),
                 anchor: .center,
                 perspective: 0.7
               )
-              .shadow(color: crawlColor.opacity(0.45), radius: 20, x: 0, y: -8)
+              .shadow(color: crawlColor.opacity(0.45), radius: 18, x: 0, y: -10)
               .accessibilityElement(children: .combine)
 
             Spacer(minLength: 0)
@@ -80,7 +78,13 @@ struct OpeningCrawlView: View {
       }
 
       LinearGradient(
-        colors: [Color.black.opacity(0), Color.black.opacity(0.95)],
+        gradient: Gradient(stops: [
+          .init(color: Color.black.opacity(0.95), location: 0.0),
+          .init(color: Color.black.opacity(0.8), location: 0.18),
+          .init(color: Color.black.opacity(0.0), location: 0.4),
+          .init(color: Color.black.opacity(0.0), location: 0.65),
+          .init(color: Color.black.opacity(0.92), location: 1.0),
+        ]),
         startPoint: .top,
         endPoint: .bottom
       )
@@ -128,25 +132,32 @@ struct OpeningCrawlView: View {
   private var crawlContent: some View {
     VStack(spacing: 28) {
       Text(episodeLine)
-        .font(.system(size: 30, weight: .semibold, design: .rounded))
-        .tracking(8)
+        .font(.system(size: 30, weight: .semibold, design: .default))
+        .tracking(7)
         .foregroundStyle(crawlColor)
         .multilineTextAlignment(.center)
 
       Text(content.title.uppercased())
-        .font(.system(size: 48, weight: .black, design: .rounded))
-        .tracking(6)
+        .font(.system(size: 50, weight: .black, design: .default))
+        .tracking(5)
         .foregroundStyle(crawlColor)
         .multilineTextAlignment(.center)
 
       Text(formattedCrawl)
-        .font(.system(size: 24, weight: .medium, design: .rounded))
-        .lineSpacing(10)
+        .font(.system(size: 24, weight: .semibold, design: .default))
+        .lineSpacing(9)
         .multilineTextAlignment(.center)
         .foregroundStyle(crawlColor)
         .padding(.horizontal)
     }
     .frame(maxWidth: .infinity)
+    .mask(
+      LinearGradient(
+        colors: [Color.white.opacity(0), Color.white, Color.white],
+        startPoint: .top,
+        endPoint: .bottom
+      )
+    )
   }
 
   private func close() {
@@ -175,6 +186,12 @@ struct OpeningCrawlView: View {
     var attributed = AttributedString(raw)
     attributed.kern = 1.5
     return attributed
+  }
+
+  private func easeOutCubic(_ progress: Double) -> CGFloat {
+    let clamped = max(0, min(1, progress))
+    let eased = 1 - pow(1 - clamped, 3)
+    return CGFloat(eased)
   }
 
   private func romanNumeral(for value: Int) -> String {

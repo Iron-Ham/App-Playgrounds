@@ -587,19 +587,19 @@ extension PersistenceContainer {
   {
     let films = Self.filmSummaries(from: planet.films)
 
-      .init(
-        id: planet.url,
-        name: planet.name,
-        climates: planet.climates,
-        population: planet.population,
-        rotationPeriod: planet.rotationPeriod,
-        orbitalPeriod: planet.orbitalPeriod,
-        diameter: planet.diameter,
-        gravityLevels: planet.gravityLevels,
-        terrains: planet.terrains,
-        surfaceWater: planet.surfaceWater,
-        films: films
-      )
+    return .init(
+      id: planet.url,
+      name: planet.name,
+      climates: planet.climates,
+      population: planet.population,
+      rotationPeriod: planet.rotationPeriod,
+      orbitalPeriod: planet.orbitalPeriod,
+      diameter: planet.diameter,
+      gravityLevels: planet.gravityLevels,
+      terrains: planet.terrains,
+      surfaceWater: planet.surfaceWater,
+      films: films
+    )
   }
 
   fileprivate nonisolated static func speciesDetails(
@@ -638,23 +638,23 @@ extension PersistenceContainer {
   {
     let films = Self.filmSummaries(from: starship.films)
 
-      .init(
-        id: starship.url,
-        name: starship.name,
-        model: starship.model,
-        manufacturers: starship.manufacturers,
-        costInCredits: starship.costInCredits,
-        length: starship.length,
-        maxAtmospheringSpeed: starship.maxAtmospheringSpeed,
-        crew: starship.crew,
-        passengers: starship.passengers,
-        cargoCapacity: starship.cargoCapacity,
-        consumables: starship.consumables,
-        hyperdriveRating: starship.hyperdriveRating,
-        mglt: starship.mglt,
-        starshipClass: starship.starshipClass,
-        films: films
-      )
+    return .init(
+      id: starship.url,
+      name: starship.name,
+      model: starship.model,
+      manufacturers: starship.manufacturers,
+      costInCredits: starship.costInCredits,
+      length: starship.length,
+      maxAtmospheringSpeed: starship.maxAtmospheringSpeed,
+      crew: starship.crew,
+      passengers: starship.passengers,
+      cargoCapacity: starship.cargoCapacity,
+      consumables: starship.consumables,
+      hyperdriveRating: starship.hyperdriveRating,
+      mglt: starship.mglt,
+      starshipClass: starship.starshipClass,
+      films: films
+    )
   }
 
   fileprivate nonisolated static func vehicleDetails(
@@ -664,21 +664,21 @@ extension PersistenceContainer {
   {
     let films = Self.filmSummaries(from: vehicle.films)
 
-      .init(
-        id: vehicle.url,
-        name: vehicle.name,
-        model: vehicle.model,
-        vehicleClass: vehicle.vehicleClass,
-        manufacturers: vehicle.manufacturers,
-        costInCredits: vehicle.costInCredits,
-        length: vehicle.length,
-        maxAtmospheringSpeed: vehicle.maxAtmospheringSpeed,
-        crew: vehicle.crew,
-        passengers: vehicle.passengers,
-        cargoCapacity: vehicle.cargoCapacity,
-        consumables: vehicle.consumables,
-        films: films
-      )
+    return .init(
+      id: vehicle.url,
+      name: vehicle.name,
+      model: vehicle.model,
+      vehicleClass: vehicle.vehicleClass,
+      manufacturers: vehicle.manufacturers,
+      costInCredits: vehicle.costInCredits,
+      length: vehicle.length,
+      maxAtmospheringSpeed: vehicle.maxAtmospheringSpeed,
+      crew: vehicle.crew,
+      passengers: vehicle.passengers,
+      cargoCapacity: vehicle.cargoCapacity,
+      consumables: vehicle.consumables,
+      films: films
+    )
   }
 
   fileprivate nonisolated static func filmSummaries(
