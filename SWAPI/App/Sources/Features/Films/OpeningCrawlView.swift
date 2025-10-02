@@ -1,4 +1,5 @@
 import Foundation
+import QuartzCore
 import SwiftUI
 
 struct OpeningCrawlView: View {
@@ -30,14 +31,14 @@ struct OpeningCrawlView: View {
         TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { timeline in
           let containerHeight = geometry.size.height
           let effectiveDistance = crawlHeight + containerHeight * 1.8
-          let pointsPerSecond: CGFloat = max(containerHeight * 0.15, 34)
-          let duration = max(Double(effectiveDistance / pointsPerSecond), 28)
+          let pointsPerSecond: CGFloat = max(containerHeight * 0.045, 9)
+          let duration = max(Double(effectiveDistance / pointsPerSecond), 52)
           let elapsed = max(0, timeline.date.timeIntervalSince(animationStartDate))
           let normalizedTime = duration > 0 ? min(elapsed / duration, 1) : 1
           let easedProgress = easeOutCubic(normalizedTime)
 
-          let startOffset = containerHeight * 0.85
-          let endOffset = -crawlHeight - containerHeight * 0.7
+          let startOffset = containerHeight * 1.25
+          let endOffset = -crawlHeight - containerHeight * 0.44
           let offset = startOffset + (endOffset - startOffset) * easedProgress
 
           VStack {
@@ -53,13 +54,15 @@ struct OpeningCrawlView: View {
                   )
                 }
               )
-              .offset(y: offset)
-              .rotation3DEffect(
-                .degrees(27),
-                axis: (x: 1, y: 0, z: 0),
-                anchor: .center,
-                perspective: 0.7
+              .scaleEffect(x: 1.08, y: 1.0, anchor: .bottom)
+              .modifier(
+                TiltedPlaneEffect(
+                  tiltDegrees: 50,
+                  perspectiveDistance: max(geometry.size.height * 1.4, 600),
+                  verticalOriginOffset: geometry.size.height * 0.25
+                )
               )
+              .offset(y: offset)
               .shadow(color: crawlColor.opacity(0.45), radius: 18, x: 0, y: -10)
               .accessibilityElement(children: .combine)
 
@@ -145,19 +148,10 @@ struct OpeningCrawlView: View {
 
       Text(formattedCrawl)
         .font(.system(size: 24, weight: .semibold, design: .default))
-        .lineSpacing(9)
-        .multilineTextAlignment(.center)
         .foregroundStyle(crawlColor)
         .padding(.horizontal)
     }
     .frame(maxWidth: .infinity)
-    .mask(
-      LinearGradient(
-        colors: [Color.white.opacity(0), Color.white, Color.white],
-        startPoint: .top,
-        endPoint: .bottom
-      )
-    )
   }
 
   private func close() {
@@ -176,16 +170,64 @@ struct OpeningCrawlView: View {
   }
 
   private var formattedCrawl: AttributedString {
-    let raw = content.openingText
-      .replacingOccurrences(of: "\r", with: "")
-      .components(separatedBy: "\n")
-      .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+    let normalized = content.openingText
+      .replacingOccurrences(of: "\r", with: " ")
+      .replacingOccurrences(of: "\n", with: " ")
+      .components(separatedBy: .whitespacesAndNewlines)
       .filter { !$0.isEmpty }
-      .joined(separator: "\n\n")
+      .joined(separator: " ")
 
-    var attributed = AttributedString(raw)
-    attributed.kern = 1.5
-    return attributed
+    let sentences = splitIntoSentences(from: normalized)
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.alignment = .justified
+    paragraphStyle.paragraphSpacing = 16
+    paragraphStyle.lineSpacing = 6
+
+    let attributes: [NSAttributedString.Key: Any] = [
+      .kern: 1.5,
+      .paragraphStyle: paragraphStyle,
+    ]
+    let attributedBuilder = NSMutableAttributedString()
+
+    for (index, sentence) in sentences.enumerated() {
+      attributedBuilder.append(NSAttributedString(string: sentence, attributes: attributes))
+
+      if index < sentences.count - 1 {
+        attributedBuilder.append(NSAttributedString(string: "\n\n", attributes: attributes))
+      }
+    }
+
+    return AttributedString(attributedBuilder)
+  }
+
+  private func splitIntoSentences(from text: String) -> [String] {
+    guard !text.isEmpty else { return [] }
+
+    let pattern = "(?<=[.!?])\\s+(?=[A-Z0-9])"
+    guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+      return [text]
+    }
+
+    let fullRange = NSRange(text.startIndex..<text.endIndex, in: text)
+    var sentences: [String] = []
+    var currentIndex = text.startIndex
+
+    regex.enumerateMatches(in: text, options: [], range: fullRange) { match, _, _ in
+      guard let match = match, let matchRange = Range(match.range, in: text) else { return }
+      let sentenceRange = currentIndex..<matchRange.lowerBound
+      let sentence = text[sentenceRange].trimmingCharacters(in: .whitespacesAndNewlines)
+      if !sentence.isEmpty {
+        sentences.append(sentence)
+      }
+      currentIndex = matchRange.upperBound
+    }
+
+    let tail = text[currentIndex...].trimmingCharacters(in: .whitespacesAndNewlines)
+    if !tail.isEmpty {
+      sentences.append(tail)
+    }
+
+    return sentences
   }
 
   private func easeOutCubic(_ progress: Double) -> CGFloat {
@@ -212,6 +254,37 @@ struct OpeningCrawlView: View {
     }
 
     return result
+  }
+}
+
+private struct TiltedPlaneEffect: GeometryEffect {
+  var tiltDegrees: Double
+  var perspectiveDistance: CGFloat
+  var verticalOriginOffset: CGFloat
+
+  var animatableData: AnimatablePair<Double, AnimatablePair<CGFloat, CGFloat>> {
+    get { AnimatablePair(tiltDegrees, AnimatablePair(perspectiveDistance, verticalOriginOffset)) }
+    set {
+      tiltDegrees = newValue.first
+      perspectiveDistance = newValue.second.first
+      verticalOriginOffset = newValue.second.second
+    }
+  }
+
+  func effectValue(size: CGSize) -> ProjectionTransform {
+    guard perspectiveDistance != 0 else { return ProjectionTransform(CATransform3DIdentity) }
+
+    var transform = CATransform3DIdentity
+    transform.m34 = -1 / perspectiveDistance
+
+    let center = CGPoint(x: size.width / 2, y: size.height / 2)
+    let tiltRadians = CGFloat(tiltDegrees * Double.pi / 180)
+
+    transform = CATransform3DTranslate(transform, -center.x, -center.y + verticalOriginOffset, 0)
+    transform = CATransform3DRotate(transform, tiltRadians, 1, 0, 0)
+    transform = CATransform3DTranslate(transform, center.x, center.y - verticalOriginOffset, 0)
+
+    return ProjectionTransform(transform)
   }
 }
 
