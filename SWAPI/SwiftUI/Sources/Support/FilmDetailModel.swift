@@ -29,7 +29,7 @@ final class FilmDetailModel {
   var summaryError: Error?
   var isLoadingSummary = false
   var expandedRelationships: Set<Relationship> = []
-  var navigationPath: [RelationshipEntity] = []
+  var navigationPath: [RelationshipDetailScreens.Screen] = []
   var relationshipStates: [Relationship: RelationshipItemsState] =
     Relationship.defaultStates()
 
@@ -110,8 +110,9 @@ final class FilmDetailModel {
   }
 
   func navigate(to entity: RelationshipEntity) {
-    guard navigationPath != [entity] else { return }
-    navigationPath = [entity]
+    let destination = RelationshipDetailScreens.Screen(entity: entity)
+    guard navigationPath != [destination] else { return }
+    navigationPath = [destination]
   }
 }
 

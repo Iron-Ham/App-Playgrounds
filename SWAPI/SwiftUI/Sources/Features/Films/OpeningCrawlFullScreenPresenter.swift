@@ -1,83 +1,83 @@
 #if os(macOS)
-import AppKit
-import SwiftUI
+  import AppKit
+  import SwiftUI
 
-@MainActor
-final class OpeningCrawlFullScreenPresenter: NSObject, NSWindowDelegate {
-  static let shared = OpeningCrawlFullScreenPresenter()
+  @MainActor
+  final class OpeningCrawlFullScreenPresenter: NSObject, NSWindowDelegate {
+    static let shared = OpeningCrawlFullScreenPresenter()
 
-  private var windowController: NSWindowController?
-  private var dismissalHandler: (() -> Void)?
+    private var windowController: NSWindowController?
+    private var dismissalHandler: (() -> Void)?
 
-  func present(content: OpeningCrawlView.Content, onDismiss: @escaping () -> Void) {
-    dismiss(shouldNotify: false)
+    func present(content: OpeningCrawlView.Content, onDismiss: @escaping () -> Void) {
+      dismiss(shouldNotify: false)
 
-    dismissalHandler = onDismiss
+      dismissalHandler = onDismiss
 
-    let hostingController = NSHostingController(
-      rootView: OpeningCrawlView(content: content) { [weak self] in
-        self?.dismiss()
+      let hostingController = NSHostingController(
+        rootView: OpeningCrawlView(content: content) { [weak self] in
+          self?.dismiss()
+        }
+      )
+
+      let window = NSWindow(contentViewController: hostingController)
+      window.delegate = self
+      window.styleMask = [.borderless]
+      window.level = .screenSaver
+      window.isOpaque = true
+      window.backgroundColor = .black
+      window.hasShadow = false
+      window.animationBehavior = .none
+      window.isReleasedWhenClosed = false
+      window.collectionBehavior = [
+        .canJoinAllSpaces,
+        .fullScreenAuxiliary,
+        .stationary,
+        .ignoresCycle,
+      ]
+
+      if let screen = NSApp.keyWindow?.screen ?? NSScreen.main ?? NSScreen.screens.first {
+        window.setFrame(screen.frame, display: true)
       }
-    )
 
-    let window = NSWindow(contentViewController: hostingController)
-    window.delegate = self
-    window.styleMask = [.borderless]
-    window.level = .screenSaver
-    window.isOpaque = true
-    window.backgroundColor = .black
-    window.hasShadow = false
-    window.animationBehavior = .none
-    window.isReleasedWhenClosed = false
-    window.collectionBehavior = [
-      .canJoinAllSpaces,
-      .fullScreenAuxiliary,
-      .stationary,
-      .ignoresCycle
-    ]
+      windowController = NSWindowController(window: window)
+      windowController?.shouldCascadeWindows = false
+      windowController?.showWindow(nil)
 
-    if let screen = NSApp.keyWindow?.screen ?? NSScreen.main ?? NSScreen.screens.first {
-      window.setFrame(screen.frame, display: true)
+      NSApp.activate(ignoringOtherApps: true)
     }
 
-    windowController = NSWindowController(window: window)
-    windowController?.shouldCascadeWindows = false
-    windowController?.showWindow(nil)
+    func dismiss() {
+      dismiss(shouldNotify: true)
+    }
 
-    NSApp.activate(ignoringOtherApps: true)
-  }
-
-  func dismiss() {
-    dismiss(shouldNotify: true)
-  }
-
-  private func dismiss(shouldNotify: Bool) {
-    guard let controller = windowController else {
-      if shouldNotify {
-        dismissalHandler = nil
+    private func dismiss(shouldNotify: Bool) {
+      guard let controller = windowController else {
+        if shouldNotify {
+          dismissalHandler = nil
+        }
+        return
       }
-      return
-    }
 
-    controller.close()
-    windowController = nil
-
-    if shouldNotify, let handler = dismissalHandler {
-      dismissalHandler = nil
-      handler()
-    } else if !shouldNotify {
-      dismissalHandler = nil
-    }
-  }
-
-  func windowWillClose(_ notification: Notification) {
-    if let window = notification.object as? NSWindow, window == windowController?.window {
+      controller.close()
       windowController = nil
-      if let handler = dismissalHandler {
+
+      if shouldNotify, let handler = dismissalHandler {
         dismissalHandler = nil
         handler()
+      } else if !shouldNotify {
+        dismissalHandler = nil
+      }
+    }
+
+    func windowWillClose(_ notification: Notification) {
+      if let window = notification.object as? NSWindow, window == windowController?.window {
+        windowController = nil
+        if let handler = dismissalHandler {
+          dismissalHandler = nil
+          handler()
+        }
       }
     }
   }
-}
 #endif

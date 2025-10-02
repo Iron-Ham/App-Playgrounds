@@ -23,8 +23,8 @@
           NavigationStack(path: $model.navigationPath) {
             detailContent(for: film, summary: model.summary)
           }
-          .navigationDestination(for: RelationshipEntity.self) { entity in
-            RelationshipDestinationPlaceholder(entity: entity)
+          .navigationDestination(for: RelationshipDetailScreens.Screen.self) { screen in
+            RelationshipDetailScreens.makeView(for: screen)
           }
           .id(film.id)
           .overlay(alignment: .bottomLeading) {
