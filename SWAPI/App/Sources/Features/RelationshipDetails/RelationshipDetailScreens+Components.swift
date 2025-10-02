@@ -193,25 +193,35 @@
       let film: PersistenceService.FilmSummary
 
       var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-          Image(systemName: "film")
-            .font(.body.weight(.semibold))
-            .foregroundStyle(.secondary)
-            .accessibilityHidden(true)
-
-          VStack(alignment: .leading, spacing: 4) {
-            Text(film.title)
-              .font(.body)
-              .foregroundStyle(.primary)
-              .accessibilityLabel(Text(film.title))
-
-            Text(RelationshipDetailFormatter.filmSubtitle(for: film))
-              .font(.caption)
+        NavigationLink {
+          RelationshipDetailScreens.makeView(for: .film(film))
+        } label: {
+          HStack(alignment: .center, spacing: 12) {
+            Image(systemName: "film")
+              .font(.body.weight(.semibold))
               .foregroundStyle(.secondary)
-          }
+              .accessibilityHidden(true)
 
-          Spacer(minLength: 0)
+            VStack(alignment: .leading, spacing: 4) {
+              Text(film.title)
+                .font(.body)
+                .foregroundStyle(.primary)
+                .accessibilityLabel(Text(film.title))
+
+              Text(RelationshipDetailFormatter.filmSubtitle(for: film))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+
+            Spacer(minLength: 0)
+
+            Image(systemName: "chevron.forward")
+              .font(.caption.weight(.semibold))
+              .foregroundStyle(.tertiary)
+              .accessibilityHidden(true)
+          }
         }
+        .buttonStyle(.plain)
       }
     }
 
