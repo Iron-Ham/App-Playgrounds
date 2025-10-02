@@ -1,6 +1,6 @@
 import Dependencies
-import Persistence
 import Foundation
+import Persistence
 import XCTestDynamicOverlay
 
 private enum PersistenceServiceKey: DependencyKey {

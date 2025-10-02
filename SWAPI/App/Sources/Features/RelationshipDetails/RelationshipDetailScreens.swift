@@ -81,14 +81,14 @@
         gradient: screen.accentGradient
       ) {
         RelationshipDetailSection(
-          title: String(localized: "Profile"), iconName: "person.crop.circle"
+          title: String(localized: "Vitals"), iconName: "person.text.rectangle"
         ) {
           RelationshipDetailRow(
             label: String(localized: "Gender"), value: genderDisplay,
             systemImage: "figure.arms.open")
           RelationshipDetailRow(
-            label: String(localized: "Birth year"), value: birthYearDisplay, systemImage: "calendar"
-          )
+            label: String(localized: "Birth year"), value: birthYearDisplay,
+            systemImage: "calendar")
           if let eraDescription {
             RelationshipDetailRow(
               label: String(localized: "Galactic era"), value: eraDescription,
@@ -98,6 +98,110 @@
             RelationshipDetailRow(
               label: String(localized: "Relative year"), value: relativeYearDescription,
               systemImage: "timeline.selection")
+          }
+          RelationshipDetailRow(
+            label: String(localized: "Height"), value: heightDisplay, systemImage: "ruler")
+          RelationshipDetailRow(
+            label: String(localized: "Mass"), value: massDisplay, systemImage: "scalemass")
+        }
+
+        RelationshipDetailSection(
+          title: String(localized: "Appearance"), iconName: "paintpalette"
+        ) {
+          RelationshipDetailRow(
+            label: String(localized: "Hair"), value: hairColorDisplay,
+            systemImage: "comb")
+          RelationshipDetailRow(
+            label: String(localized: "Skin"), value: skinColorDisplay,
+            systemImage: "paintbrush")
+          RelationshipDetailRow(
+            label: String(localized: "Eyes"), value: eyeColorDisplay,
+            systemImage: "eye")
+        }
+
+        RelationshipDetailSection(
+          title: String(localized: "Origins & Affiliations"), iconName: "globe.europe.africa"
+        ) {
+          if let homeworld = details.homeworld {
+            RelationshipDetailNavigationRow(
+              title: homeworld.name,
+              subtitle: RelationshipDetailFormatter.planetSummary(for: homeworld),
+              iconName: "globe.europe.africa",
+              destination: .planet(homeworld)
+            )
+          } else {
+            RelationshipDetailRow(
+              label: String(localized: "Homeworld"),
+              value: RelationshipDetailFormatter.unknownDisplay,
+              systemImage: "globe.europe.africa"
+            )
+          }
+
+          if details.species.isEmpty {
+            RelationshipDetailRow(
+              label: String(localized: "Species"),
+              value: RelationshipDetailFormatter.notDocumentedDisplay,
+              systemImage: "leaf"
+            )
+          } else {
+            ForEach(details.species) { species in
+              RelationshipDetailNavigationRow(
+                title: species.name,
+                subtitle: RelationshipDetailFormatter.speciesSummary(for: species),
+                iconName: "leaf",
+                destination: .species(species)
+              )
+            }
+          }
+        }
+
+        if !details.starships.isEmpty || !details.vehicles.isEmpty {
+          RelationshipDetailSection(
+            title: String(localized: "Piloted craft"), iconName: "airplane"
+          ) {
+            if details.starships.isEmpty {
+              RelationshipDetailRow(
+                label: String(localized: "Starships"),
+                value: RelationshipDetailFormatter.notDocumentedDisplay,
+                systemImage: "airplane"
+              )
+            } else {
+              ForEach(details.starships) { starship in
+                RelationshipDetailNavigationRow(
+                  title: starship.name,
+                  subtitle: RelationshipDetailFormatter.starshipSummary(for: starship),
+                  iconName: "airplane",
+                  destination: .starship(starship)
+                )
+              }
+            }
+
+            if details.vehicles.isEmpty {
+              RelationshipDetailRow(
+                label: String(localized: "Vehicles"),
+                value: RelationshipDetailFormatter.notDocumentedDisplay,
+                systemImage: "car"
+              )
+            } else {
+              ForEach(details.vehicles) { vehicle in
+                RelationshipDetailNavigationRow(
+                  title: vehicle.name,
+                  subtitle: RelationshipDetailFormatter.vehicleSummary(for: vehicle),
+                  iconName: "car",
+                  destination: .vehicle(vehicle)
+                )
+              }
+            }
+          }
+        }
+
+        if !details.films.isEmpty {
+          RelationshipDetailSection(
+            title: String(localized: "Featured films"), iconName: "film"
+          ) {
+            ForEach(details.films) { film in
+              RelationshipDetailFilmRow(film: film)
+            }
           }
         }
 
@@ -109,7 +213,7 @@
         RelationshipDetailCallout(
           text: String(
             localized:
-              "More character lore, affiliations, and equipment will arrive in future updates."
+              "Affiliations, loadouts, and behind-the-scenes lore are in active production."
           )
         )
       }
@@ -144,6 +248,26 @@
     private var relativeYearDescription: String? {
       RelationshipDetailFormatter.relativeYear(details.birthYear)
     }
+
+    private var heightDisplay: String {
+      RelationshipDetailFormatter.measurement(details.height, unit: String(localized: "cm"))
+    }
+
+    private var massDisplay: String {
+      RelationshipDetailFormatter.measurement(details.mass, unit: String(localized: "kg"))
+    }
+
+    private var hairColorDisplay: String {
+      RelationshipDetailFormatter.colorSummary(details.hairColors)
+    }
+
+    private var skinColorDisplay: String {
+      RelationshipDetailFormatter.colorSummary(details.skinColors)
+    }
+
+    private var eyeColorDisplay: String {
+      RelationshipDetailFormatter.colorSummary(details.eyeColors)
+    }
   }
 
   // MARK: - Planet Detail
@@ -166,8 +290,31 @@
             label: String(localized: "Primary climate"), value: climateSummary,
             systemImage: "sun.max")
           RelationshipDetailRow(
+            label: String(localized: "Terrains"), value: terrainSummary,
+            systemImage: "map")
+          RelationshipDetailRow(
+            label: String(localized: "Gravity"), value: gravitySummary,
+            systemImage: "arrow.up.and.down.circle")
+          RelationshipDetailRow(
+            label: String(localized: "Surface water"), value: surfaceWaterSummary,
+            systemImage: "drop.fill")
+          RelationshipDetailRow(
             label: String(localized: "Population"), value: populationSummary,
             systemImage: "person.3")
+        }
+
+        RelationshipDetailSection(
+          title: String(localized: "Astronomical metrics"), iconName: "clock.arrow.circlepath"
+        ) {
+          RelationshipDetailRow(
+            label: String(localized: "Rotation period"), value: rotationSummary,
+            systemImage: "arrow.triangle.2.circlepath")
+          RelationshipDetailRow(
+            label: String(localized: "Orbital period"), value: orbitalSummary,
+            systemImage: "globe.europe.africa")
+          RelationshipDetailRow(
+            label: String(localized: "Diameter"), value: diameterSummary,
+            systemImage: "ruler")
         }
 
         RelationshipDetailSection(title: String(localized: "Canonical reference"), iconName: "link")
@@ -178,7 +325,7 @@
         RelationshipDetailCallout(
           text: String(
             localized:
-              "Future releases will chart terrains, gravity, and resident bios for each world."
+              "Atmospheric composition, notable residents, and trade data are on the roadmap."
           )
         )
       }
@@ -191,13 +338,39 @@
 
     private var climateSummary: String {
       guard !details.climates.isEmpty else {
-        return String(localized: "Not documented")
+        return RelationshipDetailFormatter.notDocumentedDisplay
       }
       return RelationshipDetailFormatter.list(details.climates.map(\.displayName))
     }
 
+    private var terrainSummary: String {
+      RelationshipDetailFormatter.list(details.terrains.map(\.displayName))
+    }
+
+    private var gravitySummary: String {
+      RelationshipDetailFormatter.list(details.gravityLevels.map(\.displayName))
+    }
+
+    private var surfaceWaterSummary: String {
+      RelationshipDetailFormatter.percentage(details.surfaceWater)
+    }
+
     private var populationSummary: String {
       RelationshipDetailFormatter.population(details.population)
+    }
+
+    private var rotationSummary: String {
+      RelationshipDetailFormatter.measurement(
+        details.rotationPeriod, unit: String(localized: "hours"))
+    }
+
+    private var orbitalSummary: String {
+      RelationshipDetailFormatter.measurement(
+        details.orbitalPeriod, unit: String(localized: "days"))
+    }
+
+    private var diameterSummary: String {
+      RelationshipDetailFormatter.measurement(details.diameter, unit: String(localized: "km"))
     }
   }
 
@@ -214,15 +387,67 @@
         iconName: screen.iconName,
         gradient: screen.accentGradient
       ) {
-        RelationshipDetailSection(title: String(localized: "Culture"), iconName: "leaf") {
+        RelationshipDetailSection(
+          title: String(localized: "Biology"), iconName: "cross.case.fill"
+        ) {
           RelationshipDetailRow(
-            label: String(localized: "Classification"),
-            value: RelationshipDetailFormatter.displayOrFallback(details.classification),
+            label: String(localized: "Classification"), value: classificationDisplay,
             systemImage: "square.grid.2x2")
           RelationshipDetailRow(
-            label: String(localized: "Language"),
-            value: RelationshipDetailFormatter.displayOrFallback(details.language),
+            label: String(localized: "Designation"), value: designationDisplay,
+            systemImage: "person.3")
+          RelationshipDetailRow(
+            label: String(localized: "Average height"), value: averageHeightDisplay,
+            systemImage: "ruler")
+          RelationshipDetailRow(
+            label: String(localized: "Average lifespan"), value: averageLifespanDisplay,
+            systemImage: "hourglass")
+        }
+
+        RelationshipDetailSection(
+          title: String(localized: "Appearance"), iconName: "paintpalette"
+        ) {
+          RelationshipDetailRow(
+            label: String(localized: "Skin"), value: skinColorDisplay,
+            systemImage: "paintbrush")
+          RelationshipDetailRow(
+            label: String(localized: "Hair"), value: hairColorDisplay,
+            systemImage: "comb")
+          RelationshipDetailRow(
+            label: String(localized: "Eyes"), value: eyeColorDisplay,
+            systemImage: "eye")
+        }
+
+        RelationshipDetailSection(
+          title: String(localized: "Origins & language"), iconName: "globe"
+        ) {
+          if let homeworld = details.homeworld {
+            RelationshipDetailNavigationRow(
+              title: homeworld.name,
+              subtitle: RelationshipDetailFormatter.planetSummary(for: homeworld),
+              iconName: "globe",
+              destination: .planet(homeworld)
+            )
+          } else {
+            RelationshipDetailRow(
+              label: String(localized: "Homeworld"),
+              value: RelationshipDetailFormatter.unknownDisplay,
+              systemImage: "globe")
+          }
+
+          RelationshipDetailRow(
+            label: String(localized: "Language"), value: languageDisplay,
             systemImage: "character.book.closed")
+        }
+
+        if !details.films.isEmpty {
+          RelationshipDetailSection(
+            title: String(localized: "Featured films"), iconName: "film"
+          ) {
+            ForEach(details.films) { film in
+              RelationshipDetailFilmRow(film: film)
+            }
+          }
         }
 
         RelationshipDetailSection(title: String(localized: "Canonical reference"), iconName: "link")
@@ -233,7 +458,7 @@
         RelationshipDetailCallout(
           text: String(
             localized:
-              "Expect lifecycle traits, homeworld spotlights, and cultural highlights soon."
+              "Cultural rituals, notable representatives, and origin timelines are coming soon."
           )
         )
       }
@@ -244,6 +469,39 @@
         RelationshipDetailFormatter.titleCased(details.classification),
         RelationshipDetailFormatter.titleCased(details.language),
       ])
+    }
+
+    private var classificationDisplay: String {
+      RelationshipDetailFormatter.displayOrFallback(details.classification)
+    }
+
+    private var designationDisplay: String {
+      RelationshipDetailFormatter.displayOrFallback(details.designation)
+    }
+
+    private var averageHeightDisplay: String {
+      RelationshipDetailFormatter.measurement(details.averageHeight, unit: String(localized: "cm"))
+    }
+
+    private var averageLifespanDisplay: String {
+      RelationshipDetailFormatter.duration(
+        details.averageLifespan, unit: String(localized: "years"))
+    }
+
+    private var skinColorDisplay: String {
+      RelationshipDetailFormatter.colorSummary(details.skinColors)
+    }
+
+    private var hairColorDisplay: String {
+      RelationshipDetailFormatter.colorSummary(details.hairColors)
+    }
+
+    private var eyeColorDisplay: String {
+      RelationshipDetailFormatter.colorSummary(details.eyeColors)
+    }
+
+    private var languageDisplay: String {
+      RelationshipDetailFormatter.displayOrFallback(details.language)
     }
   }
 
@@ -435,6 +693,43 @@
     }
   }
 
+  private struct RelationshipDetailNavigationRow: View {
+    let title: String
+    let subtitle: String?
+    let iconName: String
+    let destination: RelationshipDetailScreens.Screen
+
+    var body: some View {
+      NavigationLink(value: destination) {
+        HStack(alignment: .center, spacing: 12) {
+          Image(systemName: iconName)
+            .font(.body.weight(.semibold))
+            .foregroundStyle(.secondary)
+            .accessibilityHidden(true)
+
+          VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+              .font(.body)
+              .foregroundStyle(.primary)
+            if let subtitle, !subtitle.isEmpty {
+              Text(subtitle)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+          }
+
+          Spacer(minLength: 0)
+
+          Image(systemName: "chevron.forward")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.tertiary)
+            .accessibilityHidden(true)
+        }
+      }
+      .buttonStyle(.plain)
+    }
+  }
+
   private struct RelationshipDetailRow: View {
     let label: String
     let value: String
@@ -462,6 +757,32 @@
           Text(value)
             .font(.body)
             .foregroundStyle(.primary)
+        }
+
+        Spacer(minLength: 0)
+      }
+    }
+  }
+
+  private struct RelationshipDetailFilmRow: View {
+    let film: PersistenceService.FilmSummary
+
+    var body: some View {
+      HStack(alignment: .center, spacing: 12) {
+        Image(systemName: "film")
+          .font(.body.weight(.semibold))
+          .foregroundStyle(.secondary)
+          .accessibilityHidden(true)
+
+        VStack(alignment: .leading, spacing: 4) {
+          Text(film.title)
+            .font(.body)
+            .foregroundStyle(.primary)
+            .accessibilityLabel(Text(film.title))
+
+          Text(RelationshipDetailFormatter.filmSubtitle(for: film))
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
 
         Spacer(minLength: 0)
@@ -523,6 +844,39 @@
   }
 
   private enum RelationshipDetailFormatter {
+    private static let unknownTokens: Set<String> = ["unknown", "n/a", "none"]
+
+    private static let measurementNumberFormatter: NumberFormatter = {
+      let formatter = NumberFormatter()
+      formatter.numberStyle = .decimal
+      formatter.maximumFractionDigits = 1
+      return formatter
+    }()
+
+    private static let percentageFormatter: NumberFormatter = {
+      let formatter = NumberFormatter()
+      formatter.numberStyle = .decimal
+      formatter.maximumFractionDigits = 1
+      return formatter
+    }()
+
+    private static let populationFormatter: NumberFormatter = {
+      let formatter = NumberFormatter()
+      formatter.numberStyle = .decimal
+      formatter.maximumFractionDigits = 0
+      return formatter
+    }()
+
+    private static let filmReleaseFormatter: DateFormatter = {
+      let formatter = DateFormatter()
+      formatter.dateStyle = .medium
+      return formatter
+    }()
+
+    static var unknownDisplay: String { String(localized: "Unknown") }
+
+    static var notDocumentedDisplay: String { String(localized: "Not documented") }
+
     static func joinedLine(_ components: [String?]) -> String? {
       let items = components.compactMap { nonEmpty($0) }
       guard !items.isEmpty else { return nil }
@@ -536,26 +890,18 @@
     }
 
     static func list(_ items: [String]) -> String {
-      guard !items.isEmpty else { return String(localized: "Not documented") }
+      guard !items.isEmpty else { return notDocumentedDisplay }
       return ListFormatter.localizedString(byJoining: items)
     }
 
     static func displayOrFallback(_ raw: String) -> String {
-      let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-      guard !trimmed.isEmpty else { return String(localized: "Unknown") }
-      let lowered = trimmed.lowercased()
-      if ["unknown", "n/a", "none"].contains(lowered) {
-        return String(localized: "Unknown")
-      }
-      return trimmed
+      fallback(for: raw)
     }
 
     static func birthYear(_ birthYear: PersonResponse.BirthYear) -> String {
       let trimmed = birthYear.rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
-      guard !trimmed.isEmpty else { return String(localized: "Unknown") }
-      if trimmed.lowercased() == "unknown" {
-        return String(localized: "Unknown")
-      }
+      guard !trimmed.isEmpty else { return unknownDisplay }
+      if isUnknown(trimmed) { return unknownDisplay }
       return trimmed.uppercased()
     }
 
@@ -571,36 +917,118 @@
 
     static func relativeYear(_ birthYear: PersonResponse.BirthYear) -> String? {
       guard let value = birthYear.relativeYear else { return nil }
-      let formatter = NumberFormatter()
-      formatter.numberStyle = .decimal
-      formatter.maximumFractionDigits = 1
-      guard let formatted = formatter.string(from: NSNumber(value: value)) else {
+      guard let formatted = measurementNumberFormatter.string(from: NSNumber(value: value)) else {
         return nil
       }
       return String(localized: "\(formatted) years from Yavin")
     }
 
+    static func measurement(_ raw: String, unit: String) -> String {
+      guard let numeric = numericValue(from: raw) else {
+        return fallback(for: raw)
+      }
+      let formatted =
+        measurementNumberFormatter.string(from: NSNumber(value: numeric))
+        ?? String(numeric)
+      return "\(formatted) \(unit)"
+    }
+
+    static func duration(_ raw: String, unit: String) -> String {
+      measurement(raw, unit: unit)
+    }
+
+    static func percentage(_ raw: String) -> String {
+      guard let numeric = numericValue(from: raw) else {
+        return fallback(for: raw)
+      }
+      let formatted =
+        percentageFormatter.string(from: NSNumber(value: numeric))
+        ?? String(numeric)
+      return "\(formatted)%"
+    }
+
+    static func colorSummary(_ descriptors: [ColorDescriptor]) -> String {
+      let names =
+        descriptors
+        .map { $0.displayName }
+        .compactMap { nonEmpty($0) }
+      guard !names.isEmpty else { return notDocumentedDisplay }
+      return list(names)
+    }
+
     static func population(_ raw: String) -> String {
       let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-      guard !trimmed.isEmpty else { return String(localized: "Unknown") }
-      let lowered = trimmed.lowercased()
-      if ["unknown", "n/a", "none"].contains(lowered) {
-        return String(localized: "Unknown")
-      }
+      guard !trimmed.isEmpty else { return unknownDisplay }
+      if isUnknown(trimmed) { return unknownDisplay }
 
       let digits = trimmed.filter { $0.isNumber }
       guard !digits.isEmpty, let value = Double(digits) else { return trimmed }
-      let formatter = NumberFormatter()
-      formatter.numberStyle = .decimal
-      formatter.maximumFractionDigits = 0
-      if let formatted = formatter.string(from: NSNumber(value: value)) {
+      if let formatted = populationFormatter.string(from: NSNumber(value: value)) {
         return formatted
       }
       return trimmed
     }
 
+    static func planetSummary(for planet: PersistenceService.PlanetDetails) -> String {
+      let climate = planet.climates.isEmpty ? nil : list(planet.climates.map(\.displayName))
+      let populationValue = population(planet.population)
+      let populationLine =
+        populationValue == unknownDisplay
+        ? nil
+        : String(localized: "Population \(populationValue)")
+      return joinedLine([climate, populationLine]) ?? notDocumentedDisplay
+    }
+
+    static func speciesSummary(for species: PersistenceService.SpeciesDetails) -> String {
+      joinedLine([
+        titleCased(species.classification),
+        nonEmpty(displayOrFallback(species.language)),
+      ]) ?? notDocumentedDisplay
+    }
+
+    static func starshipSummary(for starship: PersistenceService.StarshipDetails) -> String {
+      joinedLine([
+        nonEmpty(starship.model),
+        nonEmpty(starship.starshipClass.displayName),
+      ]) ?? notDocumentedDisplay
+    }
+
+    static func vehicleSummary(for vehicle: PersistenceService.VehicleDetails) -> String {
+      joinedLine([
+        nonEmpty(vehicle.model),
+        nonEmpty(vehicle.vehicleClass.displayName),
+      ]) ?? notDocumentedDisplay
+    }
+
+    static func filmSubtitle(for film: PersistenceService.FilmSummary) -> String {
+      let release = film.releaseDate.flatMap { filmReleaseFormatter.string(from: $0) }
+      return joinedLine([
+        String(localized: "Episode \(film.episodeId)"),
+        release,
+      ]) ?? String(localized: "Release date unknown")
+    }
+
     static func titleCased(_ raw: String) -> String? {
       nonEmpty(raw)?.localizedCapitalized
+    }
+
+    private static func fallback(for raw: String) -> String {
+      let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+      guard !trimmed.isEmpty else { return unknownDisplay }
+      if isUnknown(trimmed) { return unknownDisplay }
+      return trimmed
+    }
+
+    private static func numericValue(from raw: String) -> Double? {
+      let filtered = raw.filter { character in
+        character.isNumber || character == "." || character == "-"
+      }
+      guard !filtered.isEmpty else { return nil }
+      return Double(filtered)
+    }
+
+    private static func isUnknown(_ raw: String) -> Bool {
+      unknownTokens.contains(raw.lowercased())
     }
   }
 

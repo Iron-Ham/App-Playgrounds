@@ -1,7 +1,7 @@
 import API
 import Dependencies
-import Persistence
 import Foundation
+import Persistence
 import Testing
 
 @testable import StarWarsDB

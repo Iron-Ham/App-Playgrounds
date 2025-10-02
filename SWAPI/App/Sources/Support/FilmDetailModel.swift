@@ -1,6 +1,6 @@
-import Persistence
 import Foundation
 import Observation
+import Persistence
 
 @MainActor
 @Observable

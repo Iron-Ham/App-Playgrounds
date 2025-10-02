@@ -22,8 +22,7 @@ final class PersistenceContainer {
   private var migrator: Migrator?
   private var configuration: ConfigurationState?
 
-  private let changeStreamContinuation:
-    AsyncStream<PersistenceService.ChangeBatch>.Continuation
+  private let changeStreamContinuation: AsyncStream<PersistenceService.ChangeBatch>.Continuation
 
   let changeStream: AsyncStream<PersistenceService.ChangeBatch>
 
