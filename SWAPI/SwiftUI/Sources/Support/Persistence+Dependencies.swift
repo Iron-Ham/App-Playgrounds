@@ -11,6 +11,14 @@ private enum PersistenceServiceKey: DependencyKey {
   static let previewValue: FluentPersistenceService = .preview
 }
 
+private enum PersistenceCoordinatorKey: DependencyKey {
+  static let liveValue: PersistenceCoordinator = .unimplemented(
+    "PersistenceCoordinatorKey.liveValue")
+  static let testValue: PersistenceCoordinator = .unimplemented(
+    "PersistenceCoordinatorKey.testValue")
+  static let previewValue: PersistenceCoordinator = .preview
+}
+
 private enum ConfigurePersistenceKey: DependencyKey {
   static let liveValue: @Sendable () async throws -> Void = {
     dependencyFailure("ConfigurePersistenceKey.liveValue")
@@ -31,10 +39,15 @@ extension DependencyValues {
     get { self[ConfigurePersistenceKey.self] }
     set { self[ConfigurePersistenceKey.self] = newValue }
   }
+
+  var persistenceCoordinator: PersistenceCoordinator {
+    get { self[PersistenceCoordinatorKey.self] }
+    set { self[PersistenceCoordinatorKey.self] = newValue }
+  }
 }
 
-private extension FluentPersistenceService {
-  static func unimplemented(_ message: @autoclosure () -> String) -> Self {
+extension FluentPersistenceService {
+  fileprivate static func unimplemented(_ message: @autoclosure () -> String) -> Self {
     let label = message()
     let failure: @Sendable () -> Never = { dependencyFailure(label) }
     return Self(
@@ -58,7 +71,7 @@ private extension FluentPersistenceService {
     )
   }
 
-  static var preview: Self {
+  fileprivate static var preview: Self {
     let sampleFilm = FluentPersistenceService.FilmDetails(
       id: URL(string: "https://swapi.dev/api/films/1/")!,
       title: "A New Hope",
@@ -87,9 +100,38 @@ private extension FluentPersistenceService {
   }
 }
 
+extension PersistenceCoordinator {
+  fileprivate static func unimplemented(
+    _ message: @autoclosure () -> String
+  ) -> PersistenceCoordinator {
+    let label = message()
+    return PersistenceCoordinator(
+      persistenceService: .unimplemented(label),
+      configurationProvider: {
+        dependencyFailure(label)
+      },
+      snapshotProvider: {
+        dependencyFailure(label)
+      }
+    )
+  }
+
+  fileprivate static var preview: PersistenceCoordinator {
+    return PersistenceCoordinator(
+      persistenceService: .preview,
+      configurationProvider: {
+        .init(storage: .inMemory(identifier: "preview"))
+      },
+      snapshotProvider: {
+        .init()
+      }
+    )
+  }
+}
+
 private func dependencyFailure(_ message: @autoclosure () -> String) -> Never {
-#if DEBUG
-  XCTFail(message())
-#endif
+  #if DEBUG
+    XCTFail(message())
+  #endif
   fatalError(message())
 }

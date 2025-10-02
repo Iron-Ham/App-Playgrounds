@@ -4,44 +4,76 @@ import FluentPersistence
 import SwiftUI
 
 @main
-struct SWAPIApp: App {
+struct StarWarsDBApp: App {
   private let client: Client
   private let persistenceService: FluentPersistenceService
-  private let persistenceSetupTask: Task<Void, Error>
+  private let persistenceCoordinator: PersistenceCoordinator
+  @StateObject
+  private var rootViewModel: RootSplitViewModel
 
   init() {
-    client = Client()
-    let service = FluentPersistenceService.live()
-    persistenceService = service
+    let appClient = Client()
+    self.client = appClient
 
-    let setupTask = Task {
-      let storageURL = try Self.persistenceURL()
-      try await service.setup(
+    let appService = FluentPersistenceService.live()
+    self.persistenceService = appService
+
+    let storageURL: URL
+    do {
+      storageURL = try Self.persistenceURL()
+    } catch {
+      fatalError("Unable to resolve persistence storage URL: \(error)")
+    }
+
+    let coordinator = PersistenceCoordinator(
+      persistenceService: appService,
+      configurationProvider: {
         .init(
           storage: .file(storageURL),
           loggingLevel: .error
         )
-      )
-    }
-    persistenceSetupTask = setupTask
+      },
+      snapshotProvider: {
+        async let films = appClient.films()
+        async let people = appClient.people()
+        async let planets = appClient.planets()
+        async let species = appClient.species()
+        async let starships = appClient.starships()
+        async let vehicles = appClient.vehicles()
 
-    prepareDependencies {
-      $0.client = client
-      $0.persistenceService = service
-      $0.configurePersistence = {
-        try await setupTask.value
+        return .init(
+          films: try await films,
+          people: try await people,
+          planets: try await planets,
+          species: try await species,
+          starships: try await starships,
+          vehicles: try await vehicles
+        )
       }
+    )
+
+    self.persistenceCoordinator = coordinator
+
+    prepareDependencies { values in
+      values.client = appClient
+      values.persistenceService = appService
+      values.configurePersistence = {
+        try await coordinator.preparePersistence()
+      }
+      values.persistenceCoordinator = coordinator
     }
+
+    _rootViewModel = StateObject(wrappedValue: RootSplitViewModel(coordinator: coordinator))
   }
 
   var body: some Scene {
     WindowGroup {
-      RootSplitView()
+      RootSplitView(model: rootViewModel)
     }
   }
 }
 
-extension SWAPIApp {
+extension StarWarsDBApp {
   fileprivate static func persistenceURL() throws -> URL {
     let applicationSupport = try FileManager.default.url(
       for: .applicationSupportDirectory,
@@ -49,8 +81,15 @@ extension SWAPIApp {
       appropriateFor: nil,
       create: true
     )
-    let directory = applicationSupport.appendingPathComponent("SWAPI", isDirectory: true)
+    let directory = applicationSupport.appendingPathComponent("StarWarsDB", isDirectory: true)
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-    return directory.appendingPathComponent("persistence.sqlite")
+
+    let fileURL = directory.appendingPathComponent("persistence.sqlite")
+    #if swift(>=6.0)
+      let decodedPath = fileURL.path(percentEncoded: false)
+      return URL(fileURLWithPath: decodedPath, isDirectory: false)
+    #else
+      return URL(fileURLWithPath: fileURL.path, isDirectory: false)
+    #endif
   }
 }

@@ -8,7 +8,7 @@ private let swiftFormatScript: TargetScript = .pre(
 )
 
 let project = Project(
-  name: "SWAPI",
+  name: "StarWarsDB",
   settings: .settings(
     base: [
       "SWIFT_VERSION": "6.0",
@@ -17,10 +17,10 @@ let project = Project(
   ),
   targets: [
     .target(
-      name: "SWAPI-SwiftUI",
+      name: "StarWarsDB",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .app,
-      bundleId: "dev.iron-ham.SWAPI-SwiftUI",
+      bundleId: "dev.iron-ham.StarWarsDB",
       infoPlist: .extendingDefault(
         with: [
           "UILaunchScreen": [
@@ -41,17 +41,17 @@ let project = Project(
       ]
     ),
     .target(
-      name: "SwiftUI-Tests",
+      name: "StarWarsDBTests",
       destinations: [.iPad, .iPhone, .mac, .appleVision],
       product: .unitTests,
-      bundleId: "dev.iron-ham.SwiftUI-Tests",
+      bundleId: "dev.iron-ham.StarWarsDBTests",
       infoPlist: .default,
       buildableFolders: [
         "SwiftUI/Tests"
       ],
       scripts: [swiftFormatScript],
       dependencies: [
-        .target(name: "SWAPI-SwiftUI"),
+        .target(name: "StarWarsDB"),
         .target(name: "FluentPersistence"),
         .target(name: "API"),
         .external(name: "Dependencies"),

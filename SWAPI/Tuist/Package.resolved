@@ -1,5 +1,5 @@
 {
-  "originHash" : "e2979609edac4b89ce3e1c9a30ad2eed84b95e87a84584aee71f0f6249beb1d3",
+  "originHash" : "c687d40f2219a36a3c2272cc8cb30507f2a8be9f63a3c6d615600327c11ea5b5",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -265,7 +265,7 @@
     {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-log.git",
+      "location" : "https://github.com/apple/swift-log",
       "state" : {
         "revision" : "ce592ae52f982c847a4efc0dd881cc9eb32d29f2",
         "version" : "1.6.4"
@@ -283,7 +283,7 @@
     {
       "identity" : "swift-nio",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-nio.git",
+      "location" : "https://github.com/apple/swift-nio",
       "state" : {
         "revision" : "a18bddb0acf7a40d982b2f128ce73ce4ee31f352",
         "version" : "2.86.2"

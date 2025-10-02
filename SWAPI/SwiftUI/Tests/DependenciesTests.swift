@@ -4,7 +4,7 @@ import FluentPersistence
 import Foundation
 import Testing
 
-@testable import SWAPI_SwiftUI
+@testable import StarWarsDB
 
 @Suite("SwiftUI dependency wiring")
 struct SwiftUIDependenciesTests {
@@ -58,20 +58,27 @@ struct SwiftUIDependenciesTests {
       observeChanges: { AsyncStream { _ in } },
       shutdown: {},
       fetchFilms: { [sampleFilm] },
-      fetchRelationshipSummary: { _ in .empty },
+      fetchRelationshipSummary: { _ in FluentPersistenceService.FilmRelationshipSummary() },
       fetchRelationshipEntities: { _, _ in [] }
     )
 
     try await withDependencies {
       $0.persistenceService = service
       $0.configurePersistence = {}
+      $0.persistenceCoordinator = PersistenceCoordinator(
+        persistenceService: service,
+        configurationProvider: { .init(storage: .inMemory()) },
+        snapshotProvider: { .init() }
+      )
     } operation: {
       struct Harness {
         @Dependency(\.persistenceService)
         var persistenceService: FluentPersistenceService
+        @Dependency(\.persistenceCoordinator)
+        var persistenceCoordinator: PersistenceCoordinator
 
         func filmCount() async throws -> Int {
-          try await persistenceService.films().count
+          try await persistenceCoordinator.loadFilms().count
         }
       }
 

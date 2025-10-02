@@ -61,7 +61,11 @@ final class FluentPersistenceContainer {
       let fileURL = url.standardizedFileURL
       let directoryURL = fileURL.deletingLastPathComponent()
       try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
-      sqliteConfiguration = .file(fileURL.path())
+      #if swift(>=6.0)
+        sqliteConfiguration = .file(fileURL.path(percentEncoded: false))
+      #else
+        sqliteConfiguration = .file(fileURL.path)
+      #endif
     case .inMemory(let identifier):
       sqliteConfiguration = .init(storage: .memory(identifier: identifier))
     }

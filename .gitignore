@@ -63,7 +63,7 @@ fastlane/test_output
 
 .DS_Store
 
-SWAPI/SWAPI.xcodeproj 
-SWAPI/SWAPI.xcworkspace
+SWAPI/StarWarsDB.xcodeproj 
+SWAPI/StarWarsDB.xcworkspace
 # Generated derived data (should not be versioned)
 SWAPI/Derived/

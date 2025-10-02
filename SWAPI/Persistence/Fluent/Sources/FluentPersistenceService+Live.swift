@@ -1,6 +1,6 @@
 @MainActor
-public extension FluentPersistenceService {
-  static func live() -> FluentPersistenceService {
+extension FluentPersistenceService {
+  public static func live() -> FluentPersistenceService {
     let container = FluentPersistenceContainer()
 
     return FluentPersistenceService(
