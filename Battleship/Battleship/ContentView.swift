@@ -1,10 +1,18 @@
 import SwiftUI
 
 struct ContentView: View {
-  @State var game: Game = try! Game(ships: .random(), randomPlacements: true)
+  @State
+  var game: Game = Game()
+  @State
+  var isShowingAlert = false
+  @State
+  var turnResult: Game.TurnResult?
+  @State
+  var isGameOver = false
 
-  @State var isShowingAlert = false
-  @State var turnResult: Game.TurnResult?
+  init(board: Board = .defaultBoard) {
+    game = Game(board: board)
+  }
 
   private func buttonColor(isFired: Bool?) -> Color {
     switch isFired {
@@ -14,6 +22,14 @@ struct ContentView: View {
       Color.green
     case false:
       Color.gray
+    }
+  }
+
+  private var alertTitle: String {
+    if game.isGameOver {
+      "Game Over"
+    } else {
+      turnResult?.displayText ?? ""
     }
   }
 
@@ -28,6 +44,7 @@ struct ContentView: View {
                 Button {
                   turnResult = try? game.fireShot(x: col, y: row)
                   isShowingAlert = true
+                  isGameOver = game.isGameOver
                 } label: {
                   ZStack {
                     RoundedRectangle(cornerRadius: 6)
@@ -44,14 +61,21 @@ struct ContentView: View {
             }
           }
         }
-        .alert(turnResult?.displayText ?? "", isPresented: $isShowingAlert, actions: {
-
-        })
+        .alert(
+          alertTitle, isPresented: $isShowingAlert, actions: {},
+          message: {
+            if game.isGameOver {
+              Text(turnResult?.displayText ?? "")
+            } else {
+              EmptyView()
+            }
+          }
+        )
         .disabled(game.isGameOver)
         .aspectRatio(1, contentMode: .fit)
         .padding()
 
-        Text("\(Set(game.board.values).count) ships remaining")
+        Text("\(game.board.shipsRemaining) ships remaining")
       }
       .navigationTitle("Battleship")
     }

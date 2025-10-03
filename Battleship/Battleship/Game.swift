@@ -7,6 +7,67 @@ enum GameError: Error {
   case unknown
 }
 
+struct Board {
+  var underlying: [ShipIndex: Ship]
+
+  var boardSize: Int
+
+  var isBoardEmpty: Bool { underlying.values.isEmpty }
+
+  var shipsRemaining: Int {
+    Set(underlying.values).count
+  }
+
+  mutating func insert(ship: Ship, x: Int, y: Int, horizontal: Bool) throws(GameError) {
+    let range = 0..<boardSize
+    let endIndex = ship.type.startingHealth - 1 + (horizontal ? x : y)
+    guard range ~= x, range ~= y, range ~= endIndex else {
+      print("eeesh")
+      throw .outOfBounds
+    }
+
+    for value in (horizontal ? x...endIndex : y...endIndex) {
+      let insertionX = horizontal ? y : value
+      let insertionY = horizontal ? value : x
+      guard try getValue(x: insertionX, y: insertionY) == nil else {
+        throw GameError.invalidInsertion
+      }
+      underlying[ShipIndex(x: insertionX, y: insertionY)] = ship
+    }
+  }
+
+  @discardableResult
+  mutating func remove(at index: ShipIndex) -> Ship? {
+    underlying.removeValue(forKey: index)
+  }
+
+  func getValue(x: Int, y: Int) throws(GameError) -> Ship? {
+    if x < boardSize, y < boardSize {
+      underlying[ShipIndex(x: x, y: y)]
+    } else {
+      throw .outOfBounds
+    }
+  }
+}
+
+extension Board {
+  static var defaultBoard: Board {
+    var board: Board = Board(underlying: [:], boardSize: 10)
+    let battleShip = Ship(type: .battleship)
+    let submarine = Ship(type: .submarine)
+    let aircraft = Ship(type: .aircraftCarrier)
+    let destroyer = Ship(type: .destroyer)
+    let cruiser = Ship(type: .cruiser)
+    try! board.insert(ship: battleShip, x: 1, y: 1, horizontal: true)
+    try! board.insert(ship: submarine, x: 3, y: 2, horizontal: false)
+    try! board.insert(ship: aircraft, x: 6, y: 2, horizontal: false)
+    try! board.insert(ship: destroyer, x: 2, y: 7, horizontal: true)
+    try! board.insert(ship: cruiser, x: 7, y: 8, horizontal: true)
+
+    return board
+  }
+}
+
 class Ship: Hashable {
   var health: Int
   let name: String
@@ -89,90 +150,33 @@ extension Ship {
   }
 }
 
-struct ShipIndex: Hashable {
+nonisolated struct ShipIndex: Hashable {
   let x: Int
   let y: Int
-}
-
-extension Array where Element == Ship {
-  static func random(gameSize: Int) throws(GameError) -> [Ship] {
-    var ships: [Ship] = []
-
-    for _ in 0..<Int.random(in: 1...5) {
-      if let type = Ship.ShipType.random() {
-        ships.append(Ship(type: type))
-      } else {
-        throw GameError.unknown
-      }
-    }
-
-    return ships
-  }
 }
 
 @Observable
 class Game {
   static let defaultGridSize: Int = 10
-  private(set) var board: [ShipIndex: Ship] = [:]
-
-  private var ships: [Ship] = []
+  private(set) var board: Board
 
   var firedLocations: [ShipIndex: Bool] = [:]
   var gridSize: Int
 
   init(
     gridSize: Int = Game.defaultGridSize,
-    ships: [Ship],
-    randomPlacements: Bool = false
-  ) throws(GameError) {
+    board: Board = .defaultBoard
+  ) {
     self.gridSize = gridSize
-    self.ships = ships
-
-    if randomPlacements {
-      try randomizeGrid(with: ships)
-    }
-  }
-
-  func reset() {
-    board = [:]
-  }
-
-  func randomizeGrid(with ships: [Ship]? = nil) throws(GameError) {
-    if let ships {
-      self.ships = ships
-    }
-
-    for ship in self.ships {
-      let insertionX = Int.random(in: 0..<gridSize)
-      let insertionY = Int.random(in: 0..<gridSize)
-      try insert(ship: ship, x: insertionX, y: insertionY, horizontal: Bool.random())
-    }
+    self.board = board
   }
 
   func insert(ship: Ship, x: Int, y: Int, horizontal: Bool) throws(GameError) {
-    let range = 0..<gridSize
-    let endIndex = ship.type.startingHealth - 1 + (horizontal ? x : y)
-    guard range ~= x, range ~= y, range ~= endIndex else {
-      print("eeesh")
-      throw .outOfBounds
-    }
-
-    for value in (horizontal ? x...endIndex : y...endIndex) {
-      let insertionX = horizontal ? value : x
-      let insertionY = horizontal ? y : value
-      guard try getValue(x: insertionX, y: insertionY) == nil else {
-        throw GameError.invalidInsertion
-      }
-      board[ShipIndex(x: insertionX, y: insertionY)] = ship
-    }
+    try board.insert(ship: ship, x: x, y: y, horizontal: horizontal)
   }
 
   func getValue(x: Int, y: Int) throws(GameError) -> Ship? {
-    if x < gridSize, y < gridSize {
-      board[ShipIndex(x: x, y: y)]
-    } else {
-      throw .outOfBounds
-    }
+    try board.getValue(x: x, y: y)
   }
 
   enum TurnResult: Hashable {
@@ -193,14 +197,14 @@ class Game {
   }
 
   var isGameOver: Bool {
-    board.values.isEmpty
+    board.isBoardEmpty
   }
 
   func fireShot(x: Int, y: Int) throws(GameError) -> TurnResult {
     if let ship = try getValue(x: x, y: y) {
       firedLocations[ShipIndex(x: x, y: y)] = true
       ship.health -= 1
-      board.removeValue(forKey: ShipIndex(x: x, y: y))
+      board.remove(at: ShipIndex(x: x, y: y))
       if ship.health == 0 {
         return .sunk(ship)
       } else if ship.health > 0 {
