@@ -37,7 +37,6 @@ final class MessageSceneDelegate: UIResponder, UIWindowSceneDelegate {
     let preferredSize = CGSize(width: 720, height: 880)
     if let restrictions = windowScene.sizeRestrictions {
       restrictions.minimumSize = preferredSize
-      restrictions.maximumSize = preferredSize
     }
 
     if let messageID, let message = MailStore.shared.message(id: messageID) {

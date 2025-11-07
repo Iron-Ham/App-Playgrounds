@@ -18,9 +18,7 @@ final class ComposeSceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     let hostingController = UIHostingController(rootView: rootView)
     hostingController.view.backgroundColor = .systemBackground
-    if #available(iOS 16.0, *) {
-      hostingController.sizingOptions = .intrinsicContentSize
-    }
+    hostingController.sizingOptions = .intrinsicContentSize
 
     let window = UIWindow(windowScene: windowScene)
     window.rootViewController = hostingController

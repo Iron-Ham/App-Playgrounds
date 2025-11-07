@@ -16,16 +16,19 @@ struct ComposeView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
-        headers
-        Divider()
-        TextEditor(text: $messageBody)
-          .font(.body)
-          .padding([.leading, .trailing], 12)
-          .padding(.top, 8)
-          .scrollContentBackground(.hidden)
-          .background(Color(uiColor: .systemBackground))
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
+      ScrollView {
+        VStack(spacing: 0) {
+          headers
+          Divider()
+          TextEditor(text: $messageBody)
+            .scrollDisabled(true)
+            .font(.body)
+            .padding([.leading, .trailing], 12)
+            .padding(.top, 8)
+            .scrollContentBackground(.hidden)
+            .background(Color(uiColor: .systemBackground))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color(uiColor: .systemBackground))
@@ -95,8 +98,4 @@ private struct ComposeField: View {
 
 #Preview {
   ComposeView()
-}
-
-extension ComposeView {
-  static let preferredWindowSize = CGSize(width: 600, height: 680)
 }
