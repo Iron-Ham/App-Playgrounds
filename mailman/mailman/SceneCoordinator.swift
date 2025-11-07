@@ -9,6 +9,7 @@ enum SceneUserInfoKey {
   static let messageID = "messageID"
 }
 
+@MainActor
 enum SceneCoordinator {
   static var canActivateAdditionalScenes: Bool {
     UIApplication.shared.supportsMultipleScenes

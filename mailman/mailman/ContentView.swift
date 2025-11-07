@@ -4,9 +4,22 @@ struct ContentView: View {
   @EnvironmentObject private var store: MailStore
 
   @State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
-  @State private var selectedMailbox: Mailbox?
-  @State private var selectedMessage: Message?
+  @SceneStorage("ContentView.selectedMailboxID") private var selectedMailboxID: Mailbox.ID?
+  @SceneStorage("ContentView.selectedMessageID") private var selectedMessageID: String?
   @State private var isShowingComposeSheet = false
+
+  private var selectedMailbox: Mailbox? {
+    guard let id = selectedMailboxID else { return nil }
+    return store.mailbox(id: id)
+  }
+
+  private var selectedMessage: Message? {
+    guard
+      let idString = selectedMessageID,
+      let uuid = UUID(uuidString: idString)
+    else { return nil }
+    return store.message(id: uuid)
+  }
 
   var body: some View {
     NavigationSplitView(columnVisibility: $columnVisibility) {
@@ -18,7 +31,7 @@ struct ContentView: View {
         .toolbar { toolbarContent }
     }
     .task { configureInitialSelectionIfNeeded() }
-    .onChange(of: selectedMailbox) { _, newValue in
+    .onChange(of: selectedMailboxID) { _, newValue in
       updateSelection(for: newValue)
     }
     .sheet(isPresented: $isShowingComposeSheet) {
@@ -27,7 +40,7 @@ struct ContentView: View {
   }
 
   private var mailboxList: some View {
-    List(store.mailboxes, selection: $selectedMailbox) { mailbox in
+    List(store.mailboxes, selection: $selectedMailboxID) { mailbox in
       HStack {
         Label(mailbox.displayName, systemImage: mailbox.icon)
         Spacer()
@@ -37,7 +50,7 @@ struct ContentView: View {
             .foregroundStyle(.secondary)
         }
       }
-      .tag(mailbox)
+      .tag(mailbox.id)
     }
     .navigationTitle("Mailboxes")
     .listStyle(.sidebar)
@@ -46,10 +59,32 @@ struct ContentView: View {
   private var messageList: some View {
     let messages = store.messages(for: selectedMailbox)
 
-    return List(messages, selection: $selectedMessage) { message in
+    return List(messages, selection: $selectedMessageID) { message in
       MessageRow(message: message)
         .contentShape(Rectangle())
-        .tag(message)
+        .tag(message.id.uuidString)
+        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+          Button {
+            store.setMessage(message.id, isUnread: !message.isUnread)
+          } label: {
+            Label(
+              message.isUnread ? "Mark as Read" : "Mark as Unread",
+              systemImage: message.isUnread ? "envelope.open" : "envelope.badge"
+            )
+          }
+          .tint(.blue)
+        }
+        .swipeActions {
+          Button {
+            store.toggleFlag(for: message.id)
+          } label: {
+            Label(
+              message.isFlagged ? "Remove Flag" : "Flag",
+              systemImage: message.isFlagged ? "flag.slash" : "flag"
+            )
+          }
+          .tint(.orange)
+        }
         .contextMenu {
           Button {
             SceneCoordinator.activateMessageScene(for: message.id)
@@ -94,16 +129,29 @@ struct ContentView: View {
 
   @ToolbarContentBuilder
   private var toolbarContent: some ToolbarContent {
-    ToolbarItemGroup(placement: .topBarTrailing) {
+    ToolbarItemGroup {
       if let message = selectedMessage {
         Button {
-          SceneCoordinator.activateMessageScene(for: message.id)
+          store.setMessage(message.id, isUnread: !message.isUnread)
         } label: {
-          Label("Open Window", systemImage: "uiwindow.split.2x1")
+          Label(
+            message.isUnread ? "Mark as Read" : "Mark as Unread",
+            systemImage: message.isUnread ? "envelope.open" : "envelope.badge"
+          )
         }
-        .disabled(!SceneCoordinator.canActivateAdditionalScenes)
-      }
 
+        Button {
+          store.toggleFlag(for: message.id)
+        } label: {
+          Label(
+            message.isFlagged ? "Remove Flag" : "Flag",
+            systemImage: message.isFlagged ? "flag.slash" : "flag"
+          )
+        }
+      }
+    }
+    ToolbarSpacer(.flexible)
+    ToolbarItem {
       Button {
         if SceneCoordinator.canActivateAdditionalScenes {
           SceneCoordinator.activateComposeScene()
@@ -117,23 +165,43 @@ struct ContentView: View {
     }
   }
 
-  private func updateSelection(for mailbox: Mailbox?) {
-    guard let mailbox else {
-      selectedMessage = nil
+  private func updateSelection(for mailboxID: Mailbox.ID?) {
+    guard let mailboxID, let mailbox = store.mailbox(id: mailboxID) else {
+      selectedMessageID = nil
       return
     }
 
     let messages = store.messages(for: mailbox)
-    if let current = selectedMessage, messages.contains(current) {
+    if let currentID = selectedMessageID,
+      messages.contains(where: { $0.id.uuidString == currentID })
+    {
       return
     }
-    selectedMessage = messages.first
+
+    selectedMessageID = messages.first?.id.uuidString
   }
 
   private func configureInitialSelectionIfNeeded() {
-    guard selectedMailbox == nil else { return }
-    selectedMailbox = store.defaultMailbox
-    selectedMessage = store.messages(for: selectedMailbox).first
+    if let storedMailboxID = selectedMailboxID,
+      store.mailbox(id: storedMailboxID) == nil
+    {
+      selectedMailboxID = nil
+    }
+
+    if selectedMailboxID == nil, let mailbox = store.defaultMailbox {
+      selectedMailboxID = mailbox.id
+    }
+
+    if let mailbox = selectedMailbox {
+      if let identifier = selectedMessageID,
+        let uuid = UUID(uuidString: identifier),
+        store.message(id: uuid) != nil
+      {
+        return
+      }
+
+      selectedMessageID = store.messages(for: mailbox).first?.id.uuidString
+    }
   }
 
   private func composeSheet() -> some View {

@@ -19,31 +19,23 @@ final class MessageSceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     let hostingController = UIHostingController(rootView: rootView)
     hostingController.view.backgroundColor = .systemBackground
+    hostingController.sizingOptions = .intrinsicContentSize
 
     let window = UIWindow(windowScene: windowScene)
     window.rootViewController = hostingController
     window.makeKeyAndVisible()
     self.window = window
 
-    configure(windowScene: windowScene, with: messageID)
-  }
-
-  func stateRestorationActivity(for scene: UIScene) -> NSUserActivity? {
-    guard let messageID else { return nil }
-    return NSUserActivity.messageDetailActivity(id: messageID)
-  }
-
-  private func configure(windowScene: UIWindowScene, with messageID: Message.ID?) {
-    let preferredSize = CGSize(width: 720, height: 880)
-    if let restrictions = windowScene.sizeRestrictions {
-      restrictions.minimumSize = preferredSize
-    }
-
     if let messageID, let message = MailStore.shared.message(id: messageID) {
       windowScene.title = message.subject
     } else {
       windowScene.title = "Message"
     }
+  }
+
+  func stateRestorationActivity(for scene: UIScene) -> NSUserActivity? {
+    guard let messageID else { return nil }
+    return NSUserActivity.messageDetailActivity(id: messageID)
   }
 
   private static func resolveMessageID(

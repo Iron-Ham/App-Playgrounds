@@ -9,6 +9,11 @@ struct MessageDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
           Text(message.subject)
             .font(.title2.weight(.semibold))
+          if message.isFlagged {
+            Label("Flagged", systemImage: "flag.fill")
+              .font(.footnote)
+              .foregroundStyle(.orange)
+          }
           HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
               Text(message.senderName)

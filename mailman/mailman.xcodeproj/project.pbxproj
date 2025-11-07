@@ -14,19 +14,11 @@
 			remoteGlobalIDString = 0B0BFAF32EBD349600FE4E45;
 			remoteInfo = mailman;
 		};
-		0B0BFB0C2EBD349B00FE4E45 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0B0BFAEC2EBD349600FE4E45 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 0B0BFAF32EBD349600FE4E45;
-			remoteInfo = mailman;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0B0BFAF42EBD349600FE4E45 /* mailman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mailman.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B0BFB012EBD349B00FE4E45 /* mailmanTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = mailmanTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		0B0BFB0B2EBD349B00FE4E45 /* mailmanUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = mailmanUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -53,11 +45,6 @@
 			path = mailmanTests;
 			sourceTree = "<group>";
 		};
-		0B0BFB0E2EBD349B00FE4E45 /* mailmanUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = mailmanUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,13 +62,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		0B0BFB082EBD349B00FE4E45 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -90,7 +70,6 @@
 			children = (
 				0B0BFAF62EBD349600FE4E45 /* mailman */,
 				0B0BFB042EBD349B00FE4E45 /* mailmanTests */,
-				0B0BFB0E2EBD349B00FE4E45 /* mailmanUITests */,
 				0B0BFAF52EBD349600FE4E45 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -100,7 +79,6 @@
 			children = (
 				0B0BFAF42EBD349600FE4E45 /* mailman.app */,
 				0B0BFB012EBD349B00FE4E45 /* mailmanTests.xctest */,
-				0B0BFB0B2EBD349B00FE4E45 /* mailmanUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -153,29 +131,6 @@
 			productReference = 0B0BFB012EBD349B00FE4E45 /* mailmanTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		0B0BFB0A2EBD349B00FE4E45 /* mailmanUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 0B0BFB1B2EBD349B00FE4E45 /* Build configuration list for PBXNativeTarget "mailmanUITests" */;
-			buildPhases = (
-				0B0BFB072EBD349B00FE4E45 /* Sources */,
-				0B0BFB082EBD349B00FE4E45 /* Frameworks */,
-				0B0BFB092EBD349B00FE4E45 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				0B0BFB0D2EBD349B00FE4E45 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				0B0BFB0E2EBD349B00FE4E45 /* mailmanUITests */,
-			);
-			name = mailmanUITests;
-			packageProductDependencies = (
-			);
-			productName = mailmanUITests;
-			productReference = 0B0BFB0B2EBD349B00FE4E45 /* mailmanUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -190,10 +145,6 @@
 						CreatedOnToolsVersion = 26.1;
 					};
 					0B0BFB002EBD349B00FE4E45 = {
-						CreatedOnToolsVersion = 26.1;
-						TestTargetID = 0B0BFAF32EBD349600FE4E45;
-					};
-					0B0BFB0A2EBD349B00FE4E45 = {
 						CreatedOnToolsVersion = 26.1;
 						TestTargetID = 0B0BFAF32EBD349600FE4E45;
 					};
@@ -215,7 +166,6 @@
 			targets = (
 				0B0BFAF32EBD349600FE4E45 /* mailman */,
 				0B0BFB002EBD349B00FE4E45 /* mailmanTests */,
-				0B0BFB0A2EBD349B00FE4E45 /* mailmanUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -229,13 +179,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		0B0BFAFF2EBD349B00FE4E45 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0B0BFB092EBD349B00FE4E45 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -259,13 +202,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		0B0BFB072EBD349B00FE4E45 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -273,11 +209,6 @@
 			isa = PBXTargetDependency;
 			target = 0B0BFAF32EBD349600FE4E45 /* mailman */;
 			targetProxy = 0B0BFB022EBD349B00FE4E45 /* PBXContainerItemProxy */;
-		};
-		0B0BFB0D2EBD349B00FE4E45 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 0B0BFAF32EBD349600FE4E45 /* mailman */;
-			targetProxy = 0B0BFB0C2EBD349B00FE4E45 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -505,46 +436,6 @@
 			};
 			name = Release;
 		};
-		0B0BFB1C2EBD349B00FE4E45 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = F4H8GRP7M4;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ironham.mailmanUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = mailman;
-			};
-			name = Debug;
-		};
-		0B0BFB1D2EBD349B00FE4E45 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = F4H8GRP7M4;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ironham.mailmanUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = mailman;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -571,15 +462,6 @@
 			buildConfigurations = (
 				0B0BFB192EBD349B00FE4E45 /* Debug */,
 				0B0BFB1A2EBD349B00FE4E45 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		0B0BFB1B2EBD349B00FE4E45 /* Build configuration list for PBXNativeTarget "mailmanUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				0B0BFB1C2EBD349B00FE4E45 /* Debug */,
-				0B0BFB1D2EBD349B00FE4E45 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

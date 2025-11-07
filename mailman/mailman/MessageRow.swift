@@ -8,6 +8,12 @@ struct MessageRow: View {
       HStack {
         Text(message.senderName)
           .font(.headline)
+        if message.isFlagged {
+          Image(systemName: "flag.fill")
+            .font(.footnote)
+            .foregroundStyle(.orange)
+            .accessibilityLabel("Flagged")
+        }
         Spacer()
         Text(message.formattedReceivedAt)
           .font(.caption)
@@ -16,7 +22,7 @@ struct MessageRow: View {
 
       Text(message.subject)
         .font(.subheadline)
-        .fontWeight(.semibold)
+        .fontWeight(message.isUnread ? .semibold : .regular)
         .foregroundStyle(message.isUnread ? .primary : .secondary)
 
       Text(message.preview)

@@ -10,6 +10,7 @@ struct Mailbox: Identifiable, Hashable, Codable {
   var unreadCount: Int
 
   static let allInboxesID = "allInboxes"
+  static let sentID = "sent"
 }
 
 struct Message: Identifiable, Hashable, Codable {
@@ -42,27 +43,20 @@ final class MailStore: ObservableObject {
 
   @Published private(set) var mailboxes: [Mailbox]
   @Published private var messagesByMailbox: [Mailbox.ID: [Message]]
+  private let currentUser = (name: "You", email: "me@example.com")
 
-  private init(isPreview: Bool = false) {
+  private init() {
     let now = Date()
     let messages = Self.makeSampleMessages(anchor: now)
     self.messagesByMailbox = Dictionary(grouping: messages, by: { $0.mailboxID })
+    self.mailboxes = Self.makeSampleMailboxes()
 
-    var mailboxes = Self.makeSampleMailboxes()
-    for index in mailboxes.indices {
-      let id = mailboxes[index].id
-      let unread = Self.unreadCount(for: id, within: messages)
-      mailboxes[index].unreadCount = unread
-    }
-    if let aggregateIndex = mailboxes.firstIndex(where: { $0.id == Mailbox.allInboxesID }) {
-      let unread = messages.filter { $0.isUnread }.count
-      mailboxes[aggregateIndex].unreadCount = unread
-    }
-    self.mailboxes = mailboxes
+    ensureMessageStorageExistsForConfiguredMailboxes()
+    recalculateMailboxMetadata()
   }
 
   static func makePreviewStore() -> MailStore {
-    MailStore(isPreview: true)
+    MailStore()
   }
 
   var defaultMailbox: Mailbox? {
@@ -76,7 +70,9 @@ final class MailStore: ObservableObject {
   func messages(for mailbox: Mailbox?) -> [Message] {
     guard let mailbox else { return [] }
     if mailbox.id == Mailbox.allInboxesID {
-      return messagesByMailbox.values
+      return messagesByMailbox
+        .filter { $0.key != Mailbox.sentID }
+        .values
         .flatMap { $0 }
         .sorted(by: { $0.receivedAt > $1.receivedAt })
     } else {
@@ -91,10 +87,68 @@ final class MailStore: ObservableObject {
       .first(where: { $0.id == id })
   }
 
-  private static func unreadCount(for mailboxID: Mailbox.ID, within messages: [Message]) -> Int {
-    messages
-      .filter { $0.mailboxID == mailboxID && $0.isUnread }
-      .count
+  enum DraftError: LocalizedError, Equatable {
+    case missingRecipients
+    case invalidAddress(String)
+
+    var errorDescription: String? {
+      switch self {
+      case .missingRecipients:
+        "Add at least one valid email address."
+      case .invalidAddress(let address):
+        "\(address) doesn’t look like a valid email address."
+      }
+    }
+  }
+
+  func sendDraft(to rawTo: String, cc rawCc: String, subject rawSubject: String, body rawBody: String)
+    async throws
+  {
+    let toRecipients = try parseRecipients(from: rawTo, allowEmpty: false)
+    let ccRecipients = try parseRecipients(from: rawCc, allowEmpty: true)
+
+    // Mirror the async shape of a real network call to reinforce structured concurrency.
+    if #available(iOS 17.0, *) {
+      try await Task.sleep(for: .milliseconds(250))
+    } else {
+      try await Task.sleep(nanoseconds: 250_000_000)
+    }
+
+    let normalizedSubject = rawSubject.trimmingCharacters(in: .whitespacesAndNewlines)
+    let normalizedBody = rawBody.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    let newMessage = Message(
+      id: UUID(),
+      mailboxID: Mailbox.sentID,
+      senderName: currentUser.name,
+      senderEmail: currentUser.email,
+      subject: normalizedSubject.isEmpty ? "(No Subject)" : normalizedSubject,
+      preview: Self.makePreviewText(from: normalizedBody),
+      body: Self.composeBody(
+        to: toRecipients,
+        cc: ccRecipients,
+        originalBody: normalizedBody
+      ),
+      receivedAt: Date(),
+      isUnread: false,
+      isFlagged: false
+    )
+
+    messagesByMailbox[Mailbox.sentID, default: []].insert(newMessage, at: 0)
+    recalculateMailboxMetadata()
+  }
+
+  func setMessage(_ id: Message.ID, isUnread: Bool) {
+    mutateMessage(id: id) { message, mailboxID in
+      guard message.isUnread != isUnread else { return }
+      message.isUnread = isUnread
+    }
+  }
+
+  func toggleFlag(for id: Message.ID) {
+    mutateMessage(id: id) { message, _ in
+      message.isFlagged.toggle()
+    }
   }
 
   private static func makeSampleMailboxes() -> [Mailbox] {
@@ -108,6 +162,7 @@ final class MailStore: ObservableObject {
       Mailbox(id: "icloud", displayName: "iCloud", icon: "icloud", unreadCount: 0),
       Mailbox(id: "gmail", displayName: "Gmail", icon: "envelope", unreadCount: 0),
       Mailbox(id: "vip", displayName: "VIP", icon: "star", unreadCount: 0),
+      Mailbox(id: Mailbox.sentID, displayName: "Sent", icon: "paperplane", unreadCount: 0),
     ]
   }
 
@@ -211,10 +266,107 @@ final class MailStore: ObservableObject {
         isUnread: true,
         isFlagged: true
       ),
+      Message(
+        id: UUID(),
+        mailboxID: Mailbox.sentID,
+        senderName: "You",
+        senderEmail: "me@example.com",
+        subject: "Mailman onboarding notes",
+        preview: "Recapping the talking points for the next Mailman walkthrough...",
+        body: Self.makeBody(
+          intro: "Hi Team,",
+          paragraphs: [
+            "Thanks for joining the walkthrough earlier today.",
+            "Attached is the latest deck along with a summary of open action items.",
+          ],
+          outro: "Best,\nYou"
+        ),
+        receivedAt: now.addingTimeInterval(-60 * 60 * 12),
+        isUnread: false,
+        isFlagged: false
+      ),
     ]
   }
 
   private static func makeBody(intro: String, paragraphs: [String], outro: String) -> String {
     ([intro] + paragraphs + [outro]).joined(separator: "\n\n")
+  }
+
+  private static func makePreviewText(from body: String) -> String {
+    guard !body.isEmpty else { return "No additional details." }
+    return body
+      .split(separator: "\n")
+      .first
+      .map(String.init) ?? body
+  }
+
+  private static func composeBody(to recipients: [String], cc: [String], originalBody: String) -> String {
+    var headerLines: [String] = ["To: \(recipients.joined(separator: ", "))"]
+    if !cc.isEmpty {
+      headerLines.append("Cc: \(cc.joined(separator: ", "))")
+    }
+
+    let trimmedBody = originalBody.isEmpty ? "(No Message Body)" : originalBody
+    return ([headerLines.joined(separator: "\n")] + ["", trimmedBody]).joined(separator: "\n")
+  }
+
+  private func parseRecipients(from string: String, allowEmpty: Bool) throws -> [String] {
+    let separators = CharacterSet(charactersIn: ",;\n")
+    let components = string
+      .components(separatedBy: separators)
+      .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+      .filter { !$0.isEmpty }
+
+    if components.isEmpty {
+      if allowEmpty {
+        return []
+      } else {
+        throw DraftError.missingRecipients
+      }
+    }
+
+    for address in components {
+      if address.contains(" ") || !address.contains("@") {
+        throw DraftError.invalidAddress(address)
+      }
+    }
+
+    return components
+  }
+
+  private func ensureMessageStorageExistsForConfiguredMailboxes() {
+    for mailbox in mailboxes where mailbox.id != Mailbox.allInboxesID {
+      messagesByMailbox[mailbox.id] = messagesByMailbox[mailbox.id, default: []]
+    }
+  }
+
+  private func recalculateMailboxMetadata() {
+    let aggregateMessages = messagesByMailbox
+      .filter { $0.key != Mailbox.sentID }
+      .values
+      .flatMap { $0 }
+
+    for index in mailboxes.indices {
+      let mailboxID = mailboxes[index].id
+      if mailboxID == Mailbox.allInboxesID {
+        mailboxes[index].unreadCount = aggregateMessages.filter(\.isUnread).count
+      } else {
+        let mailboxMessages = messagesByMailbox[mailboxID, default: []]
+        mailboxes[index].unreadCount = mailboxMessages.filter(\.isUnread).count
+      }
+    }
+  }
+
+  private func mutateMessage(id: Message.ID, mutation: (inout Message, Mailbox.ID) -> Void) {
+    for mailboxID in Array(messagesByMailbox.keys) {
+      guard var messages = messagesByMailbox[mailboxID],
+        let index = messages.firstIndex(where: { $0.id == id })
+      else { continue }
+
+      mutation(&messages[index], mailboxID)
+      messagesByMailbox[mailboxID] = messages
+      recalculateMailboxMetadata()
+      return
+    }
   }
 }
