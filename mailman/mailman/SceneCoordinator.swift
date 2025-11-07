@@ -57,11 +57,7 @@ enum SceneCoordinator {
 
   private static func makeActivationOptions() -> UIWindowScene.ActivationRequestOptions {
     let options = UIWindowScene.ActivationRequestOptions()
-    if #available(iOS 17.0, *) {
-      options.placement = .prominent()
-    } else {
-      options.preferredPresentationStyle = .prominent
-    }
+    options.placement = .prominent()
     if let requester = activeWindowScene() {
       options.requestingScene = requester
     }
