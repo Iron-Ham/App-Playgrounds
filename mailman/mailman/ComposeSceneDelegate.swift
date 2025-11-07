@@ -1,8 +1,18 @@
 import SwiftUI
 import UIKit
 
-final class ComposeSceneDelegate: UIResponder, UIWindowSceneDelegate {
-  var window: UIWindow?
+final class ComposeSceneDelegate: NSObject, UIHostingSceneDelegate {
+  static var rootScene: some Scene {
+    WindowGroup("New Message", id: SceneActivityType.compose) {
+      ComposeView()
+        .environmentObject(MailStore.shared)
+    }
+    .commands {
+      TextEditingCommands()
+    }
+    .windowResizability(.contentMinSize)
+    .defaultSize(width: 420, height: 520)
+  }
 
   func scene(
     _ scene: UIScene,
@@ -10,21 +20,6 @@ final class ComposeSceneDelegate: UIResponder, UIWindowSceneDelegate {
     options connectionOptions: UIScene.ConnectionOptions
   ) {
     guard let windowScene = scene as? UIWindowScene else { return }
-
-    let closeScene = { SceneCoordinator.destroy(scene: windowScene) }
-
-    let rootView = ComposeView(onClose: closeScene)
-      .environmentObject(MailStore.shared)
-
-    let hostingController = UIHostingController(rootView: rootView)
-    hostingController.view.backgroundColor = .systemBackground
-    hostingController.sizingOptions = .intrinsicContentSize
-
-    let window = UIWindow(windowScene: windowScene)
-    window.rootViewController = hostingController
-    window.backgroundColor = .systemBackground
-    window.makeKeyAndVisible()
-    self.window = window
     windowScene.title = "New Message"
   }
 

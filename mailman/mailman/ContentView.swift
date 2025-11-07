@@ -241,7 +241,7 @@ struct ContentView: View {
   }
 
   private func composeSheet() -> some View {
-    ComposeView(onClose: { isShowingComposeSheet = false })
+    ComposeView()
       .environmentObject(store)
   }
 }

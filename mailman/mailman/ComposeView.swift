@@ -2,8 +2,8 @@ import SwiftUI
 import UIKit
 
 struct ComposeView: View {
+  @Environment(\.dismiss) private var dismiss
   @EnvironmentObject private var store: MailStore
-  var onClose: () -> Void = {}
   @State private var toField: String = ""
   @State private var ccField: String = ""
   @State private var subject: String = ""
@@ -81,7 +81,7 @@ struct ComposeView: View {
   private var toolbar: some ToolbarContent {
     if UIDevice.current.userInterfaceIdiom == .phone {
       ToolbarItem(placement: .navigationBarLeading) {
-        Button("Cancel") { onClose() }
+        Button("Cancel") { dismiss() }
           .disabled(isSending)
       }
     }
@@ -123,7 +123,7 @@ struct ComposeView: View {
         await MainActor.run {
           resetForm()
           isSending = false
-          onClose()
+          dismiss()
         }
       } catch {
         await MainActor.run {

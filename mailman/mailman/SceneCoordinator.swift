@@ -1,4 +1,4 @@
-import UIKit
+import SwiftUI
 
 enum SceneActivityType {
   static let message = "com.ironham.mailman.message"
@@ -17,9 +17,19 @@ enum SceneCoordinator {
 
   static func activateComposeScene() {
     guard canActivateAdditionalScenes else { return }
-    let activity = NSUserActivity(activityType: SceneActivityType.compose)
-    activity.title = "New Message"
-    requestScene(with: activity)
+    guard var request = UISceneSessionActivationRequest(
+      hostingDelegateClass: ComposeSceneDelegate.self,
+      id: SceneActivityType.compose
+    ) else {
+      assertionFailure("Unable to build compose scene activation request")
+      return
+    }
+
+    request.options = makeActivationOptions()
+
+    Task { @MainActor in
+      UIApplication.shared.activateSceneSession(for: request)
+    }
   }
 
   static func activateMessageScene(for messageID: Message.ID) {
@@ -46,12 +56,11 @@ enum SceneCoordinator {
   private static func requestScene(with activity: NSUserActivity) {
     Task { @MainActor in
       let options = makeActivationOptions()
-      UIApplication.shared.requestSceneSessionActivation(
-        nil,
+      let request = UISceneSessionActivationRequest(
         userActivity: activity,
-        options: options,
-        errorHandler: nil
+        options: options
       )
+      UIApplication.shared.activateSceneSession(for: request)
     }
   }
 
