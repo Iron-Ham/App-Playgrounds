@@ -17,10 +17,12 @@ enum SceneCoordinator {
 
   static func activateComposeScene() {
     guard canActivateAdditionalScenes else { return }
-    guard var request = UISceneSessionActivationRequest(
-      hostingDelegateClass: ComposeSceneDelegate.self,
-      id: SceneActivityType.compose
-    ) else {
+    guard
+      var request = UISceneSessionActivationRequest(
+        hostingDelegateClass: ComposeSceneDelegate.self,
+        id: SceneActivityType.compose
+      )
+    else {
       assertionFailure("Unable to build compose scene activation request")
       return
     }
