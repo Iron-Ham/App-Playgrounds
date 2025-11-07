@@ -2,11 +2,13 @@ import SwiftUI
 
 struct ContentView: View {
   @EnvironmentObject private var store: MailStore
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
   @State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
   @SceneStorage("ContentView.selectedMailboxID") private var selectedMailboxID: Mailbox.ID?
   @SceneStorage("ContentView.selectedMessageID") private var selectedMessageID: String?
   @State private var isShowingComposeSheet = false
+  @State private var isInspectorPresented = false
 
   private var selectedMailbox: Mailbox? {
     guard let id = selectedMailboxID else { return nil }
@@ -33,6 +35,11 @@ struct ContentView: View {
     .task { configureInitialSelectionIfNeeded() }
     .onChange(of: selectedMailboxID) { _, newValue in
       updateSelection(for: newValue)
+    }
+    .onChange(of: selectedMessageID) { _, newValue in
+      if newValue == nil {
+        isInspectorPresented = false
+      }
     }
     .sheet(isPresented: $isShowingComposeSheet) {
       composeSheet()
@@ -125,6 +132,35 @@ struct ContentView: View {
       }
     }
     .background(Color(uiColor: .systemBackground))
+    .inspector(isPresented: $isInspectorPresented) {
+      Group {
+        if let message = selectedMessage {
+          MessageInspectorView(message: message)
+        } else {
+          ContentUnavailableView(
+            "No Message Selected",
+            systemImage: "sidebar.trailing",
+            description: Text("Pick a message to view its details.")
+          )
+        }
+      }
+      .environmentObject(store)
+      .presentationDragIndicator(.visible)
+      .presentationDetents([.medium, .large])
+      .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+      .presentationBackground(.thinMaterial)
+
+      .toolbar {
+        Button {
+          isInspectorPresented.toggle()
+        } label: {
+          Label(
+            isInspectorPresented ? "Hide Inspector" : "Show Inspector",
+            systemImage: "info.circle"
+          )
+        }
+      }
+    }
   }
 
   @ToolbarContentBuilder
@@ -151,7 +187,7 @@ struct ContentView: View {
       }
     }
     ToolbarSpacer(.flexible)
-    ToolbarItem {
+    ToolbarItem(placement: .primaryAction) {
       Button {
         if SceneCoordinator.canActivateAdditionalScenes {
           SceneCoordinator.activateComposeScene()

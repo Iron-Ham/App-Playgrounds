@@ -60,7 +60,7 @@ struct ComposeView: View {
         textContentType: .emailAddress,
         keyboardType: .emailAddress
       )
-        .focused($focusedField, equals: .to)
+      .focused($focusedField, equals: .to)
       Divider()
       ComposeField(
         title: "Cc/Bcc",
@@ -68,7 +68,7 @@ struct ComposeView: View {
         textContentType: .emailAddress,
         keyboardType: .emailAddress
       )
-        .focused($focusedField, equals: .cc)
+      .focused($focusedField, equals: .cc)
       Divider()
       ComposeField(title: "Subject", text: $subject)
         .focused($focusedField, equals: .subject)

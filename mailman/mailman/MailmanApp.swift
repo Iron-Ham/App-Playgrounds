@@ -31,5 +31,9 @@ struct MailmanApp: App {
       ContentView()
         .environmentObject(MailStore.shared)
     }
+    .commands {
+      InspectorCommands()
+      SidebarCommands()
+    }
   }
 }

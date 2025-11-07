@@ -70,7 +70,8 @@ final class MailStore: ObservableObject {
   func messages(for mailbox: Mailbox?) -> [Message] {
     guard let mailbox else { return [] }
     if mailbox.id == Mailbox.allInboxesID {
-      return messagesByMailbox
+      return
+        messagesByMailbox
         .filter { $0.key != Mailbox.sentID }
         .values
         .flatMap { $0 }
@@ -101,7 +102,12 @@ final class MailStore: ObservableObject {
     }
   }
 
-  func sendDraft(to rawTo: String, cc rawCc: String, subject rawSubject: String, body rawBody: String)
+  func sendDraft(
+    to rawTo: String,
+    cc rawCc: String,
+    subject rawSubject: String,
+    body rawBody: String
+  )
     async throws
   {
     let toRecipients = try parseRecipients(from: rawTo, allowEmpty: false)
@@ -290,13 +296,16 @@ final class MailStore: ObservableObject {
 
   private static func makePreviewText(from body: String) -> String {
     guard !body.isEmpty else { return "No additional details." }
-    return body
+    return
+      body
       .split(separator: "\n")
       .first
       .map(String.init) ?? body
   }
 
-  private static func composeBody(to recipients: [String], cc: [String], originalBody: String) -> String {
+  private static func composeBody(to recipients: [String], cc: [String], originalBody: String)
+    -> String
+  {
     var headerLines: [String] = ["To: \(recipients.joined(separator: ", "))"]
     if !cc.isEmpty {
       headerLines.append("Cc: \(cc.joined(separator: ", "))")
@@ -308,7 +317,8 @@ final class MailStore: ObservableObject {
 
   private func parseRecipients(from string: String, allowEmpty: Bool) throws -> [String] {
     let separators = CharacterSet(charactersIn: ",;\n")
-    let components = string
+    let components =
+      string
       .components(separatedBy: separators)
       .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
       .filter { !$0.isEmpty }
@@ -321,10 +331,8 @@ final class MailStore: ObservableObject {
       }
     }
 
-    for address in components {
-      if address.contains(" ") || !address.contains("@") {
-        throw DraftError.invalidAddress(address)
-      }
+    for address in components where address.contains(" ") || !address.contains("@") {
+      throw DraftError.invalidAddress(address)
     }
 
     return components
@@ -337,7 +345,8 @@ final class MailStore: ObservableObject {
   }
 
   private func recalculateMailboxMetadata() {
-    let aggregateMessages = messagesByMailbox
+    let aggregateMessages =
+      messagesByMailbox
       .filter { $0.key != Mailbox.sentID }
       .values
       .flatMap { $0 }
