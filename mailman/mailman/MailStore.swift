@@ -108,11 +108,7 @@ final class MailStore: ObservableObject {
     let ccRecipients = try parseRecipients(from: rawCc, allowEmpty: true)
 
     // Mirror the async shape of a real network call to reinforce structured concurrency.
-    if #available(iOS 17.0, *) {
-      try await Task.sleep(for: .milliseconds(250))
-    } else {
-      try await Task.sleep(nanoseconds: 250_000_000)
-    }
+    try await Task.sleep(for: .milliseconds(250))
 
     let normalizedSubject = rawSubject.trimmingCharacters(in: .whitespacesAndNewlines)
     let normalizedBody = rawBody.trimmingCharacters(in: .whitespacesAndNewlines)
