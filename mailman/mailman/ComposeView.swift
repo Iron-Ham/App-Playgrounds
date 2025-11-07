@@ -7,7 +7,7 @@ struct ComposeView: View {
   @State private var toField: String = ""
   @State private var ccField: String = ""
   @State private var subject: String = ""
-  @State private var messageBody: String = ""
+  @State private var messageBody: AttributedString = ""
   @State private var isSending = false
   @State private var alert: ComposeAlert?
   @FocusState private var focusedField: Field?

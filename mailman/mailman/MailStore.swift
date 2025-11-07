@@ -20,7 +20,7 @@ struct Message: Identifiable, Hashable, Codable {
   var senderEmail: String
   var subject: String
   var preview: String
-  var body: String
+  var body: AttributedString
   var receivedAt: Date
   var isUnread: Bool
   var isFlagged: Bool
@@ -106,7 +106,7 @@ final class MailStore: ObservableObject {
     to rawTo: String,
     cc rawCc: String,
     subject rawSubject: String,
-    body rawBody: String
+    body rawBody: AttributedString
   )
     async throws
   {
@@ -117,7 +117,7 @@ final class MailStore: ObservableObject {
     try await Task.sleep(for: .milliseconds(250))
 
     let normalizedSubject = rawSubject.trimmingCharacters(in: .whitespacesAndNewlines)
-    let normalizedBody = rawBody.trimmingCharacters(in: .whitespacesAndNewlines)
+    let normalizedBody = Self.trimmedBody(rawBody)
 
     let newMessage = Message(
       id: UUID(),
@@ -290,29 +290,68 @@ final class MailStore: ObservableObject {
     ]
   }
 
-  private static func makeBody(intro: String, paragraphs: [String], outro: String) -> String {
-    ([intro] + paragraphs + [outro]).joined(separator: "\n\n")
-  }
-
-  private static func makePreviewText(from body: String) -> String {
-    guard !body.isEmpty else { return "No additional details." }
-    return
-      body
-      .split(separator: "\n")
-      .first
-      .map(String.init) ?? body
-  }
-
-  private static func composeBody(to recipients: [String], cc: [String], originalBody: String)
-    -> String
+  private static func makeBody(intro: String, paragraphs: [String], outro: String)
+    -> AttributedString
   {
+    var result = AttributedString()
+    let segments = [intro] + paragraphs + [outro]
+
+    for (index, segment) in segments.enumerated() {
+      if index > 0 {
+        result.append(AttributedString("\n\n"))
+      }
+      result.append(AttributedString(segment))
+    }
+
+    return result
+  }
+
+  private static func makePreviewText(from body: AttributedString) -> String {
+    let plain = String(body.characters)
+    guard !plain.isEmpty else { return "No additional details." }
+    return plain.split(separator: "\n").first.map(String.init) ?? plain
+  }
+
+  private static func trimmedBody(_ body: AttributedString) -> AttributedString {
+    var trimmed = body
+
+    while let first = trimmed.characters.first, isWhitespaceOrNewline(first) {
+      let next = trimmed.index(afterCharacter: trimmed.startIndex)
+      trimmed.removeSubrange(trimmed.startIndex..<next)
+    }
+
+    while let last = trimmed.characters.last, isWhitespaceOrNewline(last) {
+      let before = trimmed.index(beforeCharacter: trimmed.endIndex)
+      trimmed.removeSubrange(before..<trimmed.endIndex)
+    }
+
+    return trimmed
+  }
+
+  private static func isWhitespaceOrNewline(_ character: Character) -> Bool {
+    character.isWhitespace || character.isNewline
+  }
+
+  private static func composeBody(
+    to recipients: [String],
+    cc: [String],
+    originalBody: AttributedString
+  ) -> AttributedString {
     var headerLines: [String] = ["To: \(recipients.joined(separator: ", "))"]
     if !cc.isEmpty {
       headerLines.append("Cc: \(cc.joined(separator: ", "))")
     }
 
-    let trimmedBody = originalBody.isEmpty ? "(No Message Body)" : originalBody
-    return ([headerLines.joined(separator: "\n")] + ["", trimmedBody]).joined(separator: "\n")
+    var composed = AttributedString(headerLines.joined(separator: "\n"))
+    composed.append(AttributedString("\n\n"))
+
+    if originalBody.characters.isEmpty {
+      composed.append(AttributedString("(No Message Body)"))
+    } else {
+      composed.append(originalBody)
+    }
+
+    return composed
   }
 
   private func parseRecipients(from string: String, allowEmpty: Bool) throws -> [String] {

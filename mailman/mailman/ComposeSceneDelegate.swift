@@ -9,6 +9,7 @@ final class ComposeSceneDelegate: NSObject, UIHostingSceneDelegate {
     }
     .commands {
       TextEditingCommands()
+      TextFormattingCommands()
     }
     .windowResizability(.contentMinSize)
     .defaultSize(width: 420, height: 520)
