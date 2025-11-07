@@ -3,7 +3,7 @@ import SwiftUI
 struct ContentView: View {
   @EnvironmentObject private var store: MailStore
 
-  @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
+  @State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
   @State private var selectedMailbox: Mailbox?
   @State private var selectedMessage: Message?
   @State private var isShowingComposeSheet = false
